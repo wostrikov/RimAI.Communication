@@ -10,8 +10,11 @@
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
         <RimWorldDir Condition=" '$(RimWorldDir)' == '' ">$(RIMWORLD_DIR)</RimWorldDir>
+        <RimWorldWorkshopDir Condition=" '$(RimWorldWorkshopDir)' == '' ">$(RIMWORLD_WORKSHOP_DIR)</RimWorldWorkshopDir>
+        <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimTalk\bin\</BaseOutputPath>
+        <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimTalk\obj\</BaseIntermediateOutputPath>
 
-        <OutputPath>$(GameVersion)/Assemblies</OutputPath>
+        <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
         <ModFolderName>RimTalk</ModFolderName>
         <LangVersion>default</LangVersion>
         <EnableBubbles>true</EnableBubbles>
@@ -64,7 +67,7 @@
     <!-- Include External Libraries -->
     <ItemGroup>
         <Reference Include="Bubbles" Condition=" '$(EnableBubbles)' == 'true' ">
-            <HintPath>Libs/Bubbles.dll</HintPath>
+            <HintPath>$(RimWorldWorkshopDir)\1516158345\Assemblies\Bubbles.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="Scriban">
