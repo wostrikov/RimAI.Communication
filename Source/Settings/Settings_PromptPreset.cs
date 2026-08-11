@@ -272,7 +272,7 @@ public partial class Settings
                 Widgets.Checkbox(new Vector2(4f, ey + 4f), ref en, 16f);
                 entry.Enabled = en;
 
-                if (Widgets.ButtonText(new Rect(24f, ey, eViewRect.width - 48f, 24f), entry.Name, false))
+                if (Widgets.ButtonText(new Rect(24f, ey, eViewRect.width - 48f, 24f), LocalizePromptEntryName(entry.Name), false))
                     _selectedEntryId = entry.Id;
 
                 if (!isHistoryMarker)
@@ -407,7 +407,7 @@ public partial class Settings
         if (isHistoryMarker)
         {
             GUI.enabled = false;
-            Widgets.TextField(new Rect(inputX, y, inputWidth, 24f), e.Name);
+            Widgets.TextField(new Rect(inputX, y, inputWidth, 24f), LocalizePromptEntryName(e.Name));
             GUI.enabled = true;
         }
         else
@@ -683,6 +683,22 @@ public partial class Settings
 
             if (Event.current.rawType == EventType.MouseUp) _isDraggingHoriz = false;
         }
+    }
+
+    private static string LocalizePromptEntryName(string internalName)
+    {
+        return internalName switch
+        {
+            "Base Instruction" => "RimTalk.PromptEntry.BaseInstruction".Translate(),
+            "EA Action Schema" => "RimTalk.PromptEntry.EAActionSchema".Translate(),
+            "Схема дій EA" => "RimTalk.PromptEntry.EAActionSchema".Translate(),
+            "JSON Format" => "RimTalk.PromptEntry.JsonFormat".Translate(),
+            "Pawn Profiles" => "RimTalk.PromptEntry.PawnProfiles".Translate(),
+            "Chat History" => "RimTalk.PromptEntry.ChatHistory".Translate(),
+            "Memory & Knowledge Context" => "RimTalk.PromptEntry.MemoryKnowledge".Translate(),
+            "Dialogue Prompt" => "RimTalk.PromptEntry.DialoguePrompt".Translate(),
+            _ => internalName
+        };
     }
 
     private void UpdateSmartFilter(string text)

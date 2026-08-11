@@ -280,6 +280,14 @@ public class RimTalkSettings : ModSettings
         // Migration Logic for Simple Mode Instruction
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
+            string languageFolder = LanguageDatabase.activeLanguage?.folderName ?? string.Empty;
+            static string NormalizePrompt(string value) => (value ?? string.Empty).Replace("\r\n", "\n").Trim();
+            if (languageFolder.StartsWith("Ukrainian", StringComparison.OrdinalIgnoreCase) &&
+                NormalizePrompt(SimpleModeInstruction) == NormalizePrompt(Constant.LegacyEnglishDefaultInstruction))
+            {
+                SimpleModeInstruction = Constant.DefaultInstruction;
+            }
+
             // 1. Recover from Preset (Reverse Migration)
             // If SimpleModeInstruction is default, but we have a custom instruction in the preset, pull it back.
             if (string.IsNullOrWhiteSpace(SimpleModeInstruction) || SimpleModeInstruction == Constant.DefaultInstruction)

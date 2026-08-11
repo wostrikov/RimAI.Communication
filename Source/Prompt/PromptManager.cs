@@ -333,11 +333,38 @@ public class PromptManager : IExposable
 
                 preset.Entries.RemoveAll(e =>
                     string.Equals(e.Name, "Legacy Custom Instruction", StringComparison.OrdinalIgnoreCase));
+
+                MigrateUnchangedEnglishDefaultsToUkrainian(preset);
             }
         }
         
         // Don't initialize defaults here - game systems may not be ready
         // Defaults will be initialized lazily when needed
+    }
+
+    private static void MigrateUnchangedEnglishDefaultsToUkrainian(PromptPreset preset)
+    {
+        string languageFolder = LanguageDatabase.activeLanguage?.folderName ?? string.Empty;
+        if (!languageFolder.StartsWith("Ukrainian", StringComparison.OrdinalIgnoreCase)) return;
+
+        static string Normalize(string value) => (value ?? string.Empty).Replace("\r\n", "\n").Trim();
+
+        var baseEntry = preset.Entries.FirstOrDefault(e =>
+            string.Equals(e.Name, "Base Instruction", StringComparison.OrdinalIgnoreCase));
+        if (baseEntry != null && Normalize(baseEntry.Content) == Normalize(Constant.LegacyEnglishDefaultInstruction))
+        {
+            baseEntry.Content = Constant.DefaultInstruction;
+        }
+
+        var jsonEntry = preset.Entries.FirstOrDefault(e =>
+            string.Equals(e.Name, "JSON Format", StringComparison.OrdinalIgnoreCase));
+        string oldJson = Constant.LegacyEnglishJsonInstruction + "\n{{ if settings.ApplyMoodAndSocialEffects }}\n" +
+                         Constant.LegacyEnglishSocialInstruction + "\n{{ end }}";
+        if (jsonEntry != null && Normalize(jsonEntry.Content) == Normalize(oldJson))
+        {
+            jsonEntry.Content = Constant.JsonInstruction + "\n{{ if settings.ApplyMoodAndSocialEffects }}\n" +
+                                Constant.SocialInstruction + "\n{{ end }}";
+        }
     }
 
     /// <summary>Sets the singleton instance (for loading settings)</summary>

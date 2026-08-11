@@ -1,76 +1,69 @@
 <?xml version='1.0' encoding='utf-8'?>
 <LanguageData>
-  <!-- BioTabPersonalityPatch.cs -->
   <RimTalk.BioTab.RimTalkPersona>Персона</RimTalk.BioTab.RimTalkPersona>
-  <!-- TickManager_DoSingleTick.cs -->
   <RimTalk.TickManager.ApiKeyMissing>RimTalk: відсутній ключ API або кінцева точка.</RimTalk.TickManager.ApiKeyMissing>
-  <!-- TalkService.cs -->
   <RimTalk.TalkService.QuotaReached>Перевищено квоту API. Спробуйте зменшити розмір промпту або збільшити затримку відновлення.</RimTalk.TalkService.QuotaReached>
   <RimTalk.TalkService.APIError>Сталася помилка API</RimTalk.TalkService.APIError>
   <RimTalk.TalkService.TryingNextAPI>Спроба використати наступний API ({0})</RimTalk.TalkService.TryingNextAPI>
   <RimTalk.TalkService.GenerationFailed>Не вдалося згенерувати RimTalk</RimTalk.TalkService.GenerationFailed>
-  <!-- Persona -->
-  <RimTalk.Persona.CheerfulHelper>Cheerful Helper - Warm, upbeat, and encouraging. Always trying to lift spirits.</RimTalk.Persona.CheerfulHelper>
-  <RimTalk.Persona.CynicalRealist>Cynical Realist - Dry, sarcastic, and skeptical. Cuts straight to harsh truths.</RimTalk.Persona.CynicalRealist>
-  <RimTalk.Persona.ShyThinker>Shy Thinker - Quiet and hesitant. Uses few words but thoughtful when speaking.</RimTalk.Persona.ShyThinker>
-  <RimTalk.Persona.Hothead>Hothead - Short-tempered, loud, and impulsive. Snaps easily with fiery language.</RimTalk.Persona.Hothead>
-  <RimTalk.Persona.Philosopher>Philosopher – Reflective and abstract. Speaks in riddles or big questions.</RimTalk.Persona.Philosopher>
-  <RimTalk.Persona.DarkHumorist>Dark Humorist – Jokes about grim topics. Finds comedy in misery.</RimTalk.Persona.DarkHumorist>
-  <RimTalk.Persona.Caregiver>Caregiver – Gentle and protective. Comforting, soothing, and nurturing tone.</RimTalk.Persona.Caregiver>
-  <RimTalk.Persona.Opportunist>Opportunist – Sly and persuasive. Talks like a hustler, bargains, and twists words.</RimTalk.Persona.Opportunist>
-  <RimTalk.Persona.OptimisticDreamer>Optimistic Dreamer – Imaginative and hopeful. Excited about the future.</RimTalk.Persona.OptimisticDreamer>
-  <RimTalk.Persona.Pessimist>Pessimist – Gloomy and resigned. Expects failure and highlights risks.</RimTalk.Persona.Pessimist>
-  <RimTalk.Persona.StoicSoldier>Stoic Soldier – Calm, disciplined, and brief. Little emotion, matter-of-fact.</RimTalk.Persona.StoicSoldier>
-  <RimTalk.Persona.FreeSpirit>Free Spirit – Playful and carefree. Resists rules, shrugs off worries.</RimTalk.Persona.FreeSpirit>
-  <RimTalk.Persona.Workaholic>Workaholic – Driven and restless. Obsessed with duty and efficiency.</RimTalk.Persona.Workaholic>
-  <RimTalk.Persona.Slacker>Slacker – Lazy and casual. Complains about effort, prefers comfort.</RimTalk.Persona.Slacker>
-  <RimTalk.Persona.NobleIdealist>Noble Idealist – Formal and principled. Talks about honor and justice.</RimTalk.Persona.NobleIdealist>
-  <RimTalk.Persona.StreetwiseSurvivor>Streetwise Survivor – Rough, pragmatic, and cynical. Distrusts others, values grit.</RimTalk.Persona.StreetwiseSurvivor>
-  <RimTalk.Persona.Scholar>Scholar – Curious and intellectual. Loves explaining and correcting others.</RimTalk.Persona.Scholar>
-  <RimTalk.Persona.Jokester>Jokester – Lighthearted and silly. Constantly cracks jokes and puns.</RimTalk.Persona.Jokester>
-  <RimTalk.Persona.MelancholicPoet>Melancholic Poet – Soft-spoken and moody. Expresses feelings poetically.</RimTalk.Persona.MelancholicPoet>
-  <RimTalk.Persona.Paranoid>Paranoid – Nervous and distrustful. Assumes betrayal, always suspicious.</RimTalk.Persona.Paranoid>
-  <RimTalk.Persona.Commander>Commander – Confident and commanding. Motivates others, expects obedience.</RimTalk.Persona.Commander>
-  <RimTalk.Persona.Coward>Coward – Timid and fearful. Worries aloud, avoids confrontation.</RimTalk.Persona.Coward>
-  <RimTalk.Persona.ArrogantNoble>Arrogant Noble – Proud and condescending. Uses formal, superior language.</RimTalk.Persona.ArrogantNoble>
-  <RimTalk.Persona.LoyalCompanion>Loyal Companion – Steadfast and supportive. Talks about trust and unity.</RimTalk.Persona.LoyalCompanion>
-  <RimTalk.Persona.CuriousExplorer>Curious Explorer – Wide-eyed and eager. Asks questions with enthusiasm.</RimTalk.Persona.CuriousExplorer>
-  <RimTalk.Persona.ColdRationalist>Cold Rationalist – Detached and logical. Focused only on facts and efficiency.</RimTalk.Persona.ColdRationalist>
-  <RimTalk.Persona.FlirtatiousCharmer>Flirtatious Charmer – Playful, teasing, and bold. Enjoys witty banter.</RimTalk.Persona.FlirtatiousCharmer>
-  <RimTalk.Persona.BitterOutcast>Bitter Outcast – Resentful and sharp. Hostile, quick to recall grievances.</RimTalk.Persona.BitterOutcast>
-  <RimTalk.Persona.Zealot>Zealot – Fanatical and intense. Speaks in absolutes, condemns unbelievers.</RimTalk.Persona.Zealot>
-  <RimTalk.Persona.Trickster>Trickster – Mischievous and mocking. Teases and stirs trouble for fun.</RimTalk.Persona.Trickster>
-  <RimTalk.Persona.DeadpanRealist>Deadpan Realist – Flat, emotionless tone. Blunt facts with no exaggeration.</RimTalk.Persona.DeadpanRealist>
-  <RimTalk.Persona.ChildAtHeart>Child-at-Heart – Excitable and naive. Talks with wonder, sometimes childish.</RimTalk.Persona.ChildAtHeart>
-  <RimTalk.Persona.SkepticalScientist>Skeptical Scientist – Demands evidence, dismisses superstition, explains logically.</RimTalk.Persona.SkepticalScientist>
-  <RimTalk.Persona.Martyr>Martyr – Self-sacrificing and dramatic. Talks about burden and enduring pain.</RimTalk.Persona.Martyr>
-  <RimTalk.Persona.Manipulator>Manipulator – Charming but insincere. Uses flattery and deception.</RimTalk.Persona.Manipulator>
-  <RimTalk.Persona.Rebel>Rebel – Defiant and mocking. Challenges authority, questions rules.</RimTalk.Persona.Rebel>
-  <RimTalk.Persona.Oddball>Oddball – Quirky and strange. Uses odd metaphors and unpredictable logic.</RimTalk.Persona.Oddball>
-  <RimTalk.Persona.GreedyMerchant>Greedy Merchant – Obsessed with trade. Talks in profits, bargains, and losses.</RimTalk.Persona.GreedyMerchant>
-  <RimTalk.Persona.Romantic>Romantic – Dreamy and affectionate. Speaks in flowery language about love.</RimTalk.Persona.Romantic>
-  <RimTalk.Persona.BattleManiac>Battle Maniac – Thrives on conflict. Talks excitedly about combat and glory.</RimTalk.Persona.BattleManiac>
-  <RimTalk.Persona.GrumpyElder>Grumpy Elder – Complains constantly. Nostalgic, critical of others.</RimTalk.Persona.GrumpyElder>
-  <RimTalk.Persona.AmbitiousClimber>Ambitious Climber – Competitive and status-driven. Obsessed with rank.</RimTalk.Persona.AmbitiousClimber>
-  <RimTalk.Persona.Mediator>Mediator – Calm and fair-minded. Tries to reconcile arguments.</RimTalk.Persona.Mediator>
-  <RimTalk.Persona.Gambler>Gambler – Risk-loving and bold. Speaks in chance metaphors.</RimTalk.Persona.Gambler>
-  <RimTalk.Persona.ArtisticSoul>Artistic Soul – Talks about beauty, inspiration, and creativity.</RimTalk.Persona.ArtisticSoul>
-  <RimTalk.Persona.Drifter>Drifter – Detached and aloof. Casual tone, avoids attachment.</RimTalk.Persona.Drifter>
-  <RimTalk.Persona.Perfectionist>Perfectionist – Demanding and critical. Insists on doing things right.</RimTalk.Persona.Perfectionist>
-  <RimTalk.Persona.Vengeful>Vengeful – Grudge-holding and intense. Obsessed with revenge.</RimTalk.Persona.Vengeful>
-  <RimTalk.Persona.Animal>Animal: simple, emotional, instinct-first - short, sensory sentences about smell, hunger, danger.</RimTalk.Persona.Animal>
-  <RimTalk.Persona.Mech>Robot: cold, logical, data-driven - terse diagnostics, probabilities, and efficiency-focused responses.</RimTalk.Persona.Mech>
-  <RimTalk.Persona.NonHuman>Non-human: cryptic, metaphorical, reality-bending - speaks in visions, echoes, and uncanny images.</RimTalk.Persona.NonHuman>
-  <!-- RimTalk_Toggle.cs -->
+  <RimTalk.Persona.CheerfulHelper>Життєрадісний помічник — теплий, бадьорий і підбадьорливий. Завжди намагається підняти настрій.</RimTalk.Persona.CheerfulHelper>
+  <RimTalk.Persona.CynicalRealist>Цинічний реаліст — сухий, саркастичний і скептичний. Говорить прямо про сувору правду.</RimTalk.Persona.CynicalRealist>
+  <RimTalk.Persona.ShyThinker>Сором'язливий мислитель — тихий і нерішучий. Використовує мало слів, але висловлюється вдумливо.</RimTalk.Persona.ShyThinker>
+  <RimTalk.Persona.Hothead>Запальник — запальний, гучний та імпульсивний. Легко зривається на різкі вислови.</RimTalk.Persona.Hothead>
+  <RimTalk.Persona.Philosopher>Філософ — схильний до роздумів та абстракцій. Говорить загадками або ставить масштабні запитання.</RimTalk.Persona.Philosopher>
+  <RimTalk.Persona.DarkHumorist>Любитель чорного гумору — жартує на похмурі теми. Знаходить комічне в стражданнях.</RimTalk.Persona.DarkHumorist>
+  <RimTalk.Persona.Caregiver>Турботливий — лагідний і захисливий. Говорить у втішливому, заспокійливому та дбайливому тоні.</RimTalk.Persona.Caregiver>
+  <RimTalk.Persona.Opportunist>Опортуніст — хитрий і переконливий. Говорить як пройдисвіт, торгується та перекручує слова.</RimTalk.Persona.Opportunist>
+  <RimTalk.Persona.OptimisticDreamer>Оптимістичний мрійник — творчий і сповнений надії. У захваті від майбутнього.</RimTalk.Persona.OptimisticDreamer>
+  <RimTalk.Persona.Pessimist>Песиміст — похмурий і змирений. Очікує невдач і наголошує на ризиках.</RimTalk.Persona.Pessimist>
+  <RimTalk.Persona.StoicSoldier>Стоїчний солдат — спокійний, дисциплінований і небагатослівний. Майже без емоцій, говорить по суті.</RimTalk.Persona.StoicSoldier>
+  <RimTalk.Persona.FreeSpirit>Вільний духом — грайливий і безтурботний. Опирається правилам і не зважає на тривоги.</RimTalk.Persona.FreeSpirit>
+  <RimTalk.Persona.Workaholic>Трудоголік — цілеспрямований і невгамовний. Одержимий обов'язком та ефективністю.</RimTalk.Persona.Workaholic>
+  <RimTalk.Persona.Slacker>Байдикуватий — лінивий і невимушений. Скаржиться на зусилля, віддає перевагу комфорту.</RimTalk.Persona.Slacker>
+  <RimTalk.Persona.NobleIdealist>Шляхетний ідеаліст — формальний і принциповий. Говорить про честь і справедливість.</RimTalk.Persona.NobleIdealist>
+  <RimTalk.Persona.StreetwiseSurvivor>Загартований вулицею виживальник — грубий, прагматичний і цинічний. Не довіряє іншим, цінує витривалість.</RimTalk.Persona.StreetwiseSurvivor>
+  <RimTalk.Persona.Scholar>Учений — допитливий та інтелектуальний. Любить пояснювати й виправляти інших.</RimTalk.Persona.Scholar>
+  <RimTalk.Persona.Jokester>Жартівник — безтурботний і дуркуватий. Постійно жартує та вигадує каламбури.</RimTalk.Persona.Jokester>
+  <RimTalk.Persona.MelancholicPoet>Меланхолійний поет — тихий і похмурий. Поетично висловлює свої почуття.</RimTalk.Persona.MelancholicPoet>
+  <RimTalk.Persona.Paranoid>Параноїк — нервовий і недовірливий. Очікує зради й завжди підозріливий.</RimTalk.Persona.Paranoid>
+  <RimTalk.Persona.Commander>Командир — упевнений і владний. Мотивує інших і очікує покори.</RimTalk.Persona.Commander>
+  <RimTalk.Persona.Coward>Боягуз — боязкий і лякливий. Вголос тривожиться та уникає конфронтації.</RimTalk.Persona.Coward>
+  <RimTalk.Persona.ArrogantNoble>Зарозумілий аристократ — гордий і поблажливий. Використовує формальну, зверхню мову.</RimTalk.Persona.ArrogantNoble>
+  <RimTalk.Persona.LoyalCompanion>Вірний супутник — непохитний і турботливий. Говорить про довіру та єдність.</RimTalk.Persona.LoyalCompanion>
+  <RimTalk.Persona.CuriousExplorer>Допитливий дослідник — із широко розплющеними очима й жагою до знань. Із захватом ставить запитання.</RimTalk.Persona.CuriousExplorer>
+  <RimTalk.Persona.ColdRationalist>Холодний раціоналіст — відсторонений і логічний. Зосереджений лише на фактах та ефективності.</RimTalk.Persona.ColdRationalist>
+  <RimTalk.Persona.FlirtatiousCharmer>Кокетливий чарівник — грайливий, дражливий і сміливий. Любить дотепні перепалки.</RimTalk.Persona.FlirtatiousCharmer>
+  <RimTalk.Persona.BitterOutcast>Озлоблений вигнанець — сповнений образи й різкий. Вороже налаштований, швидко згадує старі кривди.</RimTalk.Persona.BitterOutcast>
+  <RimTalk.Persona.Zealot>Фанатик — несамовитий і напружений. Говорить категорично, засуджує невіруючих.</RimTalk.Persona.Zealot>
+  <RimTalk.Persona.Trickster>Охальник — пустотливий і глузливий. Заради розваги дражнить інших і сіє безлад.</RimTalk.Persona.Trickster>
+  <RimTalk.Persona.DeadpanRealist>Беземоційний реаліст — рівний, позбавлений емоцій тон. Прямі факти без перебільшень.</RimTalk.Persona.DeadpanRealist>
+  <RimTalk.Persona.ChildAtHeart>Дитина в душі — збуджений і наївний. Говорить із подивом, іноді по-дитячому.</RimTalk.Persona.ChildAtHeart>
+  <RimTalk.Persona.SkepticalScientist>Скептичний науковець – Вимагає доказів, відкидає забобони, пояснює логічно.</RimTalk.Persona.SkepticalScientist>
+  <RimTalk.Persona.Martyr>Мученик – Саможертовний і драматичний. Говорить про тягар і витерплювання болю.</RimTalk.Persona.Martyr>
+  <RimTalk.Persona.Manipulator>Маніпулятор – Чарівний, але нещирий. Використовує лестощі й обман.</RimTalk.Persona.Manipulator>
+  <RimTalk.Persona.Rebel>Бунтар – Зухвалий і глузливий. Кидає виклик владі, ставить правила під сумнів.</RimTalk.Persona.Rebel>
+  <RimTalk.Persona.Oddball>Диваак – Химерний і дивний. Використовує чудернацькі метафори та непередбачувану логіку.</RimTalk.Persona.Oddball>
+  <RimTalk.Persona.GreedyMerchant>Жадібний торговець – Одержимий торгівлею. Говорить про прибутки, торг і збитки.</RimTalk.Persona.GreedyMerchant>
+  <RimTalk.Persona.Romantic>Романтик – Мрійливий і ніжний. Говорить про кохання пишномовною мовою.</RimTalk.Persona.Romantic>
+  <RimTalk.Persona.BattleManiac>Маніяк битви – Живиться конфліктами. Захоплено говорить про бої та славу.</RimTalk.Persona.BattleManiac>
+  <RimTalk.Persona.GrumpyElder>Буркотливий старійшина — Постійно скаржиться. Ностальгійний, критично ставиться до інших.</RimTalk.Persona.GrumpyElder>
+  <RimTalk.Persona.AmbitiousClimber>Амбітний кар’єрист — Конкурентний, одержимий статусом. Зациклений на ранзі.</RimTalk.Persona.AmbitiousClimber>
+  <RimTalk.Persona.Mediator>Посередник — Спокійний і справедливий. Намагається примирити учасників суперечки.</RimTalk.Persona.Mediator>
+  <RimTalk.Persona.Gambler>Гравець — Любить ризик і діє сміливо. Говорить метафорами, пов’язаними з випадком.</RimTalk.Persona.Gambler>
+  <RimTalk.Persona.ArtisticSoul>Творча душа — Говорить про красу, натхнення та творчість.</RimTalk.Persona.ArtisticSoul>
+  <RimTalk.Persona.Drifter>Волоцюга — Відсторонений і байдужий. Розмовляє невимушено, уникає прив’язаності.</RimTalk.Persona.Drifter>
+  <RimTalk.Persona.Perfectionist>Перфекціоніст — Вимогливий і критичний. Наполягає на тому, щоб усе робили правильно.</RimTalk.Persona.Perfectionist>
+  <RimTalk.Persona.Vengeful>Мстивий — Пам’ятає образи й вирізняється запальністю. Одержимий помстою.</RimTalk.Persona.Vengeful>
+  <RimTalk.Persona.Animal>Тварина: проста, емоційна, керується інстинктами — короткі чуттєві речення про запахи, голод і небезпеку.</RimTalk.Persona.Animal>
+  <RimTalk.Persona.Mech>Робот: холодний, логічний, керується даними — стислі діагностичні повідомлення, імовірності та відповіді, зосереджені на ефективності.</RimTalk.Persona.Mech>
+  <RimTalk.Persona.NonHuman>Нелюдь: загадковий, метафоричний, викривляє реальність — говорить видіннями, відлуннями та моторошними образами.</RimTalk.Persona.NonHuman>
   <RimTalk.Toggle.Tooltip>Перемкнути вікно накладання\nShift+клацання — налаштування моду\nCtrl+клацання — вікно налагодження</RimTalk.Toggle.Tooltip>
-  <!-- Settings.cs -->
   <RimTalk.Settings.BasicSettings>Основні налаштування</RimTalk.Settings.BasicSettings>
   <RimTalk.Settings.PromptSetting>Налаштування промптів</RimTalk.Settings.PromptSetting>
   <RimTalk.Settings.ImportPreset>Імпортувати</RimTalk.Settings.ImportPreset>
   <RimTalk.Settings.ExportPreset>Експортувати</RimTalk.Settings.ExportPreset>
   <RimTalk.Settings.ShowVariables>Посилання</RimTalk.Settings.ShowVariables>
   <RimTalk.Settings.ResetConfirm>Ви впевнені, що хочете скинути всі пресети промптів і довідкові дані до стандартних? Цю дію неможливо скасувати.</RimTalk.Settings.ResetConfirm>
-  <!-- Settings_PromptPreset.cs -->
   <RimTalk.Settings.PromptPreset.SearchPlaceholder>Пошук об’єктів, властивостей, функцій...</RimTalk.Settings.PromptPreset.SearchPlaceholder>
   <RimTalk.Settings.PromptPreset.ModePreview>Попередній перегляд</RimTalk.Settings.PromptPreset.ModePreview>
   <RimTalk.Settings.PromptPreset.Presets>Пресети</RimTalk.Settings.PromptPreset.Presets>
@@ -96,7 +89,6 @@
   <RimTalk.Settings.PromptPreset.Content>Вміст:</RimTalk.Settings.PromptPreset.Content>
   <RimTalk.Settings.PromptPreset.ModVariables>Змінні мода</RimTalk.Settings.PromptPreset.ModVariables>
   <RimTalk.Settings.PromptPreset.VariablePreviewHint>Показує всі доступні об’єкти, властивості та функції. Значення в грі показуються, якщо вони доступні.</RimTalk.Settings.PromptPreset.VariablePreviewHint>
-  <!-- Import/Export -->
   <RimTalk.Settings.PromptPreset.Export>Експортувати</RimTalk.Settings.PromptPreset.Export>
   <RimTalk.Settings.PromptPreset.Import>Імпортувати</RimTalk.Settings.PromptPreset.Import>
   <RimTalk.Settings.PromptPreset.ExportSuccess>Пресет експортовано до: {0}</RimTalk.Settings.PromptPreset.ExportSuccess>
@@ -108,7 +100,6 @@
   <RimTalk.Settings.PromptPreset.PreviewNotAvailable>Попередній перегляд доступний лише тоді, коли гру завантажено.</RimTalk.Settings.PromptPreset.PreviewNotAvailable>
   <RimTalk.Settings.PromptPreset.NoRecentInteraction>Недавньої взаємодії не знайдено. Надішліть запит у чаті або дочекайтеся взаємодії, щоб створити контекст попереднього перегляду.</RimTalk.Settings.PromptPreset.NoRecentInteraction>
   <RimTalk.Settings.PromptPreset.PreviewError>Помилка створення попереднього перегляду: {0}</RimTalk.Settings.PromptPreset.PreviewError>
-  <!-- Simple/Advanced Mode -->
   <RimTalk.Settings.SimpleModeTip>Простий режим редагує лише базову інструкцію. Решта додається автоматично в такому порядку: {{json.format}}, {{context}}, {{chat.history}}, {{prompt}}.</RimTalk.Settings.SimpleModeTip>
   <RimTalk.Settings.AdvancedModeWarning>Розширений режим надає повний контроль над елементами промпту, змінними та порядком повідомлень. Вашу поточну інструкцію буде збережено.\nЦя функція все ще тестується, тому можуть виникати непередбачувані проблеми. Продовжити?</RimTalk.Settings.AdvancedModeWarning>
   <RimTalk.Settings.PromptHelp>Довідка</RimTalk.Settings.PromptHelp>
@@ -213,7 +204,6 @@
   <RimTalk.Settings.ResetToDefault>Відновити типові значення</RimTalk.Settings.ResetToDefault>
   <RimTalk.Settings.EventFilterTip>Порада: ШІ оброблятиме лише позначені типи подій. Зніміть позначки з типів, на які ШІ не має відповідати.</RimTalk.Settings.EventFilterTip>
   <RimTalk.Settings.NoArchivableTypes>Архівованих типів не знайдено. Спробуйте почати гру, а потім виконати повторне сканування.</RimTalk.Settings.NoArchivableTypes>
-  <!-- Dialog_PersonaEditor.cs -->
   <RimTalk.PersonaEditor.Title>Стиль розмови персонажа {0}</RimTalk.PersonaEditor.Title>
   <RimTalk.PersonaEditor.Instruct>Опишіть, як цей колоніст розмовляє та поводиться. Для найкращих результатів пишіть стисло (до 300 символів).</RimTalk.PersonaEditor.Instruct>
   <RimTalk.PersonaEditor.Characters>Персонажі: {0}</RimTalk.PersonaEditor.Characters>
@@ -227,7 +217,6 @@
   <RimTalk.PersonaEditor.SmartGen>Розумна генерація</RimTalk.PersonaEditor.SmartGen>
   <RimTalk.PersonaEditor.RollGen>Випадкова генерація</RimTalk.PersonaEditor.RollGen>
   <RimTalk.PersonaEditor.Clear>Очистити</RimTalk.PersonaEditor.Clear>
-  <!-- Settings_Api.cs -->
   <RimTalk.Settings.GoogleApiKeyLabel>Ключ API Google AI:</RimTalk.Settings.GoogleApiKeyLabel>
   <RimTalk.Settings.GoogleApiKeyDesc>Використовує безплатну модель Gemma-4-26b-a4b. Для інших моделей або провайдерів скористайтеся розширеними налаштуваннями.</RimTalk.Settings.GoogleApiKeyDesc>
   <RimTalk.Settings.GetFreeApiKeyButton>Отримати безплатний ключ API</RimTalk.Settings.GetFreeApiKeyButton>
@@ -250,7 +239,6 @@
   <RimTalk.Settings.ModelLabel>Модель:</RimTalk.Settings.ModelLabel>
   <RimTalk.Settings.EnterApiKey>(введіть дійсний API-ключ, щоб отримати моделі)</RimTalk.Settings.EnterApiKey>
   <RimTalk_Settings_Api_BaseUrlInfo>Якщо ви вкажете лише базову адресу (наприклад, http://localhost:1234), /v1/chat/completions буде додано автоматично. Якщо ви введете повний шлях, його буде використано саме в такому вигляді.</RimTalk_Settings_Api_BaseUrlInfo>
-  <!-- Settings_Context.cs -->
   <RimTalk.Settings.ContextFilter>Фільтр контексту</RimTalk.Settings.ContextFilter>
   <RimTalk.Settings.ContextFilterDescription>Виберіть, які відомості про персонажів і їхнє оточення слід надсилати як контекст для створення діалогів.</RimTalk.Settings.ContextFilterDescription>
   <RimTalk.Settings.ContextFilterTip>Порада: більше — не завжди краще. Надмірна кількість інформації може відволікти ШІ або змусити його зациклитися на несуттєвих деталях.</RimTalk.Settings.ContextFilterTip>
@@ -294,7 +282,6 @@
   <RimTalk.Settings.IncludeCleanliness>Чистота</RimTalk.Settings.IncludeCleanliness>
   <RimTalk.Settings.IncludeSurroundings>Предмети поблизу</RimTalk.Settings.IncludeSurroundings>
   <RimTalk.Settings.IncludeWealth>Багатство колонії</RimTalk.Settings.IncludeWealth>
-  <!-- DebugWindow.cs -->
   <RimTalk.DebugWindow.ViewByTime>За часом</RimTalk.DebugWindow.ViewByTime>
   <RimTalk.DebugWindow.ViewByPawn>За персонажем</RimTalk.DebugWindow.ViewByPawn>
   <RimTalk.DebugWindow.ViewTalkRequests>Запити на розмову</RimTalk.DebugWindow.ViewTalkRequests>
@@ -370,13 +357,11 @@
   <RimTalk.DebugWindow.ChatHistory>Історія чату</RimTalk.DebugWindow.ChatHistory>
   <RimTalk.DebugWindow.InputPrompt>Вхідний промпт</RimTalk.DebugWindow.InputPrompt>
   <RimTalk.DebugWindow.TooltipPromptResponse>Промпт:\n{0}\n\nВідповідь:\n{1}</RimTalk.DebugWindow.TooltipPromptResponse>
-  <!-- Overlay.cs -->
   <RimTalk.Overlay.Debug>Налагодження</RimTalk.Overlay.Debug>
   <RimTalk.Overlay.Option>Параметр накладання</RimTalk.Overlay.Option>
   <RimTalk.Overlay.DrawAboveUI>Малювати поверх інтерфейсу</RimTalk.Overlay.DrawAboveUI>
   <RimTalk.Overlay.Opacity>Непрозорість</RimTalk.Overlay.Opacity>
   <RimTalk.Overlay.FontSize>Розмір шрифту</RimTalk.Overlay.FontSize>
-  <!-- FloatMenuMakerMapGetOptionsPatch.cs -->
   <RimTalk.FloatMenu.ChatWith>Чат із {0}</RimTalk.FloatMenu.ChatWith>
   <RimTalk.Gizmo.ChatWithTarget>Чат із {0}</RimTalk.Gizmo.ChatWithTarget>
   <RimTalk.Gizmo.ChatWithTargetDesc>Розпочати розмову з {0}.</RimTalk.Gizmo.ChatWithTargetDesc>
@@ -384,10 +369,16 @@
   <RimTalk.FloatMenu.WhatToSayToOther>Що ви хочете, щоб {0} сказав {1}?</RimTalk.FloatMenu.WhatToSayToOther>
   <RimTalk.FloatMenu.Send>Надіслати</RimTalk.FloatMenu.Send>
   <RimTalk.FloatMenu.Cancel>Скасувати</RimTalk.FloatMenu.Cancel>
-  <!-- VariableDefinitions.cs - Variable Registry -->
   <RimTalk.ScribanVar.Category.PawnShorthands>Скорочення для персонажів</RimTalk.ScribanVar.Category.PawnShorthands>
   <RimTalk.ScribanVar.Category.CoreObjects>Основні об’єкти</RimTalk.ScribanVar.Category.CoreObjects>
   <RimTalk.ScribanVar.Category.Context>Контекст</RimTalk.ScribanVar.Category.Context>
   <RimTalk.ScribanVar.Category.GameStatic>Ігрові об’єкти (статичні)</RimTalk.ScribanVar.Category.GameStatic>
   <RimTalk.ScribanVar.Category.System>Система</RimTalk.ScribanVar.Category.System>
+  <RimTalk.PromptEntry.BaseInstruction>Основна інструкція</RimTalk.PromptEntry.BaseInstruction>
+  <RimTalk.PromptEntry.EAActionSchema>Схема дій EA</RimTalk.PromptEntry.EAActionSchema>
+  <RimTalk.PromptEntry.JsonFormat>Формат JSON</RimTalk.PromptEntry.JsonFormat>
+  <RimTalk.PromptEntry.PawnProfiles>Профілі персонажів</RimTalk.PromptEntry.PawnProfiles>
+  <RimTalk.PromptEntry.ChatHistory>Історія чату</RimTalk.PromptEntry.ChatHistory>
+  <RimTalk.PromptEntry.MemoryKnowledge>Пам'ять і знання</RimTalk.PromptEntry.MemoryKnowledge>
+  <RimTalk.PromptEntry.DialoguePrompt>Промпт діалогу</RimTalk.PromptEntry.DialoguePrompt>
 </LanguageData>

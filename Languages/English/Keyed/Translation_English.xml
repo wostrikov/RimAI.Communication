@@ -415,4 +415,11 @@ Crucial Tips:
     <RimTalk.ScribanVar.Category.Context>Context</RimTalk.ScribanVar.Category.Context>
     <RimTalk.ScribanVar.Category.GameStatic>Game Objects (Static)</RimTalk.ScribanVar.Category.GameStatic>
     <RimTalk.ScribanVar.Category.System>System</RimTalk.ScribanVar.Category.System>
+    <RimTalk.PromptEntry.BaseInstruction>Base Instruction</RimTalk.PromptEntry.BaseInstruction>
+    <RimTalk.PromptEntry.EAActionSchema>EA Action Schema</RimTalk.PromptEntry.EAActionSchema>
+    <RimTalk.PromptEntry.JsonFormat>JSON Format</RimTalk.PromptEntry.JsonFormat>
+    <RimTalk.PromptEntry.PawnProfiles>Pawn Profiles</RimTalk.PromptEntry.PawnProfiles>
+    <RimTalk.PromptEntry.ChatHistory>Chat History</RimTalk.PromptEntry.ChatHistory>
+    <RimTalk.PromptEntry.MemoryKnowledge>Memory &amp; Knowledge</RimTalk.PromptEntry.MemoryKnowledge>
+    <RimTalk.PromptEntry.DialoguePrompt>Dialogue Prompt</RimTalk.PromptEntry.DialoguePrompt>
 </LanguageData>

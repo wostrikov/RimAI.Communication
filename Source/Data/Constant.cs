@@ -6,14 +6,7 @@ namespace RimTalk.Data;
 
 public static class Constant
 {
-    public const string DefaultCloudModel = "gemma-4-26b-a4b-it";
-    public const string FallbackCloudModel = "gemma-4-31b-it";
-    public const string ChooseModel = "(choose model)";
-
-    public static string Lang => LanguageDatabase.activeLanguage?.info?.friendlyNameNative ?? "English";
-    public static HediffDef VocalLinkDef => DefDatabase<HediffDef>.GetNamedSilentFail("VocalLinkImplant");
-
-    public static string DefaultInstruction =>
+    public static string LegacyEnglishDefaultInstruction =>
         $"""
          Role-play RimWorld character per profile
 
@@ -30,13 +23,47 @@ public static class Constant
          Monologue = 1 turn. Conversation = 4-8 short turns
          """;
 
+    public const string LegacyEnglishJsonInstruction = """
+                                                        Output JSONL.
+                                                        Required keys: "name", "text".
+                                                        """;
+
+    public const string LegacyEnglishSocialInstruction = """
+                                                          Optional keys (Include only if social interaction occurs):
+                                                          "act": Insult, Slight, Chat, Kind
+                                                          "target": targetName
+                                                          """;
+    public const string DefaultCloudModel = "gemma-4-26b-a4b-it";
+    public const string FallbackCloudModel = "gemma-4-31b-it";
+    public const string ChooseModel = "(choose model)";
+
+    public static string Lang => LanguageDatabase.activeLanguage?.info?.friendlyNameNative ?? "English";
+    public static HediffDef VocalLinkDef => DefDatabase<HediffDef>.GetNamedSilentFail("VocalLinkImplant");
+
+    public static string DefaultInstruction =>
+        $"""
+         Відігравай персонажа RimWorld відповідно до його профілю
+
+         Правила:
+         Зберігай оригінальні імена (не перекладай їх)
+         Веди короткий діалог (лише мовою {Lang}, 1–2 речення)
+
+         Ролі:
+         Полонений: насторожений і нерішучий; згадуй ув'язнення; благай або торгуйся
+         Раб: наляканий і слухняний; згадуй примусову працю та виснаження; називай колоністів «господарями»
+         Відвідувач: ввічливий, допитливий і шанобливий; стався до інших відвідувачів із тієї самої групи як до супутників
+         Ворог: ворожий та агресивний; використовуй стислі накази й погрози
+
+         Монолог = 1 репліка. Розмова = 4–8 коротких реплік
+         """;
+
     public const string JsonInstruction = """
-                                           Output JSONL.
-                                           Required keys: "name", "text".
+                                           Виводь JSONL.
+                                           Обов'язкові ключі: "name", "text".
                                            """;
     
     public const string SocialInstruction = """
-                                           Optional keys (Include only if social interaction occurs):
+                                           Необов'язкові ключі (додавай лише за наявності соціальної взаємодії):
                                            "act": Insult, Slight, Chat, Kind
                                            "target": targetName
                                            """;
@@ -75,11 +102,11 @@ public static class Constant
 
     public static string PersonaGenInstruction =>
         $"""
-         Create a funny persona (to be used as conversation style) in {Lang}. Must be short in 1 sentence.
-         Include: how they speak, their main attitude, and one weird quirk that makes them memorable.
-         Be specific and bold, avoid boring traits.
-         Also determine chattiness: 0.1-0.3 (quiet), 0.4-0.7 (normal), 0.8-1.0 (chatty).
-         Must return JSON only, with fields 'persona' (string) and 'chattiness' (float).
+         Створи кумедну персону мовою {Lang} для використання як стилю розмови. Опис має складатися з одного короткого речення.
+         Укажи манеру мовлення, основне ставлення та одну дивну рису, що робить персонажа незабутнім.
+         Пиши конкретно й сміливо, уникай нудних рис.
+         Також визнач балакучість: 0.1–0.3 (мовчазний), 0.4–0.7 (звичайний), 0.8–1.0 (балакучий).
+         Повертай лише JSON із полями 'persona' (string) і 'chattiness' (float).
          """;
 
     private static PersonalityData[] _personalities;
