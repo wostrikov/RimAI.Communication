@@ -344,9 +344,6 @@ public class PromptManager : IExposable
 
     private static void MigrateUnchangedEnglishDefaultsToUkrainian(PromptPreset preset)
     {
-        string languageFolder = LanguageDatabase.activeLanguage?.folderName ?? string.Empty;
-        if (!languageFolder.StartsWith("Ukrainian", StringComparison.OrdinalIgnoreCase)) return;
-
         static string Normalize(string value) => (value ?? string.Empty).Replace("\r\n", "\n").Trim();
 
         var baseEntry = preset.Entries.FirstOrDefault(e =>

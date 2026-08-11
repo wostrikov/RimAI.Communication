@@ -280,12 +280,12 @@ public class RimTalkSettings : ModSettings
         // Migration Logic for Simple Mode Instruction
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            string languageFolder = LanguageDatabase.activeLanguage?.folderName ?? string.Empty;
             static string NormalizePrompt(string value) => (value ?? string.Empty).Replace("\r\n", "\n").Trim();
-            if (languageFolder.StartsWith("Ukrainian", StringComparison.OrdinalIgnoreCase) &&
-                NormalizePrompt(SimpleModeInstruction) == NormalizePrompt(Constant.LegacyEnglishDefaultInstruction))
+            bool migratedDefault = false;
+            if (NormalizePrompt(SimpleModeInstruction) == NormalizePrompt(Constant.LegacyEnglishDefaultInstruction))
             {
                 SimpleModeInstruction = Constant.DefaultInstruction;
+                migratedDefault = true;
             }
 
             // 1. Recover from Preset (Reverse Migration)
@@ -306,6 +306,9 @@ public class RimTalkSettings : ModSettings
                 SimpleModeInstruction = CustomInstruction;
                 CustomInstruction = "";
             }
+
+            if (migratedDefault)
+                LongEventHandler.ExecuteWhenFinished(Write);
         }
 
         // Ensure we have at least one cloud config
