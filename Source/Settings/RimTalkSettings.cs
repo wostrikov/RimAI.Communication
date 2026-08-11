@@ -290,7 +290,8 @@ public class RimTalkSettings : ModSettings
 
             // 1. Recover from Preset (Reverse Migration)
             // If SimpleModeInstruction is default, but we have a custom instruction in the preset, pull it back.
-            if (string.IsNullOrWhiteSpace(SimpleModeInstruction) || SimpleModeInstruction == Constant.DefaultInstruction)
+            if (!migratedDefault &&
+                (string.IsNullOrWhiteSpace(SimpleModeInstruction) || SimpleModeInstruction == Constant.DefaultInstruction))
             {
                 var preset = PromptSystem.GetActivePreset();
                 var entry = GetOrCreateBaseInstructionEntry(preset);
