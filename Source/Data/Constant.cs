@@ -1,4 +1,6 @@
 using System;
+using System.Security.Cryptography;
+using System.Text;
 using RimTalk.Prompt;
 using Verse;
 
@@ -6,6 +8,8 @@ namespace RimTalk.Data;
 
 public static class Constant
 {
+    private const string UkrainianLegacyDefaultSha256 = "A7DE62B0FFA691ED0B9FAD337BB5F8C02B4A1A60A0087143BD541F796FCA4694";
+
     public static string LegacyEnglishDefaultInstruction =>
         $"""
          Role-play RimWorld character per profile
@@ -22,6 +26,17 @@ public static class Constant
 
          Monologue = 1 turn. Conversation = 4-8 short turns
          """;
+
+    public static bool IsLegacyDefaultInstruction(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        static string Normalize(string text) => (text ?? string.Empty).Replace("\r\n", "\n").Trim();
+        string normalized = Normalize(value);
+        if (normalized == Normalize(LegacyEnglishDefaultInstruction)) return true;
+        using var sha = SHA256.Create();
+        string hash = BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(normalized))).Replace("-", "");
+        return string.Equals(hash, UkrainianLegacyDefaultSha256, StringComparison.Ordinal);
+    }
 
     public const string LegacyEnglishJsonInstruction = """
                                                         Output JSONL.

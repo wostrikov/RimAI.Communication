@@ -348,7 +348,7 @@ public class PromptManager : IExposable
 
         var baseEntry = preset.Entries.FirstOrDefault(e =>
             string.Equals(e.Name, "Base Instruction", StringComparison.OrdinalIgnoreCase));
-        if (baseEntry != null && Normalize(baseEntry.Content) == Normalize(Constant.LegacyEnglishDefaultInstruction))
+        if (baseEntry != null && Constant.IsLegacyDefaultInstruction(baseEntry.Content))
         {
             baseEntry.Content = Constant.DefaultInstruction;
         }

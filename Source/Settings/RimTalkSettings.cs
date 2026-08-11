@@ -280,9 +280,8 @@ public class RimTalkSettings : ModSettings
         // Migration Logic for Simple Mode Instruction
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            static string NormalizePrompt(string value) => (value ?? string.Empty).Replace("\r\n", "\n").Trim();
             bool migratedDefault = false;
-            if (NormalizePrompt(SimpleModeInstruction) == NormalizePrompt(Constant.LegacyEnglishDefaultInstruction))
+            if (Constant.IsLegacyDefaultInstruction(SimpleModeInstruction))
             {
                 SimpleModeInstruction = Constant.DefaultInstruction;
                 migratedDefault = true;
