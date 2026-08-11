@@ -1,4 +1,5 @@
 using RimTalk.Data;
+using RimTalk.Client.OpenAI;
 using Verse;
 
 namespace RimTalk;
@@ -16,7 +17,8 @@ public class ApiConfig : IExposable
     {
         Scribe_Values.Look(ref IsEnabled, "isEnabled", true);
         Scribe_Values.Look(ref Provider, "provider", AIProvider.Google);
-        Scribe_Values.Look(ref ApiKey, "apiKey", "");
+        if (Provider != AIProvider.OpenAI) Scribe_Values.Look(ref ApiKey, "apiKey", "");
+        else ApiKey = "";
         Scribe_Values.Look(ref SelectedModel, "selectedModel", Constant.DefaultCloudModel);
         Scribe_Values.Look(ref CustomModelName, "customModelName", "");
         Scribe_Values.Look(ref BaseUrl, "baseUrl", "");
@@ -32,7 +34,8 @@ public class ApiConfig : IExposable
             if (Provider == AIProvider.Player2)
                 return SelectedModel != Constant.ChooseModel;
                 
-            return !string.IsNullOrWhiteSpace(ApiKey) && SelectedModel != Constant.ChooseModel;
+            return (Provider == AIProvider.OpenAI ? OpenAIProviderAdapter.CredentialPresent : !string.IsNullOrWhiteSpace(ApiKey))
+                && SelectedModel != Constant.ChooseModel;
         }
         else
             return !string.IsNullOrWhiteSpace(BaseUrl);

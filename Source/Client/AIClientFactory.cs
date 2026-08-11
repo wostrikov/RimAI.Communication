@@ -44,6 +44,9 @@ public static class AIClientFactory
         // 1. Handle Special/Dynamic cases
         switch (config.Provider)
         {
+            case AIProvider.OpenAI:
+                return new OpenAIClient(OpenAIProviderAdapter.ResponsesEndpoint, model,
+                    OpenAIProviderAdapter.ResolveCredential(), officialOpenAI: true);
             case AIProvider.Player2: return await Player2Client.CreateAsync(config.ApiKey);
             case AIProvider.Local:   return new OpenAIClient(config.BaseUrl, config.CustomModelName);
             case AIProvider.Custom:  return new OpenAIClient(config.BaseUrl, config.CustomModelName, config.ApiKey);

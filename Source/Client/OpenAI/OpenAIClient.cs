@@ -16,7 +16,8 @@ public class OpenAIClient(
     string baseUrl,
     string model,
     string apiKey = null,
-    Dictionary<string, string> extraHeaders = null)
+    Dictionary<string, string> extraHeaders = null,
+    bool officialOpenAI = false)
     : IAIClient
 {
     private const string DefaultPath = "/v1/chat/completions";
@@ -38,13 +39,13 @@ public class OpenAIClient(
         List<(Role role, string message)> messages,
         Action<Payload> onRequestPrepared = null)
     {
-        string jsonContent = BuildRequestJson(prefixMessages, messages, stream: false);
+        string jsonContent = officialOpenAI ? BuildResponsesJson(prefixMessages, messages) : BuildRequestJson(prefixMessages, messages, stream: false);
         onRequestPrepared?.Invoke(new Payload(_endpointUrl, model, jsonContent, null, 0));
         string responseText = await SendRequestAsync(jsonContent, new DownloadHandlerBuffer());
 
-        var response = JsonUtil.DeserializeFromJson<OpenAIResponse>(responseText);
-        var content = response?.Choices?[0]?.Message?.Content;
-        var tokens = response?.Usage?.TotalTokens ?? 0;
+        var response = officialOpenAI ? null : JsonUtil.DeserializeFromJson<OpenAIResponse>(responseText);
+        var content = officialOpenAI ? OpenAIProviderAdapter.ParseOutputText(responseText) : response?.Choices?[0]?.Message?.Content;
+        var tokens = officialOpenAI ? ParseResponsesTotalTokens(responseText) : response?.Usage?.TotalTokens ?? 0;
 
         return new Payload(_endpointUrl, model, jsonContent, content, tokens);
     }
@@ -54,6 +55,12 @@ public class OpenAIClient(
         Action<T> onResponseParsed,
         Action<Payload> onRequestPrepared = null) where T : class
     {
+        if (officialOpenAI)
+        {
+            Payload result = await GetChatCompletionAsync(prefixMessages, messages, onRequestPrepared);
+            foreach (var parsed in new JsonStreamParser<T>().Parse(result.Response)) onResponseParsed?.Invoke(parsed);
+            return result;
+        }
         string jsonContent = BuildRequestJson(prefixMessages, messages, stream: true);
         onRequestPrepared?.Invoke(new Payload(_endpointUrl, model, jsonContent, null, 0));
         var jsonParser = new JsonStreamParser<T>();
@@ -68,6 +75,20 @@ public class OpenAIClient(
 
         return new Payload(_endpointUrl, model, jsonContent, streamHandler.GetFullText(),
             streamHandler.GetTotalTokens());
+    }
+
+    private string BuildResponsesJson(List<(Role role, string message)> prefixMessages, List<(Role role, string message)> messages)
+    {
+        var all = new List<(Role role, string message)>();
+        if (prefixMessages != null) all.AddRange(prefixMessages);
+        if (messages != null) all.AddRange(messages);
+        return OpenAIProviderAdapter.BuildRequest(model, all);
+    }
+
+    private static int ParseResponsesTotalTokens(string json)
+    {
+        var match = System.Text.RegularExpressions.Regex.Match(json ?? "", "\\\"total_tokens\\\"\\s*:\\s*(?<n>\\d+)");
+        return match.Success && int.TryParse(match.Groups["n"].Value, out int value) ? value : 0;
     }
 
     private string BuildRequestJson(List<(Role role, string message)> prefixMessages,
@@ -155,7 +176,7 @@ public class OpenAIClient(
             return null;
         }
 
-        Logger.Debug($"API request: {_endpointUrl}\n{jsonContent}");
+        Logger.Debug($"API request: {_endpointUrl}");
 
         using var webRequest = new UnityWebRequest(_endpointUrl, "POST");
         webRequest.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonContent));
@@ -248,10 +269,7 @@ public class OpenAIClient(
                 new Payload(_endpointUrl, model, jsonContent, responseText, 0, errorMsg));
         }
 
-        if (downloadHandler is DownloadHandlerBuffer)
-            Logger.Debug($"API response: \n{responseText}");
-        else if (downloadHandler is OpenAIStreamHandler sh)
-            Logger.Debug($"API response: \n{sh.GetRawJson()}");
+        Logger.Debug($"API response received: HTTP {webRequest.responseCode}");
 
         return responseText;
     }

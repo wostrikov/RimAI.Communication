@@ -394,6 +394,11 @@ public partial class Settings
     private void DrawApiKeyInput(float x, float y, float height, float width, ApiConfig config)
     {
         Rect apiKeyRect = new Rect(x, y, width, height);
+        if (config.Provider == AIProvider.OpenAI)
+        {
+            Widgets.Label(apiKeyRect, OpenAIProviderAdapter.CredentialDisplay);
+            return;
+        }
         config.ApiKey = DrawTextFieldWithPlaceholder(apiKeyRect, config.ApiKey, "Paste API Key...");
     }
 
@@ -416,7 +421,8 @@ public partial class Settings
     private void ShowModelSelectionMenu(ApiConfig config)
     {
         // Allow Player2 to work without API key (local app detection)
-        if (string.IsNullOrWhiteSpace(config.ApiKey) && config.Provider != AIProvider.Player2)
+        if ((config.Provider == AIProvider.OpenAI ? !OpenAIProviderAdapter.CredentialPresent : string.IsNullOrWhiteSpace(config.ApiKey))
+            && config.Provider != AIProvider.Player2)
         {
             Find.WindowStack.Add(new FloatMenu([new FloatMenuOption("RimTalk.Settings.EnterApiKey".Translate(), null)]));
             return;
@@ -454,7 +460,8 @@ public partial class Settings
         }
         else
         {
-            Task<List<string>> fetchTask = OpenAIClient.FetchModelsAsync(config.ApiKey, url);
+            string credential = config.Provider == AIProvider.OpenAI ? OpenAIProviderAdapter.ResolveCredential() : config.ApiKey;
+            Task<List<string>> fetchTask = OpenAIClient.FetchModelsAsync(credential, url);
 
             fetchTask.ContinueWith(task =>
             {

@@ -63,6 +63,9 @@
     <ItemGroup Condition=" '$(EnableBubbles)' == 'false' ">
         <Compile Remove="Source/Patch/BubblePatch.cs"/>
     </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="RimTalk.OpenAI.Tests/**/*.cs" />
+    </ItemGroup>
 
     <!-- Include External Libraries -->
     <ItemGroup>
