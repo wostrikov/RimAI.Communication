@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using RimTalk.API;
 using RimTalk.Data;
+using RimTalk.Source.Data;
 using RimTalk.Util;
 using RimWorld;
 using Verse;
@@ -147,8 +148,8 @@ public static class PromptService
         if (contextSettings.IncludeWealth)
             sb.Append($"\nWealth: {ApplyEnvironmentWithHook(mainPawn.Map, ContextCategories.Environment.Wealth, Describer.Wealth(mainPawn.Map.wealthWatcher.WealthTotal))}");
 
-        if (AIService.IsFirstInstruction())
-            sb.Append($"\nin {Constant.Lang}");
+        if (AIService.IsFirstInstruction() || talkRequest.TalkType == TalkType.User)
+            sb.Append($"\nRespond only in {Constant.Lang}.");
 
         talkRequest.Prompt = sb.ToString();
     }
