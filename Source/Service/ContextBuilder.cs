@@ -312,10 +312,11 @@ public static class ContextBuilder
 
         if (talkRequest.TalkType.IsFromUser())
         {
-            topicSb.Append($"{pawns[1].LabelShort}({pawns[1].GetRole()}) said to {shortName}: '{talkRequest.Prompt}'. ");
+            var speaker = pawns.Count > 1 ? pawns[1] : talkRequest.Initiator ?? mainPawn;
+            topicSb.Append($"{speaker.LabelShort}({speaker.GetRole()}) said to {shortName}: '{talkRequest.Prompt}'. ");
 
             var mode = Settings.Get().PlayerDialogueMode;
-            bool multiTurn = mode == Settings.PlayerDialogueMode.AIDriven || (!pawns[1].IsPlayer() && mode != Settings.PlayerDialogueMode.Manual);
+            bool multiTurn = mode == Settings.PlayerDialogueMode.AIDriven || (!speaker.IsPlayer() && mode != Settings.PlayerDialogueMode.Manual);
 
             intentSb.Append(multiTurn
                 ? $"Generate multi turn dialogues starting after this (do not repeat initial dialogue), beginning with {shortName}"
