@@ -6,6 +6,7 @@ using Ustas.RimAI.Communication.API;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Communication;
 using RimWorld;
 using Verse;
 using Verse.AI.Group;
@@ -23,6 +24,9 @@ public static class PromptService
 
     public static string BuildContext(List<Pawn> pawns)
     {
+        TalkLifecycle.PublishContextBuildStarted(pawns);
+        try
+        {
         var context = new StringBuilder();
     
         for (int i = 0; i < pawns.Count; i++)
@@ -38,7 +42,12 @@ public static class PromptService
             context.AppendLine($"[P{i + 1}]").AppendLine(pawnContext);
         }
 
-        return context.ToString().TrimEnd();
+            return context.ToString().TrimEnd();
+        }
+        finally
+        {
+            TalkLifecycle.PublishContextBuildCompleted();
+        }
     }
 
     /// <summary>Creates the basic pawn backstory section.</summary>
@@ -91,7 +100,7 @@ public static class PromptService
 
         // Stop here for invaders
         if (pawn.IsEnemy())
-            return sb.ToString();
+            return TalkLifecycle.TransformPawnContext(pawn, sb.ToString());
 
         AppendWithHook(sb, pawn, ContextCategories.Pawn.Mood, ContextBuilder.GetMoodContext(pawn, infoLevel));
         AppendWithHook(sb, pawn, ContextCategories.Pawn.Thoughts, ContextBuilder.GetThoughtsContext(pawn, infoLevel));
@@ -113,12 +122,13 @@ public static class PromptService
         if (infoLevel != InfoLevel.Short)
             AppendWithHook(sb, pawn, ContextCategories.Pawn.Equipment, ContextBuilder.GetEquipmentContext(pawn, infoLevel));
 
-        return sb.ToString();
+        return TalkLifecycle.TransformPawnContext(pawn, sb.ToString());
     }
 
     /// <summary>Decorates the prompt with dialogue type, time, weather, location, and environment.</summary>
     public static void DecoratePrompt(TalkRequest talkRequest, List<Pawn> pawns, string status)
     {
+        TalkLifecycle.PublishPromptDecorateStarted(pawns);
         var contextSettings = Settings.Get().Context;
         var sb = new StringBuilder();
         var gameData = CommonUtil.GetInGameData();
@@ -149,9 +159,15 @@ public static class PromptService
             sb.Append($"\nWealth: {ApplyEnvironmentWithHook(mainPawn.Map, ContextCategories.Environment.Wealth, Describer.Wealth(mainPawn.Map.wealthWatcher.WealthTotal))}");
 
         if (AIService.IsFirstInstruction() || talkRequest.TalkType == TalkType.User)
-            sb.Append($"\nRespond only in {Constant.Lang}.");
+        {
+            if (DialogueLanguage.TryGetDialogueInstruction(out var instruction))
+                sb.Append($"\n{instruction}");
+            else
+                sb.Append($"\nRespond only in {Constant.Lang}.");
+        }
 
         talkRequest.Prompt = sb.ToString();
+        TalkLifecycle.PublishPromptDecorated(talkRequest, pawns, status);
     }
     
     /// <summary>

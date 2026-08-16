@@ -3,6 +3,7 @@ using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.UI;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Communication;
 using Verse;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
 
@@ -80,6 +81,8 @@ public static class CustomDialogueService
             };
             Cache.Get(initiator).TalkResponses.Insert(0, talkResponse);
         }
+
+        TalkLifecycle.PublishPlayerDialogueSubmitted(initiator, recipient, message);
     }
 
     public class PendingDialogue(Pawn recipient, string message)

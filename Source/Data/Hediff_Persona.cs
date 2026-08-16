@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Communication.Util;
@@ -28,6 +29,8 @@ public class Hediff_Persona : Hediff
         }
     }
     
+    public static Func<IEnumerable<PersonalityData>, Pawn, PersonalityData> SelectPersonality;
+
     public static Hediff_Persona GetOrAddNew(Pawn pawn)
     {
         var def = DefDatabase<HediffDef>.GetNamedSilentFail(RimtalkHediff);
@@ -37,12 +40,26 @@ public class Hediff_Persona : Hediff
         {
             hediff = (Hediff_Persona)HediffMaker.MakeHediff(def, pawn);
         
-            // Assign a random personality on creation
-            PersonalityData randomPersonalityData =
-                pawn.RaceProps.Humanlike ? Constant.Personalities.RandomElement()
-                : pawn.RaceProps.Animal ? Constant.PersonaAnimal
-                : pawn.RaceProps.IsMechanoid ? Constant.PersonaMech
-                : Constant.PersonaNonHuman;
+            PersonalityData randomPersonalityData;
+            if (pawn.RaceProps.Humanlike)
+            {
+                var selector = SelectPersonality;
+                randomPersonalityData = selector != null
+                    ? selector(Constant.Personalities, pawn)
+                    : Constant.Personalities.RandomElement();
+            }
+            else if (pawn.RaceProps.Animal)
+            {
+                randomPersonalityData = Constant.PersonaAnimal;
+            }
+            else if (pawn.RaceProps.IsMechanoid)
+            {
+                randomPersonalityData = Constant.PersonaMech;
+            }
+            else
+            {
+                randomPersonalityData = Constant.PersonaNonHuman;
+            }
             hediff.Personality = randomPersonalityData.Persona;
         
             if (pawn.IsSlave || pawn.IsPrisoner || pawn.IsVisitor() || pawn.IsEnemy())
@@ -72,7 +89,7 @@ public class Hediff_Persona : Hediff
         int currentTick = Find.TickManager.TicksGame;
     
         // Randomize interval from 1 to 2.5 days
-        int randomInterval = Random.Range(60000, 150000);
+        int randomInterval = UnityEngine.Random.Range(60000, 150000);
     
         if (_spokenThoughtTicks.TryGetValue(key, out int lastTick))
         {

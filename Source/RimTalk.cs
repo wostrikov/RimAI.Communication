@@ -4,6 +4,7 @@ using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Error;
 using Ustas.RimAI.Communication.Patch;
 using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Core.Communication;
 using Verse;
 
 namespace Ustas.RimAI.Communication;
@@ -44,12 +45,17 @@ public class RimTalk : GameComponent
         Cache.InitializePlayerPawn();
         UserRequestPool.Clear();
 
-        if (soft) return;
+        if (soft)
+        {
+            TalkLifecycle.PublishGameSessionReset("soft");
+            return;
+        }
 
         Counter.Tick = 0;
         Cache.Clear();
         Stats.Reset();
         TalkRequestPool.Clear();
         ApiHistory.Clear();
+        TalkLifecycle.PublishGameSessionReset("full");
     }
 }

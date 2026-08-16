@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Communication;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -97,6 +98,8 @@ public class PawnState(Pawn pawn)
     /// </summary>
     public void QueueIncomingResponse(TalkResponse talkResponse)
     {
+        if (!TalkLifecycle.CanEnqueueTalkResponse(this, talkResponse))
+            return;
         _incomingTalkResponses.Enqueue(talkResponse);
     }
 
@@ -107,7 +110,10 @@ public class PawnState(Pawn pawn)
     public void DrainIncomingTalkResponses()
     {
         while (_incomingTalkResponses.TryDequeue(out var talkResponse))
+        {
             TalkResponses.Add(talkResponse);
+            TalkLifecycle.PublishTalkResponseQueued(Pawn, talkResponse);
+        }
     }
 
     public bool CanDisplayTalk()

@@ -2,6 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using Ustas.RimAI.Communication.Prompt;
+using Ustas.RimAI.Core.Communication;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Data;
@@ -52,7 +53,10 @@ public static class Constant
     public const string FallbackCloudModel = "gemma-4-31b-it";
     public const string ChooseModel = "(choose model)";
 
-    public static string Lang => LanguageDatabase.activeLanguage?.info?.friendlyNameNative ?? "English";
+    public static string Lang =>
+        DialogueLanguage.TryGetNativeName(out var name)
+            ? name
+            : LanguageDatabase.activeLanguage?.info?.friendlyNameNative ?? "English";
     public static HediffDef VocalLinkDef => DefDatabase<HediffDef>.GetNamedSilentFail("VocalLinkImplant");
 
     public static string DefaultInstruction =>

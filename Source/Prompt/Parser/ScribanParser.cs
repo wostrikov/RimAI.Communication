@@ -6,6 +6,7 @@ using Ustas.RimAI.Communication.API;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Communication;
 using Scriban;
 using Scriban.Parsing;
 using Scriban.Runtime;
@@ -46,6 +47,7 @@ public static class ScribanParser
     public static string Render(string templateText, PromptContext context, bool logErrors = true)
     {
         if (string.IsNullOrWhiteSpace(templateText)) return "";
+        TalkLifecycle.PublishScribanRenderStarted(context);
         
         try
         {
@@ -270,7 +272,7 @@ public static class ScribanParser
             };
 
             templateContext.PushGlobal(scriptObject);
-            return template.Render(templateContext);
+            return TalkLifecycle.PublishScribanRendered(context, template.Render(templateContext));
         }
         catch (Exception ex)
         {

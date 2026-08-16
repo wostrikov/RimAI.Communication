@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Core.Memory;
+using Ustas.RimAI.Core.Communication;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Prompt;
@@ -382,6 +383,7 @@ public class PromptManager : IExposable
         var settings = Settings.Get();
         
         // 1. Prepare shared context data
+        TalkLifecycle.PublishPromptBuildStarted();
         var (dialogueType, intent, topic) = PromptContextProvider.GetDialogueTypeData(talkRequest, pawns);
         talkRequest.Context = PromptService.BuildContext(pawns);
         PromptService.DecoratePrompt(talkRequest, pawns, status);

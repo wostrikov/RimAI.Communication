@@ -7,6 +7,7 @@ using Ustas.RimAI.Communication.Prompt;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.UI;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Communication;
 using RimWorld;
 using Verse;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
@@ -104,7 +105,8 @@ public static class TalkService
         try
         {
             Cache.Get(initiator).IsGeneratingTalk = true;
-            
+            TalkLifecycle.PublishTalkRequestEnrichment(talkRequest);
+
             var receivedResponses = new List<TalkResponse>();
 
             // Call the streaming chat service. The callback is executed as each piece of dialogue is parsed.
@@ -162,7 +164,7 @@ public static class TalkService
     /// <summary>
     /// Iterates through all pawns on each game tick to display any queued talks.
     /// </summary>
-    public static void DisplayTalk()
+    public static void DisplayTalk(bool ignoreReplyInterval = false)
     {
         // Drain all pawns upfront so every pawn has a consistent view of TalkResponses for this tick cycle.
         foreach (Pawn pawn in Cache.Keys)
@@ -200,7 +202,7 @@ public static class TalkService
 
             // Enforce a delay for replies to make conversations feel more natural.
             int parentTalkTick = TalkHistory.GetSpokenTick(talk.ParentTalkId);
-            if (parentTalkTick == -1 || !CommonUtil.HasPassed(parentTalkTick, replyInterval)) continue;
+            if (!ignoreReplyInterval && (parentTalkTick == -1 || !CommonUtil.HasPassed(parentTalkTick, replyInterval))) continue;
 
             CreateInteraction(pawn, talk);
             
@@ -253,6 +255,9 @@ public static class TalkService
 
     private static void CreateInteraction(Pawn pawn, TalkResponse talk)
     {
+        if (!TalkLifecycle.CanDisplay(pawn, talk))
+            return;
+
         // Create the interaction log entry, which triggers the display of the talk bubble in-game.
         InteractionDef intDef = DefDatabase<InteractionDef>.GetNamed("RimTalkInteraction");
         var recipient = talk.GetTarget() ?? pawn;
@@ -276,6 +281,20 @@ public static class TalkService
                 }
             }
         }
+
+        var apiLog = ApiHistory.GetApiLog(talk.Id);
+        TalkLifecycle.PublishInteractionCreated(new TalkInteractionCreatedArgs
+        {
+            Speaker = pawn,
+            TalkResponse = talk,
+            TalkRequest = apiLog?.TalkRequest,
+            SpeakerName = talk.Name ?? string.Empty,
+            Text = talk.Text ?? string.Empty,
+            TalkId = talk.Id.ToString(),
+            Participants = apiLog?.TalkRequest?.Participants?.ConvertAll(static pawn => (object)pawn),
+            IsPlayerInitiated = talk.TalkType.IsFromUser(),
+            Channel = apiLog?.Channel.ToString() ?? string.Empty
+        });
     }
 
     private static bool AnyPawnHasPendingResponses()

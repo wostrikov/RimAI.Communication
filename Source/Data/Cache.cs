@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Communication;
 using RimWorld;
 using Verse;
 using Random = System.Random;
@@ -219,5 +220,6 @@ public static class Cache
         _playerPawn.Name = new NameSingle(Settings.Get().PlayerName);
         PawnCache[_playerPawn] = new PawnState(_playerPawn);
         NameCache[_playerPawn.LabelShort] = _playerPawn;
+        TalkLifecycle.PublishPlayerPawnInitialized(_playerPawn);
     }
 }

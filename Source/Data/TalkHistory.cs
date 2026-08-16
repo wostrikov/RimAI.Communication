@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Communication;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Data;
@@ -22,6 +23,7 @@ public static class TalkHistory
     public static void AddIgnored(Guid id)
     {
         IgnoredCache.Add(id);
+        TalkLifecycle.PublishTalkIgnored(id.ToString());
     }
 
     public static int GetSpokenTick(Guid id)

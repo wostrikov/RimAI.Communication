@@ -100,6 +100,9 @@ public class PromptContext
     public static PromptContext FromTalkRequest(TalkRequest request, List<Pawn> pawns = null)
     {
         // Prefer TalkRequest.Participants (filled in sync layer)
+        if (request != null && (request.Participants == null || request.Participants.Count == 0) && pawns != null)
+            request.Participants = pawns;
+
         var participants = request?.Participants ?? pawns ?? new List<Pawn>();
         
         return new PromptContext

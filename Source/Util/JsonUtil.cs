@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using Ustas.RimAI.Core.Communication;
 
 namespace Ustas.RimAI.Communication.Util;
 
@@ -68,6 +69,8 @@ public static class JsonUtil
         {
             return string.Empty;
         }
+
+        TalkLifecycle.PublishTalkJsonReceived(text, targetType?.Name ?? string.Empty);
 
         string sanitized = text.Replace("```json", "").Replace("```", "").Trim();
 

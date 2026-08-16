@@ -8,6 +8,8 @@ namespace Ustas.RimAI.Communication.Data;
 
 public static class PersonaService
 {
+    public static IPersonaGenerator OverrideGenerator { get; set; }
+
     public static string GetPersonality(Pawn pawn)
     {
         return Hediff_Persona.GetOrAddNew(pawn).Personality;
@@ -30,6 +32,9 @@ public static class PersonaService
 
     public static async Task<PersonalityData> GeneratePersona(Pawn pawn)
     {
+        if (OverrideGenerator != null && OverrideGenerator.TryGenerate(pawn, out var overrideTask) && overrideTask != null)
+            return await overrideTask;
+
         string pawnBackstory = PromptService.CreatePawnBackstory(pawn, PromptService.InfoLevel.Full);
 
         try

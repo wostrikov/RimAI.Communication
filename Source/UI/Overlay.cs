@@ -205,6 +205,8 @@ public class Overlay : MapComponent
         }
         GUI.EndGroup();
 
+        OverlayChrome.Draw(_gearIconScreenRect);
+
         if (_showSettingsDropdown)
         {
             DrawSettingsDropdown();
@@ -214,6 +216,9 @@ public class Overlay : MapComponent
     private void HandleInput(ref Rect windowRect)
     {
         Event currentEvent = Event.current;
+
+        if (OverlayChrome.ConsumeClick(currentEvent))
+            return;
 
         if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
         {

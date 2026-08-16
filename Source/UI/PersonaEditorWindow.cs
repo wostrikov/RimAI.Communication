@@ -15,6 +15,14 @@ public class PersonaEditorWindow : Window
     private Vector2 _scrollPos = Vector2.zero;
     private readonly string _textControlName = "RimTalk_Persona_TextArea";
 
+    public Pawn EditedPawn => _pawn;
+
+    public string EditingPersonality
+    {
+        get => _editingPersonality;
+        set => _editingPersonality = value ?? "";
+    }
+
     public PersonaEditorWindow(Pawn pawn)
     {
         _pawn = pawn;
@@ -160,15 +168,20 @@ public class PersonaEditorWindow : Window
 
         if (Widgets.ButtonText(rollGenButton, "RimTalk.PersonaEditor.RollGen".Translate()))
         {
-            PersonalityData rollGenData = Constant.Personalities.RandomElement();
-            _editingPersonality = rollGenData.Persona;
-            _talkInitiationWeight = rollGenData.Chattiness;
+            if (!PersonaEditorChrome.HandleRollGen(this, _pawn))
+            {
+                PersonalityData rollGenData = Constant.Personalities.RandomElement();
+                _editingPersonality = rollGenData.Persona;
+                _talkInitiationWeight = rollGenData.Chattiness;
+            }
         }
 
         if (Widgets.ButtonText(clearButton, "RimTalk.PersonaEditor.Clear".Translate()))
         {
             _editingPersonality = "";
         }
+
+        PersonaEditorChrome.PublishFooter(this, _pawn, inRect);
     }
 
     public override void WindowUpdate()
