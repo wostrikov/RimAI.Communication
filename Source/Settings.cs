@@ -2,6 +2,8 @@ using System.Text;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Core.Communication;
 using Ustas.RimAI.Core.Configuration;
 using Ustas.RimAI.Core.Modules;
 using Verse;
@@ -64,6 +66,7 @@ public partial class Settings : Mod
 
     void RegisterRimAIContributions()
     {
+        CommunicationApplicationAccess.Register(new CommunicationApplication());
         RimAIModuleRegistry.Current.Register(new RimAIModuleDescriptor(
             "communication",
             "RimAI.Communication",
