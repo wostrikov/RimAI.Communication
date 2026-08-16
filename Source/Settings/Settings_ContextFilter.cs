@@ -114,7 +114,7 @@ namespace Ustas.RimAI.Communication
 
         private void DrawContextFilterSettings(Listing_Standard listing)
         {
-            RimTalkSettings settings = Get();
+            CommunicationSettings settings = Get();
             ContextSettings context = settings.Context;
             
             if (!_presetInitialized)

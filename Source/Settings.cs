@@ -48,17 +48,17 @@ public partial class Settings : Mod
 
     private SettingsTab _currentTab = SettingsTab.Basic;
 
-    private static RimTalkSettings _settings;
+    private static CommunicationSettings _settings;
 
-    public static RimTalkSettings Get()
+    public static CommunicationSettings Get()
     {
-        return _settings ??= LoadedModManager.GetMod<Settings>().GetSettings<RimTalkSettings>();
+        return _settings ??= LoadedModManager.GetMod<Settings>().GetSettings<CommunicationSettings>();
     }
 
     public Settings(ModContentPack content) : base(content)
     {
         var harmony = new Harmony("ustas.rimai.communication");
-        var settings = GetSettings<RimTalkSettings>();
+        var settings = GetSettings<CommunicationSettings>();
         harmony.PatchAll();
         _apiSettingsHash = GetApiSettingsHash(settings);
         RegisterRimAIContributions();
@@ -117,7 +117,7 @@ public partial class Settings : Mod
     {
         base.WriteSettings();
         ClearCache();
-        RimTalkSettings settings = Get();
+        CommunicationSettings settings = Get();
         int newHash = GetApiSettingsHash(settings);
 
         if (newHash != _apiSettingsHash)
@@ -128,7 +128,7 @@ public partial class Settings : Mod
         }
     }
 
-    private int GetApiSettingsHash(RimTalkSettings settings)
+    private int GetApiSettingsHash(CommunicationSettings settings)
     {
         var sb = new StringBuilder();
             
@@ -208,7 +208,7 @@ public partial class Settings : Mod
     public override void DoSettingsWindowContents(Rect inRect)
     {
         RimAISettingsNavigation.Open("communication", "general");
-        RimTalkSettings rtSettings = Get();
+        CommunicationSettings rtSettings = Get();
         
         // Settings window hacks
         var settingsWindow = Find.WindowStack.WindowOfType<Dialog_ModSettings>();

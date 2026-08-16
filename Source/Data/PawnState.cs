@@ -118,7 +118,7 @@ public class PawnState(Pawn pawn)
             Pawn.Map != Find.CurrentMap || !Pawn.Spawned)
             return false;
         
-        RimTalkSettings settings = Settings.Get();
+        CommunicationSettings settings = Settings.Get();
         if (!settings.DisplayTalkWhenDrafted && Pawn.Drafted) return false;
         if (!settings.ContinueDialogueWhileSleeping && !Pawn.Awake()) return false;
 
@@ -130,7 +130,7 @@ public class PawnState(Pawn pawn)
         if (Pawn.IsPlayer()) return true;
         DrainIncomingTalkResponses();
         return !IsGeneratingTalk && CanDisplayTalk() && Pawn.Awake() && TalkResponses.Empty()
-               && CommonUtil.HasPassed(LastTalkTick, RimTalkSettings.ReplyInterval);
+               && CommonUtil.HasPassed(LastTalkTick, CommunicationSettings.ReplyInterval);
     }
 
     public void IgnoreTalkResponse()

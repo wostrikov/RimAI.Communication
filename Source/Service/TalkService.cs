@@ -191,7 +191,7 @@ public static class TalkService
                 continue;
             }
 
-            int replyInterval = RimTalkSettings.ReplyInterval;
+            int replyInterval = CommunicationSettings.ReplyInterval;
             if (pawn.IsInDanger())
             {
                 replyInterval = 2;

@@ -189,7 +189,7 @@ public partial class Settings
 
         _archivableTypesScanned = true;
 
-        RimTalkSettings settings = Get();
+        CommunicationSettings settings = Get();
 
         // Identify all Message-related types (Parent + Children) to disable them by default
         var messageTypes = new HashSet<string> { VerseMessage };
@@ -214,7 +214,7 @@ public partial class Settings
 
     private void DrawEventFilterSettings(Listing_Standard listingStandard)
     {
-        RimTalkSettings settings = Get();
+        CommunicationSettings settings = Get();
 
         // Instructions
         Text.Font = GameFont.Tiny;

@@ -22,7 +22,7 @@ public static class PawnUtil
         if (!pawn.health.capacities.CapableOf(PawnCapacityDefOf.Talking)) return false;
         if (pawn.skills?.GetSkill(SkillDefOf.Social) == null) return false;
 
-        RimTalkSettings settings = Settings.Get();
+        CommunicationSettings settings = Settings.Get();
         if (!settings.AllowBabiesToTalk && pawn.IsBaby()) return false;
 
         return pawn.IsFreeColonist ||

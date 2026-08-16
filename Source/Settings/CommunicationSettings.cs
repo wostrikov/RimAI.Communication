@@ -8,7 +8,7 @@ using Verse;
 
 namespace Ustas.RimAI.Communication;
 
-public class RimTalkSettings : ModSettings
+public class CommunicationSettings : ModSettings
 {
     public List<ApiConfig> CloudConfigs = [];
     public int CurrentCloudConfigIndex = 0;

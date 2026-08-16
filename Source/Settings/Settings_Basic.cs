@@ -44,7 +44,7 @@ public partial class Settings
 
     private void DrawBasicSettings(Listing_Standard listingStandard)
     {
-        RimTalkSettings settings = Get();
+        CommunicationSettings settings = Get();
 
         listingStandard.Label("RimAI.Settings.TextAiOwnedByCore".Translate());
         listingStandard.Label(Ustas.RimAI.Core.Configuration.AiCredentialResolver.Resolve().Display);
@@ -242,7 +242,7 @@ public partial class Settings
         }
     }
     
-    private void DrawCustomConversationOptions(Listing_Standard listingStandard, RimTalkSettings settings)
+    private void DrawCustomConversationOptions(Listing_Standard listingStandard, CommunicationSettings settings)
     {
         const float indent = 30f;
         const float dropdownWidth = 120f;

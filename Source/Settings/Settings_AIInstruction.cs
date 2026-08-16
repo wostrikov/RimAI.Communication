@@ -12,7 +12,7 @@ public partial class Settings
 {
     private void DrawAIInstructionSettings(Listing_Standard listingStandard, bool showAdvancedSwitch = false)
     {
-        RimTalkSettings settings = Get();
+        CommunicationSettings settings = Get();
 
         bool isSimpleMode = !settings.UseAdvancedPromptMode;
 

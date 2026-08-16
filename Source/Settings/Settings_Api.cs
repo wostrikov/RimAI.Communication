@@ -26,7 +26,7 @@ public partial class Settings
 
     private void DrawSimpleApiSettings(Listing_Standard listingStandard)
     {
-        RimTalkSettings settings = Get();
+        CommunicationSettings settings = Get();
 
         // API Key section
         listingStandard.Label("RimTalk.Settings.GoogleApiKeyLabel".Translate());
@@ -65,7 +65,7 @@ public partial class Settings
 
     private void DrawAdvancedApiSettings(Listing_Standard listingStandard)
     {
-        RimTalkSettings settings = Get();
+        CommunicationSettings settings = Get();
 
         // Show Simple Settings button
         Rect simpleButtonRect = listingStandard.GetRect(30f);
@@ -130,7 +130,7 @@ public partial class Settings
         }
     }
     
-    private void DrawCloudProvidersSection(Listing_Standard listingStandard, RimTalkSettings settings)
+    private void DrawCloudProvidersSection(Listing_Standard listingStandard, CommunicationSettings settings)
     {
         Rect headerRect = listingStandard.GetRect(24f);
 
@@ -493,7 +493,7 @@ public partial class Settings
         }
     }
 
-    private void DrawLocalProviderSection(Listing_Standard listingStandard, RimTalkSettings settings)
+    private void DrawLocalProviderSection(Listing_Standard listingStandard, CommunicationSettings settings)
     {
         listingStandard.Label("RimTalk.Settings.LocalProviderConfiguration".Translate());
         listingStandard.Gap(6f);

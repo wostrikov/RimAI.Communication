@@ -169,7 +169,7 @@ public static class CommonUtil
 
     public static bool ShouldAiBeActiveOnSpeed()
     {
-        RimTalkSettings settings = Settings.Get();
+        CommunicationSettings settings = Settings.Get();
         if (settings.DisableAiAtSpeed == 0)
             return true;
         TimeSpeed currentGameSpeed = Find.TickManager.CurTimeSpeed;

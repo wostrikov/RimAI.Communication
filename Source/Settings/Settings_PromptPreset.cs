@@ -47,19 +47,19 @@ public partial class Settings
 
     public void DrawPromptPresetSettings(Listing_Standard listingStandard, Rect inRect)
     {
-        RimTalkSettings settings = Get();
+        CommunicationSettings settings = Get();
         if (settings.UseAdvancedPromptMode)
             DrawAdvancedPromptMode(listingStandard, settings, inRect);
         else
             DrawSimplePromptMode(listingStandard, settings);
     }
 
-    private void DrawSimplePromptMode(Listing_Standard listingStandard, RimTalkSettings settings)
+    private void DrawSimplePromptMode(Listing_Standard listingStandard, CommunicationSettings settings)
     {
         DrawAIInstructionSettings(listingStandard, showAdvancedSwitch: true);
     }
 
-    private void DrawAdvancedPromptMode(Listing_Standard listingStandard, RimTalkSettings settings, Rect containerRect)
+    private void DrawAdvancedPromptMode(Listing_Standard listingStandard, CommunicationSettings settings, Rect containerRect)
     {
         var manager = PromptManager.Instance;
         if (string.IsNullOrEmpty(_selectedPresetId))
@@ -339,7 +339,7 @@ public partial class Settings
         }
     }
 
-    private void DrawEntryEditor(Rect rect, PromptManager manager, RimTalkSettings settings)
+    private void DrawEntryEditor(Rect rect, PromptManager manager, CommunicationSettings settings)
     {
         var p = manager.Presets.FirstOrDefault(p => p.Id == _selectedPresetId);
         if (p == null)

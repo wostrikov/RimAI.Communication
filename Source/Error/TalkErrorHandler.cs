@@ -47,7 +47,7 @@ public static class AIErrorHandler
         }
     }
 
-    private static bool CanRetryGeneration(RimTalkSettings settings)
+    private static bool CanRetryGeneration(CommunicationSettings settings)
     {
         if (settings.UseSimpleConfig)
         {

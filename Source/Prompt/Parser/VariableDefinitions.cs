@@ -35,7 +35,7 @@ public static class VariableDefinitions
         RootTypeMap["lang"] = typeof(string);
         RootTypeMap["prompt"] = typeof(string);
         RootTypeMap["context"] = typeof(string);
-        RootTypeMap["settings"] = typeof(RimTalkSettings);
+        RootTypeMap["settings"] = typeof(CommunicationSettings);
         RootTypeMap["game"] = typeof(ScriptObject);
         RootTypeMap["json"] = typeof(ScriptObject);
         RootTypeMap["chat"] = typeof(ScriptObject);

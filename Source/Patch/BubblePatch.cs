@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Bubbles.Core;
 using HarmonyLib;
@@ -19,7 +19,7 @@ public static class Bubbler_Add
 
     public static bool Prefix(LogEntry entry)
     {
-        RimTalkSettings settings = Settings.Get();
+        CommunicationSettings settings = Settings.Get();
 
         Pawn initiator = (Pawn)entry.GetConcerns().First();
         Pawn recipient = GetRecipient(entry);
