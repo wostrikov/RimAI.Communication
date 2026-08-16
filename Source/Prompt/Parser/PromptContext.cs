@@ -67,6 +67,11 @@ public class PromptContext
     /// <summary>Whether this context is being used for preview (e.g. settings menu)</summary>
     public bool IsPreview { get; set; }
 
+    /// <summary>True when the primary typed Memory context provider supplied this turn.</summary>
+    public bool UsedTypedMemoryContext { get; set; }
+
+    public string TypedMemorySource { get; set; }
+
     public PromptContext()
     {
         AllPawns = [];

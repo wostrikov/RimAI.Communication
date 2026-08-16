@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using RimTalk.Client.OpenAI;
 using RimTalk.Client.Player2;
+using Ustas.RimAI.Core.Configuration;
 
 namespace RimTalk.Client;
 
@@ -19,6 +20,10 @@ public static class AIClientFactory
     public static async Task<IAIClient> GetAIClientAsync()
     {
         var config = Settings.Get().GetActiveConfig();
+        if (config == null && SharedTextAiAccess.Current is not { HasActive: true })
+        {
+            return null;
+        }
         if (config == null)
         {
             return null;

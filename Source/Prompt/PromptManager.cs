@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using RimTalk.Data;
 using RimTalk.Service;
+using Ustas.RimAI.Core.Memory;
 using Verse;
 
 namespace RimTalk.Prompt;
@@ -392,6 +393,7 @@ public class PromptManager : IExposable
         context.ConversationTopic = topic;
         context.DialogueStatus = status;
         context.DialoguePrompt = talkRequest.Prompt;
+        AttachTypedMemoryContext(context, talkRequest, pawns);
         LastContext = context;
 
         // 3. Select Preset
@@ -429,6 +431,34 @@ public class PromptManager : IExposable
         talkRequest.PromptMessageSegments = segments.Count > 0 ? segments : null;
         
         return messages.Select(m => ((Role)m.role, m.content)).ToList();
+    }
+
+    static void AttachTypedMemoryContext(PromptContext context, TalkRequest talkRequest, List<Pawn> pawns)
+    {
+        var provider = MemoryContextAccess.Current;
+        if (provider == null || context == null)
+            return;
+        var ids = new List<string>();
+        if (pawns != null)
+        {
+            foreach (var pawn in pawns)
+            {
+                if (pawn != null && !string.IsNullOrEmpty(pawn.ThingID))
+                    ids.Add(pawn.ThingID);
+            }
+        }
+
+        var result = provider.GetContext(new MemoryContextRequest
+        {
+            PawnId = talkRequest?.Initiator?.ThingID ?? ids.FirstOrDefault(),
+            PawnIds = ids,
+            Query = talkRequest?.Prompt,
+            TokenBudget = 2000
+        });
+        context.UsedTypedMemoryContext = true;
+        context.TypedMemorySource = result?.Source ?? "typed";
+        if (Prefs.DevMode)
+            Log.Message("[RIMAI_MEMORY] typed_context provider=IMemoryContextProvider scriban_required=false");
     }
 
     private List<(PromptRole role, string content)> BuildMessagesFromPreset(

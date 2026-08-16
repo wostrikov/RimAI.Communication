@@ -7,6 +7,7 @@ using RimTalk.Data;
 using RimTalk.Error;
 using RimTalk.Util;
 using UnityEngine.Networking;
+using Ustas.RimAI.Core.AI;
 using Verse;
 using Enumerable = System.Linq.Enumerable;
 
@@ -41,10 +42,32 @@ public class OpenAIClient(
     {
         string jsonContent = officialOpenAI ? BuildResponsesJson(prefixMessages, messages) : BuildRequestJson(prefixMessages, messages, stream: false);
         onRequestPrepared?.Invoke(new Payload(_endpointUrl, model, jsonContent, null, 0));
-        string responseText = await SendRequestAsync(jsonContent, new DownloadHandlerBuffer());
+        var shared = await Task.Run(() => SharedTextAiOrchestrator.Complete(new TextAiRequest
+        {
+            Messages = ToSharedMessages(prefixMessages, messages),
+            Model = model,
+            BaseUrl = _endpointUrl,
+            ApiShape = officialOpenAI ? TextAiApiShape.Responses : TextAiApiShape.ChatCompletions,
+            UseSharedGameplayCredential = officialOpenAI,
+            ApiKey = officialOpenAI ? null : apiKey,
+            ExtraHeaders = extraHeaders,
+            PrebuiltJson = jsonContent,
+            Caller = "communication"
+        }));
+        if (shared.StatusCode == 429)
+        {
+            throw new QuotaExceededException(shared.Error ?? "Quota exceeded",
+                new Payload(_endpointUrl, model, jsonContent, shared.RawPayload, 0, shared.Error));
+        }
+        if (!shared.Succeeded)
+        {
+            throw new AIRequestException(shared.Error ?? "Request failed",
+                new Payload(_endpointUrl, model, jsonContent, shared.RawPayload, 0, shared.Error));
+        }
 
+        string responseText = shared.RawPayload;
         var response = officialOpenAI ? null : JsonUtil.DeserializeFromJson<OpenAIResponse>(responseText);
-        var content = officialOpenAI ? OpenAIProviderAdapter.ParseOutputText(responseText) : response?.Choices?[0]?.Message?.Content;
+        var content = officialOpenAI ? shared.Text : response?.Choices?[0]?.Message?.Content ?? shared.Text;
         var tokens = officialOpenAI ? ParseResponsesTotalTokens(responseText) : response?.Usage?.TotalTokens ?? 0;
 
         return new Payload(_endpointUrl, model, jsonContent, content, tokens);
@@ -155,6 +178,24 @@ public class OpenAIClient(
         };
 
         return JsonUtil.SerializeToJson(request);
+    }
+
+    static List<TextAiMessage> ToSharedMessages(
+        List<(Role role, string message)> prefixMessages,
+        List<(Role role, string message)> messages)
+    {
+        var result = new List<TextAiMessage>();
+        if (prefixMessages != null)
+        {
+            foreach (var item in prefixMessages)
+                result.Add(new TextAiMessage(RoleToString(item.role), item.message));
+        }
+        if (messages != null)
+        {
+            foreach (var item in messages)
+                result.Add(new TextAiMessage(RoleToString(item.role), item.message));
+        }
+        return result;
     }
 
     private static string RoleToString(Role role)
