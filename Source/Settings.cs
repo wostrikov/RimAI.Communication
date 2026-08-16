@@ -64,20 +64,28 @@ public partial class Settings : Mod
 
     void RegisterRimAIContributions()
     {
-        RimAIModuleRegistry.Current.Register(new RimAIModuleDescriptor("communication", "RimAI.Communication"));
+        RimAIModuleRegistry.Current.Register(new RimAIModuleDescriptor(
+            "communication",
+            "RimAI.Communication",
+            "RimAI.Communication",
+            "Communication"));
         SharedTextAiAccess.Register(ResolveSharedTextSnapshot);
         RimAISettingsContributionRegistry.Current.Register(new DelegateSettingsContributor(
             "communication-ai",
             "AI",
             RimAISettingsSection.SharedAi,
             0,
-            listing => DrawSharedAiSettings((Listing_Standard)listing)));
+            listing => DrawSharedAiSettings((Listing_Standard)listing),
+            "communication",
+            "ai"));
         RimAISettingsContributionRegistry.Current.Register(new DelegateSettingsContributor(
             "communication",
             "Communication",
             RimAISettingsSection.Module,
             10,
-            listing => DrawBasicSettings((Listing_Standard)listing)));
+            listing => DrawBasicSettings((Listing_Standard)listing),
+            "communication",
+            "general"));
     }
 
     static SharedTextAiSnapshot ResolveSharedTextSnapshot()
@@ -100,7 +108,7 @@ public partial class Settings : Mod
     }
 
     public override string SettingsCategory() =>
-        (Content?.Name ?? GetType().Assembly.GetName().Name) + $" v{Version}";
+        Content?.Name ?? "RimAI.Communication";
 
     public override void WriteSettings()
     {
@@ -196,6 +204,7 @@ public partial class Settings : Mod
         
     public override void DoSettingsWindowContents(Rect inRect)
     {
+        RimAISettingsNavigation.Open("communication", "general");
         RimTalkSettings rtSettings = Get();
         
         // Settings window hacks
