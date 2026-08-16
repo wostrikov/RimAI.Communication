@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace RimTalk.Prompt;
+namespace Ustas.RimAI.Communication.Prompt;
 
 /// <summary>
 /// Data Transfer Object for preset JSON serialization.

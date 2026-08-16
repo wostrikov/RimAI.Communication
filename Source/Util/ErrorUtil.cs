@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using RimTalk.Client.OpenAI;
+using Ustas.RimAI.Communication.Client.OpenAI;
 
-namespace RimTalk.Util;
+namespace Ustas.RimAI.Communication.Util;
 
 public static class ErrorUtil
 {

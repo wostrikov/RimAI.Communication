@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using RimWorld;
 using Verse;
-using RimTalk.Service;
+using Ustas.RimAI.Communication.Service;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public class PlayLogEntry_RimTalkInteraction : PlayLogEntry_Interaction
 {

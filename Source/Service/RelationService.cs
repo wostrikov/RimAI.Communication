@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
 
-namespace RimTalk.Service;
+namespace Ustas.RimAI.Communication.Service;
 
 public static class RelationsService
 {

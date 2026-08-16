@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace RimTalk.API;
+namespace Ustas.RimAI.Communication.API;
 
 /// <summary>
 /// Predefined context category constants for API stability.

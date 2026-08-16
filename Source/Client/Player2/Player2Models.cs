@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace RimTalk.Client.Player2;
+namespace Ustas.RimAI.Communication.Client.Player2;
 
 [DataContract]
 public class Player2Request

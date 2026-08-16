@@ -1,4 +1,4 @@
-namespace RimTalk.Source.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public enum TalkType
 {

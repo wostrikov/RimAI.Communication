@@ -5,7 +5,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace RimTalk.Util;
+namespace Ustas.RimAI.Communication.Util;
 
 public static class JsonUtil
 {

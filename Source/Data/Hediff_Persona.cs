@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using RimTalk.Service;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public class Hediff_Persona : Hediff
 {

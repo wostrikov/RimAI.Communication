@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using Verse;
 using Verse.AI;
 using Verse.AI.Group;
-using Cache = RimTalk.Data.Cache;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace RimTalk.Util;
+namespace Ustas.RimAI.Communication.Util;
 
 public static class PawnUtil
 {

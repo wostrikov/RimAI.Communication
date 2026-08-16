@@ -2,15 +2,15 @@
 using System.Linq;
 using Bubbles.Core;
 using HarmonyLib;
-using RimTalk.Data;
-using RimTalk.Patches;
-using RimTalk.Service;
-using RimTalk.Source.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Patches;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
 
-namespace RimTalk.Patch;
+namespace Ustas.RimAI.Communication.Patch;
 
 [HarmonyPatch(typeof(Bubbler), nameof(Bubbler.Add))]
 public static class Bubbler_Add

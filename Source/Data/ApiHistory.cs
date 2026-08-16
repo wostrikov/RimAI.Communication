@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using RimTalk.Client;
-using RimTalk.Source.Data;
+using Ustas.RimAI.Communication.Client;
+using Ustas.RimAI.Communication.Data;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public static class ApiHistory
 {

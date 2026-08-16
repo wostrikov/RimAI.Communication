@@ -4,7 +4,7 @@ using RimWorld;
 using Verse;
 using Vector2 = UnityEngine.Vector2;
 
-namespace RimTalk.Util;
+namespace Ustas.RimAI.Communication.Util;
 
 public static class CommonUtil
 {

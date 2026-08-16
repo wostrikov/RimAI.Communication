@@ -1,6 +1,6 @@
-using RimTalk.Client;
+using Ustas.RimAI.Communication.Client;
 
-namespace RimTalk.Error;
+namespace Ustas.RimAI.Communication.Error;
 
 public class QuotaExceededException : AIRequestException
 {

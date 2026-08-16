@@ -1,11 +1,11 @@
 using System;
 using System.Text;
-using RimTalk.Client;
-using RimTalk.Source.Data;
+using Ustas.RimAI.Communication.Client;
+using Ustas.RimAI.Communication.Data;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public class ApiLog(string name, TalkRequest talkRequest, string response, Payload payload, DateTime timestamp, Channel channel)
 {

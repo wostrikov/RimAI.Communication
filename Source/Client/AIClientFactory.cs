@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
-using RimTalk.Client.OpenAI;
-using RimTalk.Client.Player2;
+using Ustas.RimAI.Communication.Client.OpenAI;
+using Ustas.RimAI.Communication.Client.Player2;
 using Ustas.RimAI.Core.Configuration;
 
-namespace RimTalk.Client;
+namespace Ustas.RimAI.Communication.Client;
 
 /// <summary>
 /// Factory for creating AI client instances with support for async initialization

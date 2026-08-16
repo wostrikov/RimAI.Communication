@@ -1,6 +1,6 @@
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 
-namespace RimTalk.Prompt;
+namespace Ustas.RimAI.Communication.Prompt;
 
 /// <summary>
 /// Prompt role for preset entries - separate from <see cref="Role"/> for:

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RimTalk.Data;
-using RimTalk.Error;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Error;
+using Ustas.RimAI.Communication.Util;
 using UnityEngine.Networking;
 using Ustas.RimAI.Core.AI;
 using Verse;
 using Enumerable = System.Linq.Enumerable;
 
-namespace RimTalk.Client.OpenAI;
+namespace Ustas.RimAI.Communication.Client.OpenAI;
 
 public class OpenAIClient(
     string baseUrl,

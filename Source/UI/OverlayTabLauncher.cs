@@ -2,7 +2,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk.UI;
+namespace Ustas.RimAI.Communication.UI;
 
 public class OverlayTabLauncher : MainTabWindow
 {

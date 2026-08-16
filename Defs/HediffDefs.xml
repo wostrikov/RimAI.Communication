@@ -4,7 +4,7 @@
         <defName>RimTalk_PersonaData</defName>
         <label>RimTalk Persona</label>
         <description>Technical hediff for storing RimTalk data. Not visible in-game.</description>
-        <hediffClass>RimTalk.Data.Hediff_Persona</hediffClass>
+        <hediffClass>Ustas.RimAI.Communication.Data.Hediff_Persona</hediffClass>
         <defaultLabelColor>(0.8, 0.8, 0.8)</defaultLabelColor>
         <isBad>false</isBad>
         <everCurableByItem>false</everCurableByItem>

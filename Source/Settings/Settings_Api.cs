@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RimTalk.Client.OpenAI;
-using RimTalk.Client.Player2;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Client.OpenAI;
+using Ustas.RimAI.Communication.Client.Player2;
+using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public partial class Settings
 {

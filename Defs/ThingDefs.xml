@@ -32,10 +32,10 @@
                 <showUseGizmo>true</showUseGizmo>
             </li>
             <li Class="CompProperties_Targetable">
-                <compClass>RimTalk.Properties.CompTargetable_NonHuman</compClass>
+                <compClass>Ustas.RimAI.Communication.Properties.CompTargetable_NonHuman</compClass>
                 <cannotHaveHediff>VocalLinkImplant</cannotHaveHediff>
             </li>
-            <li Class="RimTalk.Properties.CompProperties_TargetEffectInstallVocalLink">
+            <li Class="Ustas.RimAI.Communication.Properties.CompProperties_TargetEffectInstallVocalLink">
                 <hediffDef>VocalLinkImplant</hediffDef>
                 <soundOnUsed>MechSerumUsed</soundOnUsed>
             </li>

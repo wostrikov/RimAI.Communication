@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RimTalk.Data;
-using RimTalk.Service;
-using RimTalk.Source.Data;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
-using Cache = RimTalk.Data.Cache;
-using State = RimTalk.Data.ApiLog.State;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
+using State = Ustas.RimAI.Communication.Data.ApiLog.State;
 
-namespace RimTalk.UI;
+namespace Ustas.RimAI.Communication.UI;
 
 public class DebugWindow : Window
 {

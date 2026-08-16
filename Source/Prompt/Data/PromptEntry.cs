@@ -2,7 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using Verse;
 
-namespace RimTalk.Prompt;
+namespace Ustas.RimAI.Communication.Prompt;
 
 /// <summary>
 /// Prompt entry - corresponds to a single entry in SillyTavern's preset panel.

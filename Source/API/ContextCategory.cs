@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace RimTalk.API;
+namespace Ustas.RimAI.Communication.API;
 
 /// <summary>
 /// Strongly-typed context category for hook registration.

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-using RimTalk.Data;
-using RimTalk.Source.Data;
-using RimTalk.UI;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.UI;
+using Ustas.RimAI.Communication.Util;
 using Verse;
-using Cache = RimTalk.Data.Cache;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace RimTalk.Service;
+namespace Ustas.RimAI.Communication.Service;
 
 public static class CustomDialogueService
 {

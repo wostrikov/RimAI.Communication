@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using RimTalk.Data;
-using RimTalk.Service;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Core.Memory;
 using Verse;
 
-namespace RimTalk.Prompt;
+namespace Ustas.RimAI.Communication.Prompt;
 
 /// <summary>
 /// Prompt manager - handles presets, variables, and builds final prompts.

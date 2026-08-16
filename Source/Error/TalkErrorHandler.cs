@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
 
-namespace RimTalk.Error;
+namespace Ustas.RimAI.Communication.Error;
 
 public static class AIErrorHandler
 {

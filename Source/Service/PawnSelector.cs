@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimTalk.Data;
-using RimTalk.Source.Data;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using Verse;
 
-namespace RimTalk.Service;
+namespace Ustas.RimAI.Communication.Service;
 
 public class PawnSelector
 {

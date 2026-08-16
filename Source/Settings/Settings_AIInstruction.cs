@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
-using RimTalk.Data;
-using RimTalk.Prompt;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Prompt;
+using Ustas.RimAI.Communication.Util;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public partial class Settings
 {

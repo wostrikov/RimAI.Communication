@@ -4,15 +4,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using HarmonyLib;
-using RimTalk.API;
-using RimTalk.Data;
-using RimTalk.Source.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.API;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk.Service;
+namespace Ustas.RimAI.Communication.Service;
 
 public static class ContextBuilder
 {

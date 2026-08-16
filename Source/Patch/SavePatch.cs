@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
-using RimTalk.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
 
-namespace RimTalk.Patches;
+namespace Ustas.RimAI.Communication.Patches;
 
 [HarmonyPatch(typeof(GameDataSaveLoader), nameof(GameDataSaveLoader.SaveGame))]
 public static class SaveGamePatch

@@ -1,9 +1,9 @@
 using HarmonyLib;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using Verse;
 using Verse.AI;
 
-namespace RimTalk.Patch;
+namespace Ustas.RimAI.Communication.Patch;
 
 [HarmonyPatch(typeof(MentalStateHandler), nameof(MentalStateHandler.TryStartMentalState))]
 public static class MentalStatePatch

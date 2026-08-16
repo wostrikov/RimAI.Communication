@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using UnityEngine;
 using Verse;
-using Cache = RimTalk.Data.Cache;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace RimTalk.UI;
+namespace Ustas.RimAI.Communication.UI;
 
 public class Overlay : MapComponent
 {

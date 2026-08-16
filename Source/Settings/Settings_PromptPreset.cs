@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using RimTalk.Prompt;
+using Ustas.RimAI.Communication.Prompt;
 using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public partial class Settings
 {

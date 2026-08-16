@@ -1,11 +1,11 @@
 using System;
 using HarmonyLib;
-using RimTalk.Data;
-using RimTalk.Source.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using Verse;
 
-namespace RimTalk.Patch;
+namespace Ustas.RimAI.Communication.Patch;
 
 [HarmonyPatch(typeof(Pawn_HealthTracker))]
 [HarmonyPatch(nameof(Pawn_HealthTracker.AddHediff), new Type[] { typeof(Hediff), typeof(BodyPartRecord), typeof(DamageInfo), typeof(DamageWorker.DamageResult) })]

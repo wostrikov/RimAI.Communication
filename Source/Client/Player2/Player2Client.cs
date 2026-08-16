@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RimTalk.Data;
-using RimTalk.Error;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Error;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using UnityEngine.Networking;
 using Verse;
 
-namespace RimTalk.Client.Player2;
+namespace Ustas.RimAI.Communication.Client.Player2;
 
 public class Player2Client : IAIClient
 {

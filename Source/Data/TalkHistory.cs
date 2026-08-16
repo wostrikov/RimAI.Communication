@@ -2,10 +2,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Util;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public static class TalkHistory
 {

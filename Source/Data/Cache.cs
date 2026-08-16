@@ -1,12 +1,12 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
 using Random = System.Random;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public static class Cache
 {

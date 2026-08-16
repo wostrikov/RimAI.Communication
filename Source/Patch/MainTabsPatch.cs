@@ -1,7 +1,7 @@
 using HarmonyLib;
 using RimWorld;
 
-namespace RimTalk.Patch;
+namespace Ustas.RimAI.Communication.Patch;
 
 [HarmonyPatch(typeof(MainButtonWorker), nameof(MainButtonWorker.Visible), MethodType.Getter)]
 public static class MainTabsPatch

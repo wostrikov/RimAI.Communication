@@ -1,10 +1,10 @@
 using HarmonyLib;
-using RimTalk.UI;
+using Ustas.RimAI.Communication.UI;
 using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk.Patch
+namespace Ustas.RimAI.Communication.Patch
 {
     [StaticConstructorOnStartup]
     [HarmonyPatch(typeof(PlaySettings), nameof(PlaySettings.DoPlaySettingsGlobalControls))]

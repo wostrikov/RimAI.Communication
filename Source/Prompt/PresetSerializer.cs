@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Util;
 using Verse;
 
-namespace RimTalk.Prompt;
+namespace Ustas.RimAI.Communication.Prompt;
 
 /// <summary>
 /// Handles import/export of prompt presets in JSON format.
@@ -61,7 +61,7 @@ public static class PresetSerializer
     /// </summary>
     public static string GetExportDirectory()
     {
-        var path = Path.Combine(GenFilePaths.ConfigFolderPath, "RimTalk", "Presets");
+        var path = Path.Combine(GenFilePaths.ConfigFolderPath, "Ustas.RimAI.Communication", "Presets");
         if (!Directory.Exists(path))
         {
             Directory.CreateDirectory(path);

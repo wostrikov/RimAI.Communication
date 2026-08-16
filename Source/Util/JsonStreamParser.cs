@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RimTalk.Util;
+namespace Ustas.RimAI.Communication.Util;
 
 public class JsonStreamParser<T> where T : class
 {

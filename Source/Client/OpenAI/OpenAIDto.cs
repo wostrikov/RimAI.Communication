@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace RimTalk.Client.OpenAI;
+namespace Ustas.RimAI.Communication.Client.OpenAI;
 // === Request Models ===
 
 [DataContract]

@@ -1,10 +1,10 @@
 using Verse;
 
-namespace RimTalk.Util;
+namespace Ustas.RimAI.Communication.Util;
 
 public static class Logger
 {
-    private const string ModTag = "[RimTalk]";
+    private const string ModTag = "[RimAI.Communication]";
     public static void Message(object message)
     {
         Log.Message($"{ModTag} {message}\n\n");

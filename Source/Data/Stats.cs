@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public static class Stats
 {

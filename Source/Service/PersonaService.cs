@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
-using RimTalk.Service;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.Util;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public static class PersonaService
 {

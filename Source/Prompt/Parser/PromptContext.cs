@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using RimTalk.Data;
-using RimTalk.Source.Data;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Data;
 using Verse;
 
-namespace RimTalk.Prompt;
+namespace Ustas.RimAI.Communication.Prompt;
 
 /// <summary>
 /// Prompt rendering context - contains all information needed for parsing.

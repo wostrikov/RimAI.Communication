@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using RimTalk.API;
-using RimTalk.Data;
-using RimTalk.Source.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.API;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
 using Verse.AI.Group;
-using Cache = RimTalk.Data.Cache;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace RimTalk.Service;
+namespace Ustas.RimAI.Communication.Service;
 
 /// <summary>
 /// All public methods in this class are designed to be patchable with Harmony.

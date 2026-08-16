@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using RimTalk.Data;
-using RimTalk.Source.Data;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using Verse;
-using Cache = RimTalk.Data.Cache;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace RimTalk.Patch;
+namespace Ustas.RimAI.Communication.Patch;
 
 [HarmonyPatch(typeof(Archive), nameof(Archive.Add))]
 public static class ArchivePatch

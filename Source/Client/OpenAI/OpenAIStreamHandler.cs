@@ -1,9 +1,9 @@
 using System;
 using System.Text;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Util;
 using UnityEngine.Networking;
 
-namespace RimTalk.Client.OpenAI;
+namespace Ustas.RimAI.Communication.Client.OpenAI;
 
 /// <summary>
 /// A custom download handler that processes Server-Sent Events (SSE) streams for OpenAI.

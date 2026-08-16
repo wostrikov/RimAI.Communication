@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using RimTalk.Source.Data;
+using Ustas.RimAI.Communication.Data;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public static class TalkRequestPool
 {

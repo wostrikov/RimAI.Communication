@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RimTalk.Data;
-using RimTalk.Prompt;
-using RimTalk.Source.Data;
-using RimTalk.UI;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Prompt;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.UI;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
-using Cache = RimTalk.Data.Cache;
-using Logger = RimTalk.Util.Logger;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
+using Logger = Ustas.RimAI.Communication.Util.Logger;
 
-namespace RimTalk.Service;
+namespace Ustas.RimAI.Communication.Service;
 
 /// <summary>
 /// Core service for generating and managing AI-driven conversations between pawns.

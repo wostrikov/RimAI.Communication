@@ -1,4 +1,4 @@
-namespace RimTalk.Client;
+namespace Ustas.RimAI.Communication.Client;
 
 public class Payload(string url, string model, string request, string response, int tokenCount, string errorMessage = null)
 {

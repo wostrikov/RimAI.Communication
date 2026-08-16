@@ -1,4 +1,4 @@
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public static class Counter
 {

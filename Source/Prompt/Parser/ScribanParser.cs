@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using RimTalk.API;
-using RimTalk.Data;
-using RimTalk.Service;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.API;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.Util;
 using Scriban;
 using Scriban.Parsing;
 using Scriban.Runtime;
 using UnityEngine;
 using RimWorld;
 using Verse;
-using Cache = RimTalk.Data.Cache;
-using Logger = RimTalk.Util.Logger;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
+using Logger = Ustas.RimAI.Communication.Util.Logger;
 
-namespace RimTalk.Prompt;
+namespace Ustas.RimAI.Communication.Prompt;
 
 public static class ScribanParser
 {
@@ -422,7 +422,7 @@ public static class ScribanParser
         if (context.IsPreview)
             return "Conversation history (reference only; do not repeat or continue):\n" +
                    "- 1 | role=User | text=Hello!\n" +
-                   "- 2 | role=AI | text=Greetings from RimTalk. This is a placeholder for chat history.";
+                   "- 2 | role=AI | text=Greetings from Ustas.RimAI.Communication. This is a placeholder for chat history.";
 
         return "";
     }

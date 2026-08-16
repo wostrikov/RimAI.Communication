@@ -1,8 +1,8 @@
 using System;
-using RimTalk.Prompt;
+using Ustas.RimAI.Communication.Prompt;
 using Verse;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public static class PresetPreviewGenerator
 {

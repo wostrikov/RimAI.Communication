@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 [DataContract]
 public class PersonalityData(string persona, float chattiness = 1.0f) : IJsonData

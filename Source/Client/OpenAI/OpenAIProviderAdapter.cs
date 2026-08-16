@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Core.Configuration;
 
-namespace RimTalk.Client.OpenAI;
+namespace Ustas.RimAI.Communication.Client.OpenAI;
 
 public enum OpenAIErrorCategory { Unknown, Authentication, Permission, InvalidRequest, UnsupportedParameter, ModelNotFound, RateLimit, Server }
 

@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using RimTalk.UI;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.UI;
+using Ustas.RimAI.Communication.Util;
 using UnityEngine;
 using Verse;
-using Cache = RimTalk.Data.Cache;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace RimTalk.Patch
+namespace Ustas.RimAI.Communication.Patch
 {
     [HarmonyPatch(typeof(Pawn), "GetGizmos")]
     public static class PawnGizmoPatch

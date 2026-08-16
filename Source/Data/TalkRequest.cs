@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using RimTalk.Patch;
-using RimTalk.Source.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Patch;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public enum RequestStatus
 {

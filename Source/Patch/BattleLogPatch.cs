@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using RimTalk.Service;
-using RimTalk.Source.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using Verse;
-using Cache = RimTalk.Data.Cache;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace RimTalk.Patches;
+namespace Ustas.RimAI.Communication.Patches;
 
 [HarmonyPatch(typeof(BattleLog), nameof(BattleLog.Add))]
 public static class BattleLogPatch

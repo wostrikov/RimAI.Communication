@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RimTalk.Client;
-using RimTalk.Data;
-using RimTalk.Error;
-using RimTalk.Source.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Client;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Error;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 
-namespace RimTalk.Service;
+namespace Ustas.RimAI.Communication.Service;
 
 // WARNING:
 // This class defines core logic and has a significant impact on system behavior.

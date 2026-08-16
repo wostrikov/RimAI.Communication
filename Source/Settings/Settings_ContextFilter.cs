@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk
+namespace Ustas.RimAI.Communication
 {
     public enum ContextPreset
     {

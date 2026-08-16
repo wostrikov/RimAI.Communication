@@ -1,8 +1,8 @@
-using RimTalk.Data;
-using RimTalk.Client.OpenAI;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Client.OpenAI;
 using Verse;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public class ApiConfig : IExposable
 {

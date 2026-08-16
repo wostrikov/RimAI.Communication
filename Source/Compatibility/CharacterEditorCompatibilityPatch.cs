@@ -1,10 +1,10 @@
 using System;
 using HarmonyLib;
-using RimTalk.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using Verse;
 
-namespace RimTalk.Compatibility;
+namespace Ustas.RimAI.Communication.Compatibility;
 
 // This is meant to be a temporary compatibility patch for Character Editor mod;
 // As soon as communicated with its author, it will be removed/edited as needed.
@@ -16,7 +16,7 @@ public static class CharacterEditorCompatibilityPatch
 
     static CharacterEditorCompatibilityPatch()
     {
-        var harmony = new Harmony("cj.rimtalk.compat.charactereditor");
+        var harmony = new Harmony("ustas.rimai.communication.compat.charactereditor");
         TryPatch(harmony);
     }
 

@@ -1,7 +1,7 @@
 using System;
 using Verse;
 
-namespace RimTalk.Util;
+namespace Ustas.RimAI.Communication.Util;
 
 public static class Describer
 {

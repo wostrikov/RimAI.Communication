@@ -6,7 +6,7 @@ using Ustas.RimAI.Core.Configuration;
 using Ustas.RimAI.Core.Modules;
 using Verse;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public partial class Settings : Mod
 {
@@ -55,7 +55,7 @@ public partial class Settings : Mod
 
     public Settings(ModContentPack content) : base(content)
     {
-        var harmony = new Harmony("cj.rimtalk");
+        var harmony = new Harmony("ustas.rimai.communication");
         var settings = GetSettings<RimTalkSettings>();
         harmony.PatchAll();
         _apiSettingsHash = GetApiSettingsHash(settings);

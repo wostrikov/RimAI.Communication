@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using Verse;
 using Verse.AI;
 using Verse.Sound;
 
-namespace RimTalk.Properties;
+namespace Ustas.RimAI.Communication.Properties;
 
 public class CompTargetEffect_InstallVocalLink : CompTargetEffect
 {

@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using RimTalk.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using UnityEngine;
 using Verse;
-using Logger = RimTalk.Util.Logger;
+using Logger = Ustas.RimAI.Communication.Util.Logger;
 
-namespace RimTalk.UI;
+namespace Ustas.RimAI.Communication.UI;
 public static class UIUtil
 {
     /// <summary>

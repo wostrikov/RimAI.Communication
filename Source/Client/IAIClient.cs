@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 
-namespace RimTalk.Client
+namespace Ustas.RimAI.Communication.Client
 {
     public interface IAIClient
     {

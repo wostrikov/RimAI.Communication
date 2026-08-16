@@ -5,9 +5,9 @@ using System.Reflection;
 using RimWorld;
 using UnityEngine;
 using Verse;
-using Logger = RimTalk.Util.Logger;
+using Logger = Ustas.RimAI.Communication.Util.Logger;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public partial class Settings
 {

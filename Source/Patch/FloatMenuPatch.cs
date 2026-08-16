@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using HarmonyLib;
-using RimTalk.UI;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.UI;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.AI;
-using Cache = RimTalk.Data.Cache;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace RimTalk.Patch;
+namespace Ustas.RimAI.Communication.Patch;
 
 #if V1_5
 [HarmonyPatch(typeof(FloatMenuMakerMap), nameof(FloatMenuMakerMap.ChoicesAtFor))]

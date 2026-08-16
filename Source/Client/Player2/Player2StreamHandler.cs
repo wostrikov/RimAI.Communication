@@ -1,9 +1,9 @@
 using System;
 using System.Text;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Util;
 using UnityEngine.Networking;
 
-namespace RimTalk.Client.Player2;
+namespace Ustas.RimAI.Communication.Client.Player2;
 
 public class Player2StreamHandler(Action<string> onContentReceived) : DownloadHandlerScript
 {

@@ -2,7 +2,7 @@
 using RimWorld;
 using Verse;
 
-namespace RimTalk.Source.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public enum InteractionType
 {

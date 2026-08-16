@@ -1,9 +1,9 @@
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk.UI;
+namespace Ustas.RimAI.Communication.UI;
 
 public class PersonaEditorWindow : Window
 {

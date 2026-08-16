@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
 using Verse;
-using static RimTalk.Service.PromptService;
+using static Ustas.RimAI.Communication.Service.PromptService;
 
-namespace RimTalk.Util;
+namespace Ustas.RimAI.Communication.Util;
 
 public enum NearbyKind
 {

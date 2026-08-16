@@ -2,7 +2,7 @@
 <Defs>
     <MainButtonDef>
         <defName>RimTalkDebug</defName>
-        <tabWindowClass>RimTalk.UI.OverlayTabLauncher</tabWindowClass>
+        <tabWindowClass>Ustas.RimAI.Communication.UI.OverlayTabLauncher</tabWindowClass>
         <order>79</order>
         <minimized>True</minimized>
         <iconPath>UI/RimTalkIcon</iconPath>

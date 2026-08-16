@@ -1,6 +1,6 @@
 using Verse;
 
-namespace RimTalk.Data
+namespace Ustas.RimAI.Communication.Data
 {
     public class ContextSettings : IExposable
     {

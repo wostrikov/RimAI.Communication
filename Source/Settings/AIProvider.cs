@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public enum AIProvider
 {
@@ -82,7 +82,7 @@ public static class AIProviderRegistry
                 ExtraHeaders = new Dictionary<string, string>
                 {
                     { "HTTP-Referer", "https://github.com/jlibrary/RimTalk" },
-                    { "X-Title", "RimTalk" }
+                    { "X-Title", "Ustas.RimAI.Communication" }
                 }
             }
         },

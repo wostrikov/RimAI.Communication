@@ -1,10 +1,10 @@
 #nullable enable
 using System;
 using System.Runtime.Serialization;
-using RimTalk.Source.Data;
+using Ustas.RimAI.Communication.Data;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 [DataContract]
 public class TalkResponse(TalkType talkType, string name, string text) : IJsonData

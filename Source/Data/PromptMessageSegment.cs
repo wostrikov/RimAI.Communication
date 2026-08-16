@@ -1,6 +1,6 @@
-using RimTalk.Source.Data;
+using Ustas.RimAI.Communication.Data;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public class PromptMessageSegment
 {

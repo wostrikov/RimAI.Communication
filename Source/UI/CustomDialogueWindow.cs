@@ -1,11 +1,11 @@
-using RimTalk.Service;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.AI;
 
-namespace RimTalk.UI;
+namespace Ustas.RimAI.Communication.UI;
 
 public class CustomDialogueWindow : Window
 {

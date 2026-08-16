@@ -1,10 +1,10 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using RimTalk.Prompt;
+using Ustas.RimAI.Communication.Prompt;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public static class Constant
 {

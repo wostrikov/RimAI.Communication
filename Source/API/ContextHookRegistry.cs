@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using RimTalk.Data;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
-using Logger = RimTalk.Util.Logger;
+using Logger = Ustas.RimAI.Communication.Util.Logger;
 
-namespace RimTalk.API;
+namespace Ustas.RimAI.Communication.API;
 
 /// <summary>
 /// Unified hook registry for context modifications.

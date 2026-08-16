@@ -1,12 +1,12 @@
 using System.Linq;
-using RimTalk.Client;
-using RimTalk.Data;
-using RimTalk.Error;
-using RimTalk.Patch;
-using RimTalk.Service;
+using Ustas.RimAI.Communication.Client;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Error;
+using Ustas.RimAI.Communication.Patch;
+using Ustas.RimAI.Communication.Service;
 using Verse;
 
-namespace RimTalk;
+namespace Ustas.RimAI.Communication;
 
 public class RimTalk : GameComponent
 {

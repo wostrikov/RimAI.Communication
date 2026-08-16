@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
-using RimTalk.Data;
-using RimTalk.UI;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.UI;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk.Patches;
+namespace Ustas.RimAI.Communication.Patches;
 
 [StaticConstructorOnStartup]
 public static class BioTabPersonalityPatch

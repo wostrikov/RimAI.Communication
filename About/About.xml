@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<packageId>cj.rimtalk</packageId>
+	<packageId>ustas.rimai.communication</packageId>
 	<name>RimAI.Communication</name>
 	<modVersion>1.0.16</modVersion>
 	<author>juicy</author>

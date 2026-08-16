@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using RimWorld;
 using Verse;
 
-namespace RimTalk.Properties;
+namespace Ustas.RimAI.Communication.Properties;
 
 public class CompTargetable_NonHuman : CompTargetable
 {

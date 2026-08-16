@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using RimTalk.Prompt;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Prompt;
+using Ustas.RimAI.Communication.Util;
 using Verse;
 
-namespace RimTalk.API;
+namespace Ustas.RimAI.Communication.API;
 
 /// <summary>
 /// RimTalk prompt system public API for other mods to use.

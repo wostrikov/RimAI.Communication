@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using RimTalk.Data;
-using RimTalk.UI;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.UI;
 using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace RimTalk.Patch;
+namespace Ustas.RimAI.Communication.Patch;
 
 [HarmonyPatch(typeof(HealthCardUtility), "EntryClicked")]
 public static class HealthCardUtilityPatch

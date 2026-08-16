@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Util;
 using RimWorld.Planet;
 using Verse;
 
-namespace RimTalk.Data;
+namespace Ustas.RimAI.Communication.Data;
 
 public class RimTalkWorldComponent(World world) : WorldComponent(world)
 {

@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using RimTalk.API;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.API;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Scriban.Runtime;
 using Verse;
 
-namespace RimTalk.Prompt;
+namespace Ustas.RimAI.Communication.Prompt;
 
 public static class VariableDefinitions
 {
