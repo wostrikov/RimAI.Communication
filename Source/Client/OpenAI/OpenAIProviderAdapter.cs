@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using RimTalk.Data;
+using Ustas.RimAI.Core.Configuration;
 
 namespace RimTalk.Client.OpenAI;
 
@@ -10,12 +11,12 @@ public enum OpenAIErrorCategory { Unknown, Authentication, Permission, InvalidRe
 
 public static class OpenAIProviderAdapter
 {
-    public const string CredentialVariable = "OPENAI_RIMTALK";
+    public const string CredentialVariable = AiCredentialResolver.LegacyTalk;
     public const string ResponsesEndpoint = "https://api.openai.com/v1/responses";
     public const string ModelsEndpoint = "https://api.openai.com/v1/models";
-    public static string ResolveCredential() => (Environment.GetEnvironmentVariable(CredentialVariable) ?? string.Empty).Trim();
-    public static bool CredentialPresent => ResolveCredential().Length > 0;
-    public static string CredentialDisplay => CredentialVariable + (CredentialPresent ? " ✓" : " ✗");
+    public static string ResolveCredential() => AiCredentialResolver.Resolve().Value ?? string.Empty;
+    public static bool CredentialPresent => AiCredentialResolver.Resolve().Present;
+    public static string CredentialDisplay => AiCredentialResolver.Resolve().Display;
 
     public static string BuildRequest(string model, IList<(Role role, string message)> messages, int maxOutputTokens = 2048)
     {

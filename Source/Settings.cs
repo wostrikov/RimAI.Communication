@@ -2,6 +2,8 @@ using System.Text;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
+using Ustas.RimAI.Core.Configuration;
+using Ustas.RimAI.Core.Modules;
 using Verse;
 
 namespace RimTalk;
@@ -57,6 +59,44 @@ public partial class Settings : Mod
         var settings = GetSettings<RimTalkSettings>();
         harmony.PatchAll();
         _apiSettingsHash = GetApiSettingsHash(settings);
+        RegisterRimAIContributions();
+    }
+
+    void RegisterRimAIContributions()
+    {
+        RimAIModuleRegistry.Current.Register(new RimAIModuleDescriptor("communication", "RimAI.Communication"));
+        SharedTextAiAccess.Register(ResolveSharedTextSnapshot);
+        RimAISettingsContributionRegistry.Current.Register(new DelegateSettingsContributor(
+            "communication-ai",
+            "AI",
+            RimAISettingsSection.SharedAi,
+            0,
+            listing => DrawSharedAiSettings((Listing_Standard)listing)));
+        RimAISettingsContributionRegistry.Current.Register(new DelegateSettingsContributor(
+            "communication",
+            "Communication",
+            RimAISettingsSection.Module,
+            10,
+            listing => DrawBasicSettings((Listing_Standard)listing)));
+    }
+
+    static SharedTextAiSnapshot ResolveSharedTextSnapshot()
+    {
+        var settings = Get();
+        var config = settings?.GetActiveConfig();
+        if (config == null)
+            return new SharedTextAiSnapshot { HasActive = false, UseCloud = settings?.UseCloudProviders ?? true };
+
+        return new SharedTextAiSnapshot
+        {
+            HasActive = true,
+            UseCloud = settings.UseCloudProviders,
+            Provider = config.Provider.ToString(),
+            Model = config.SelectedModel ?? "",
+            CustomModel = config.CustomModelName ?? "",
+            BaseUrl = config.BaseUrl ?? "",
+            ApiKey = config.Provider == AIProvider.OpenAI ? "" : config.ApiKey ?? ""
+        };
     }
 
     public override string SettingsCategory() =>

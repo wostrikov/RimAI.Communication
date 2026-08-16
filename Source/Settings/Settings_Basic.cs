@@ -46,17 +46,9 @@ public partial class Settings
     {
         RimTalkSettings settings = Get();
 
-        // API Configuration section
-        if (!settings.UseSimpleConfig)
-        {
-            DrawAdvancedApiSettings(listingStandard);
-        }
-        else
-        {
-            DrawSimpleApiSettings(listingStandard);
-        }
-
-        listingStandard.Gap(30f);
+        listingStandard.Label("RimAI.Settings.TextAiOwnedByCore".Translate());
+        listingStandard.Label(Ustas.RimAI.Core.Configuration.AiCredentialResolver.Resolve().Display);
+        listingStandard.Gap(12f);
 
         // AI Cooldown
         var cooldownLabel = "RimTalk.Settings.AICooldown".Translate(settings.TalkInterval).ToString();

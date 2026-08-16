@@ -218,7 +218,7 @@ Crucial Tips:
     <RimTalk.Settings.PauseAtSpeed>Pause AI on High Speed</RimTalk.Settings.PauseAtSpeed>
     <RimTalk.Settings.DisableAiAtSpeedTooltip>To reduce API calls, the AI will be paused when game speed is set to this level or higher.</RimTalk.Settings.DisableAiAtSpeedTooltip>
     <RimTalk.Settings.Disabled>Disabled</RimTalk.Settings.Disabled>
-    <RimTalk.Settings.ButtonDisplay>RimTalk Button Display</RimTalk.Settings.ButtonDisplay>
+    <RimTalk.Settings.ButtonDisplay>Show conversation button</RimTalk.Settings.ButtonDisplay>
     <RimTalk.Settings.ButtonDisplayTooltip>Controls how the debug interface is accessed. 'Tab' adds a main tab, 'Toggle' shows an icon on the bottom bar, and 'None' hides it.</RimTalk.Settings.ButtonDisplayTooltip>
     
     <RimTalk.Settings.AIInstructionPrompt>AI Instruction Prompt (Model: {0})</RimTalk.Settings.AIInstructionPrompt>

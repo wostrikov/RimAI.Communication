@@ -195,7 +195,7 @@
   <RimTalk.Settings.PauseAtSpeed>Призупиняти ШІ на високій швидкості</RimTalk.Settings.PauseAtSpeed>
   <RimTalk.Settings.DisableAiAtSpeedTooltip>Щоб зменшити кількість викликів API, ШІ буде призупинено, коли швидкість гри буде встановлено на цей рівень або вище.</RimTalk.Settings.DisableAiAtSpeedTooltip>
   <RimTalk.Settings.Disabled>Вимкнено</RimTalk.Settings.Disabled>
-  <RimTalk.Settings.ButtonDisplay>Відображення кнопки RimTalk</RimTalk.Settings.ButtonDisplay>
+  <RimTalk.Settings.ButtonDisplay>Показувати кнопку спілкування</RimTalk.Settings.ButtonDisplay>
   <RimTalk.Settings.ButtonDisplayTooltip>Визначає спосіб доступу до налагоджувального інтерфейсу. «Вкладка» додає головну вкладку, «Перемикач» показує піктограму на нижній панелі, а «Немає» приховує її.</RimTalk.Settings.ButtonDisplayTooltip>
   <RimTalk.Settings.AIInstructionPrompt>Промпт інструкцій ШІ (модель: {0})</RimTalk.Settings.AIInstructionPrompt>
   <RimTalk.Settings.AutoIncludedTip>Порада: дані про персонажа (риси, стосунки, раса, вік тощо) додаються автоматично. Пишіть загальні інструкції, які працюватимуть для всіх персонажів і колоній.</RimTalk.Settings.AutoIncludedTip>

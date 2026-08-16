@@ -16,6 +16,14 @@ public partial class Settings
 {
     private static readonly Dictionary<string, List<string>> ModelCache = new();
 
+    internal void DrawSharedAiSettings(Listing_Standard listingStandard)
+    {
+        if (!Get().UseSimpleConfig)
+            DrawAdvancedApiSettings(listingStandard);
+        else
+            DrawSimpleApiSettings(listingStandard);
+    }
+
     private void DrawSimpleApiSettings(Listing_Standard listingStandard)
     {
         RimTalkSettings settings = Get();
