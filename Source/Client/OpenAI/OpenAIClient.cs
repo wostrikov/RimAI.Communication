@@ -52,7 +52,8 @@ public class OpenAIClient(
             ApiKey = officialOpenAI ? null : apiKey,
             ExtraHeaders = extraHeaders,
             PrebuiltJson = jsonContent,
-            Caller = "communication"
+            Caller = "communication",
+            Arbitration = AiRequestMetadata.FromCaller("communication")
         }));
         if (shared.StatusCode == 429)
         {
