@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Error;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Player2;
 using RimWorld;
 using UnityEngine.Networking;
 using Verse;
@@ -14,49 +15,42 @@ namespace Ustas.RimAI.Communication.Client.Player2;
 
 public class Player2Client : IAIClient
 {
-    private const string GameClientId = "019a8368-b00b-72bc-b367-2825079dc6fb";
-    private const string LocalUrl = "http://localhost:4315";
-    private static string RemoteUrl => AIProvider.Player2.GetEndpointUrl();
-
     private readonly string _apiKey;
     private readonly bool _isLocalConnection;
-    private static DateTime _lastHealthCheck = DateTime.MinValue;
-    private static bool _healthCheckActive;
+    private readonly string _baseUrl;
 
-    private string CurrentApiUrl => _isLocalConnection ? LocalUrl : RemoteUrl;
+    private string CurrentApiUrl => _baseUrl;
 
-    private Player2Client(string apiKey, bool isLocal)
+    private Player2Client(Player2EnsureResult session)
     {
-        _apiKey = apiKey;
-        _isLocalConnection = isLocal;
-
-        if (!_healthCheckActive && !string.IsNullOrEmpty(apiKey) && !isLocal)
-        {
-            _healthCheckActive = true;
-            StartHealthCheckLoop();
-        }
+        _apiKey = session.ApiKey;
+        _isLocalConnection = session.IsLocal;
+        _baseUrl = session.BaseUrl;
     }
 
     public static async Task<Player2Client> CreateAsync(string fallbackApiKey = null)
     {
         try
         {
-            string localKey = await TryGetLocalPlayer2Key();
-            if (!string.IsNullOrEmpty(localKey))
+            var session = await Player2Session.Current.EnsureAuthenticatedAsync(
+                new Player2AuthRequest { FallbackApiKey = fallbackApiKey });
+            if (session.Succeeded)
             {
-                Logger.Debug("Player2 local app detected.");
-                ShowNotification("RimTalk.Player2.LocalDetected", MessageTypeDefOf.PositiveEvent);
-                return new Player2Client(localKey, isLocal: true);
-            }
+                if (session.IsLocal)
+                {
+                    Logger.Debug("Player2 local app detected.");
+                    ShowNotification("RimTalk.Player2.LocalDetected", MessageTypeDefOf.PositiveEvent);
+                }
+                else
+                {
+                    Logger.Debug("Using manual Player2 API key.");
+                }
 
-            if (!string.IsNullOrEmpty(fallbackApiKey))
-            {
-                Logger.Debug("Using manual Player2 API key.");
-                return new Player2Client(fallbackApiKey, isLocal: false);
+                return new Player2Client(session);
             }
 
             ShowNotification("RimTalk.Player2.LocalNotFound", MessageTypeDefOf.CautionInput);
-            throw new Exception("Player2 not available: no local app and no API key.");
+            throw new Exception(session.Error ?? "Player2 not available: no local app and no API key.");
         }
         catch (Exception ex)
         {
@@ -65,12 +59,10 @@ public class Player2Client : IAIClient
         }
     }
 
-    public async Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages, 
-        List<(Role role, string message)> messages, 
+    public async Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
+        List<(Role role, string message)> messages,
         Action<Payload> onRequestPrepared = null)
     {
-        await EnsureHealthCheck();
-
         string jsonContent = BuildRequestJson(prefixMessages, messages, stream: false);
         onRequestPrepared?.Invoke(new Payload(CurrentApiUrl, null, jsonContent, null, 0));
         string responseText = await SendRequestAsync($"{CurrentApiUrl}/v1/chat/completions", jsonContent,
@@ -84,12 +76,10 @@ public class Player2Client : IAIClient
     }
 
     public async Task<Payload> GetStreamingChatCompletionAsync<T>(List<(Role role, string message)> prefixMessages,
-        List<(Role role, string message)> messages, 
+        List<(Role role, string message)> messages,
         Action<T> onResponseParsed,
         Action<Payload> onRequestPrepared = null) where T : class
     {
-        await EnsureHealthCheck();
-
         string jsonContent = BuildRequestJson(prefixMessages, messages, stream: true);
         onRequestPrepared?.Invoke(new Payload(CurrentApiUrl, null, jsonContent, null, 0));
         var jsonParser = new JsonStreamParser<T>();
@@ -157,7 +147,7 @@ public class Player2Client : IAIClient
         webRequest.downloadHandler = downloadHandler;
         webRequest.SetRequestHeader("Content-Type", "application/json");
         webRequest.SetRequestHeader("Authorization", $"Bearer {_apiKey}");
-        webRequest.SetRequestHeader("player2-game-key", GameClientId);
+        webRequest.SetRequestHeader(Player2GameKeys.HeaderName, Player2GameKeys.Canonical);
 
         var asyncOp = webRequest.SendWebRequest();
 
@@ -222,6 +212,8 @@ public class Player2Client : IAIClient
         {
             string errorMsg = ErrorUtil.ExtractErrorMessage(responseText) ?? webRequest.error;
             Logger.Error($"Player2 failed: {webRequest.responseCode} - {errorMsg}");
+            if (webRequest.responseCode == 401)
+                Player2Session.Current.Invalidate("communication-401");
             throw new AIRequestException(errorMsg, new Payload(url, null, jsonContent, responseText, 0, errorMsg));
         }
 
@@ -233,68 +225,7 @@ public class Player2Client : IAIClient
         return responseText;
     }
 
-    // --- Static / Connection Helpers ---
-
-    private static async Task<string> TryGetLocalPlayer2Key()
-    {
-        try
-        {
-            Logger.Debug("Checking for local Player2 app...");
-            // Health check
-            using (var healthRequest = UnityWebRequest.Get($"{LocalUrl}/v1/health"))
-            {
-                healthRequest.timeout = 2;
-                await SendWebRequestAsync(healthRequest);
-                if (healthRequest.isNetworkError || healthRequest.isHttpError)
-                {
-                    Logger.Debug($"Player2 local app health check failed: {healthRequest.error}");
-                    return null;
-                }
-
-                Logger.Debug("Player2 local app health check passed");
-            }
-
-            // Login
-            using (var loginRequest = new UnityWebRequest($"{LocalUrl}/v1/login/web/{GameClientId}", "POST"))
-            {
-                loginRequest.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes("{}"));
-                loginRequest.downloadHandler = new DownloadHandlerBuffer();
-                loginRequest.SetRequestHeader("Content-Type", "application/json");
-                loginRequest.timeout = 3;
-
-                await SendWebRequestAsync(loginRequest);
-                if (loginRequest.isNetworkError || loginRequest.isHttpError)
-                {
-                    Logger.Debug($"Player2 local login failed: {loginRequest.responseCode} - {loginRequest.error}");
-                    return null;
-                }
-
-                var response = JsonUtil.DeserializeFromJson<LocalPlayer2Response>(loginRequest.downloadHandler.text);
-                if (!string.IsNullOrEmpty(response?.P2Key))
-                {
-                    Logger.Message("[Player2] ✓ Local app authenticated successfully");
-                    return response.P2Key;
-                }
-
-                Logger.Warning("Player2 local app responded but no API key in response");
-                return null;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Debug($"Local Player2 detection failed: {ex.Message}");
-            return null;
-        }
-    }
-
-    private static Task SendWebRequestAsync(UnityWebRequest request)
-    {
-        var tcs = new TaskCompletionSource<bool>();
-        request.SendWebRequest().completed += _ => tcs.SetResult(true);
-        return tcs.Task;
-    }
-
-    private static void ShowNotification(string messageKey, MessageTypeDef type)
+    static void ShowNotification(string messageKey, MessageTypeDef type)
     {
         LongEventHandler.ExecuteWhenFinished(() =>
         {
@@ -317,55 +248,16 @@ public class Player2Client : IAIClient
         });
     }
 
-    // --- Health Check Logic ---
-
-    private async void StartHealthCheckLoop()
+    public static void StopHealthCheck()
     {
-        while (_healthCheckActive && Current.Game != null)
-        {
-            await Task.Delay(60000);
-            if (_healthCheckActive) await EnsureHealthCheck(force: true);
-        }
+        // Health cache lives on the canonical Player2 session.
     }
-
-    private async Task EnsureHealthCheck(bool force = false)
-    {
-        if (_isLocalConnection || string.IsNullOrEmpty(_apiKey)) return;
-        if (!force && (DateTime.Now - _lastHealthCheck).TotalSeconds < 60) return;
-
-        try
-        {
-            using var webRequest = new UnityWebRequest($"{RemoteUrl}/v1/health", "GET");
-            webRequest.downloadHandler = new DownloadHandlerBuffer();
-            webRequest.SetRequestHeader("Authorization", $"Bearer {_apiKey}");
-            webRequest.SetRequestHeader("player2-game-key", GameClientId);
-
-            var asyncOp = webRequest.SendWebRequest();
-            while (!asyncOp.isDone)
-            {
-                if (Current.Game == null) return;
-                await Task.Delay(100);
-            }
-
-            _lastHealthCheck = DateTime.Now;
-            if (webRequest.responseCode == 200)
-                Logger.Debug("Player2 health check successful");
-            else
-                Logger.Warning($"Player2 health check failed: {webRequest.responseCode} - {webRequest.error}");
-        }
-        catch (Exception ex)
-        {
-            Logger.Warning($"Player2 health check exception: {ex.Message}");
-        }
-    }
-
-    public static void StopHealthCheck() => _healthCheckActive = false;
 
     public static void CheckPlayer2StatusAndNotify()
     {
-        Task.Run(async () =>
+        Task.Run(() =>
         {
-            bool isAvailable = await IsPlayer2LocalAppAvailableAsync();
+            bool isAvailable = Player2Session.Current.ProbeHealth(Player2EndpointKind.LocalApp, force: true).Healthy;
             LongEventHandler.ExecuteWhenFinished(() =>
             {
                 if (isAvailable)
@@ -375,28 +267,4 @@ public class Player2Client : IAIClient
             });
         });
     }
-
-    private static async Task<bool> IsPlayer2LocalAppAvailableAsync()
-    {
-        try
-        {
-            using var webRequest = UnityWebRequest.Get($"{LocalUrl}/v1/health");
-            webRequest.timeout = 2;
-            await SendWebRequestAsync(webRequest);
-            return webRequest.responseCode == 200;
-        }
-        catch
-        {
-            {
-                return false;
-            }
-        }
-    }
-}
-
-[System.Runtime.Serialization.DataContract]
-public class LocalPlayer2Response
-{
-    [System.Runtime.Serialization.DataMember(Name = "p2Key")]
-    public string P2Key { get; set; }
 }
