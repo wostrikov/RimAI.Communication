@@ -181,6 +181,13 @@ public static class Constant
         new("RimTalk.Persona.Vengeful".Translate(), 0.35f)
     ];
 
+    public static void ReplacePersonalities(PersonalityData[] personalities)
+    {
+        if (personalities == null || personalities.Length == 0)
+            return;
+        _personalities = personalities;
+    }
+
     private static PersonalityData _personaAnimal;
     public static PersonalityData PersonaAnimal => _personaAnimal ??= new("RimTalk.Persona.Animal".Translate(), 0.2f);
 

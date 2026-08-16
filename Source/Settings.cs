@@ -67,6 +67,8 @@ public partial class Settings : Mod
     void RegisterRimAIContributions()
     {
         CommunicationApplicationAccess.Register(new CommunicationApplication());
+        PromptTemplateAccess.Register(new CommunicationPromptTemplateRenderer());
+        PromptVariableHostAccess.Register(new CommunicationPromptVariableHost());
         RimAIModuleRegistry.Current.Register(new RimAIModuleDescriptor(
             "communication",
             "RimAI.Communication",

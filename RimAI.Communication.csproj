@@ -16,7 +16,7 @@
 
         <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
         <ModFolderName>RimAI.Communication</ModFolderName>
-        <LangVersion>default</LangVersion>
+        <LangVersion>latest</LangVersion>
         <EnableBubbles>true</EnableBubbles>
     </PropertyGroup>
 
