@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Client.OpenAI;
 using Ustas.RimAI.Communication.Client.Player2;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Core.Configuration;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -22,7 +23,53 @@ public partial class Settings
             DrawAdvancedApiSettings(listingStandard);
         else
             DrawSimpleApiSettings(listingStandard);
+        DrawSharedAiLanguageSettings(listingStandard);
     }
+
+    internal void DrawSharedAiLanguageSettings(Listing_Standard listingStandard)
+    {
+        CommunicationSettings settings = Get();
+        listingStandard.Gap();
+        listingStandard.Label("Ustas.RimAI.Settings.SharedAi.Language".Translate());
+        string resolved = GameplayAiLanguage.Resolve(settings.GameplayAiLanguage, TryActiveGameLanguageEnglish());
+        string current = string.IsNullOrWhiteSpace(settings.GameplayAiLanguage)
+            ? "Ustas.RimAI.Settings.SharedAi.LanguageAuto".Translate(resolved)
+            : resolved;
+        Rect languageRect = listingStandard.GetRect(30f);
+        if (Widgets.ButtonText(languageRect, current))
+        {
+            var options = new List<FloatMenuOption>
+            {
+                new("Ustas.RimAI.Settings.SharedAi.LanguageAuto".Translate(resolved), () => settings.GameplayAiLanguage = "")
+            };
+            foreach (var language in SharedAiLanguageChoices)
+            {
+                string choice = language;
+                options.Add(new FloatMenuOption(choice, () => settings.GameplayAiLanguage = choice));
+            }
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+        Text.Font = GameFont.Tiny;
+        GUI.color = Color.gray;
+        listingStandard.Label("Ustas.RimAI.Settings.SharedAi.LanguageTooltip".Translate());
+        GUI.color = Color.white;
+        Text.Font = GameFont.Small;
+    }
+
+    static readonly string[] SharedAiLanguageChoices =
+    {
+        "English",
+        "Ukrainian",
+        "ChineseSimplified",
+        "ChineseTraditional",
+        "Japanese",
+        "Korean",
+        "French",
+        "German",
+        "Spanish",
+        "Russian",
+        "Polish"
+    };
 
     private void DrawSimpleApiSettings(Listing_Standard listingStandard)
     {

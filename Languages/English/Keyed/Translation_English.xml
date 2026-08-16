@@ -422,4 +422,7 @@ Crucial Tips:
     <RimTalk.PromptEntry.ChatHistory>Chat History</RimTalk.PromptEntry.ChatHistory>
     <RimTalk.PromptEntry.MemoryKnowledge>Memory &amp; Knowledge</RimTalk.PromptEntry.MemoryKnowledge>
     <RimTalk.PromptEntry.DialoguePrompt>Dialogue Prompt</RimTalk.PromptEntry.DialoguePrompt>
+    <Ustas.RimAI.Settings.SharedAi.Language>AI language</Ustas.RimAI.Settings.SharedAi.Language>
+    <Ustas.RimAI.Settings.SharedAi.LanguageAuto>Auto (game language) → {0}</Ustas.RimAI.Settings.SharedAi.LanguageAuto>
+    <Ustas.RimAI.Settings.SharedAi.LanguageTooltip>Target natural language for gameplay text AI. Modules including Voices use this shared value.</Ustas.RimAI.Settings.SharedAi.LanguageTooltip>
 </LanguageData>

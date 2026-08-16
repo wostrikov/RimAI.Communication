@@ -98,7 +98,11 @@ public partial class Settings : Mod
         var settings = Get();
         var config = settings?.GetActiveConfig();
         if (config == null)
-            return SharedTextAiSnapshot.Inactive(settings?.UseCloudProviders ?? true);
+        {
+            var inactive = SharedTextAiSnapshot.Inactive(settings?.UseCloudProviders ?? true);
+            inactive.Language = GameplayAiLanguage.Resolve(settings?.GameplayAiLanguage, TryActiveGameLanguageEnglish());
+            return inactive;
+        }
 
         return SharedTextAiSnapshot.FromSelection(
             hasActive: true,
@@ -107,7 +111,26 @@ public partial class Settings : Mod
             model: config.SelectedModel,
             customModel: config.CustomModelName,
             baseUrl: config.BaseUrl,
-            apiKey: config.ApiKey);
+            apiKey: config.ApiKey,
+            language: settings.GameplayAiLanguage,
+            gameLanguageFallback: TryActiveGameLanguageEnglish());
+    }
+
+    static string? TryActiveGameLanguageEnglish()
+    {
+        try
+        {
+            var language = LanguageDatabase.activeLanguage;
+            if (language?.info == null)
+                return language?.folderName;
+            if (!string.IsNullOrWhiteSpace(language.info.friendlyNameEnglish))
+                return language.info.friendlyNameEnglish;
+            return language.folderName;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     public override string SettingsCategory() =>

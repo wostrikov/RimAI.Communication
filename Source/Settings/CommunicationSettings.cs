@@ -38,6 +38,7 @@ public class CommunicationSettings : ModSettings
     public bool AllowCustomConversation = true;
     public Settings.PlayerDialogueMode PlayerDialogueMode = Settings.PlayerDialogueMode.Manual;
     public string PlayerName = "Player";
+    public string GameplayAiLanguage = "";
     public bool ContinueDialogueWhileSleeping = false;
     public bool AllowBabiesToTalk = true;
     public bool AllowNonHumanToTalk = true;
@@ -177,6 +178,7 @@ public class CommunicationSettings : ModSettings
         Scribe_Values.Look(ref AllowCustomConversation, "allowCustomConversation", true);
         Scribe_Values.Look(ref PlayerDialogueMode, "playerDialogueMode", Settings.PlayerDialogueMode.Manual);
         Scribe_Values.Look(ref PlayerName, "playerName", "Player");
+        Scribe_Values.Look(ref GameplayAiLanguage, "gameplayAiLanguage", "");
         
         Scribe_Values.Look(ref ContinueDialogueWhileSleeping, "continueDialogueWhileSleeping", false);
         Scribe_Values.Look(ref DisableAiAtSpeed, "DisableAiAtSpeed", 0);
