@@ -98,18 +98,16 @@ public partial class Settings : Mod
         var settings = Get();
         var config = settings?.GetActiveConfig();
         if (config == null)
-            return new SharedTextAiSnapshot { HasActive = false, UseCloud = settings?.UseCloudProviders ?? true };
+            return SharedTextAiSnapshot.Inactive(settings?.UseCloudProviders ?? true);
 
-        return new SharedTextAiSnapshot
-        {
-            HasActive = true,
-            UseCloud = settings.UseCloudProviders,
-            Provider = config.Provider.ToString(),
-            Model = config.SelectedModel ?? "",
-            CustomModel = config.CustomModelName ?? "",
-            BaseUrl = config.BaseUrl ?? "",
-            ApiKey = config.Provider == AIProvider.OpenAI ? "" : config.ApiKey ?? ""
-        };
+        return SharedTextAiSnapshot.FromSelection(
+            hasActive: true,
+            useCloud: settings.UseCloudProviders,
+            providerId: config.Provider.ToString(),
+            model: config.SelectedModel,
+            customModel: config.CustomModelName,
+            baseUrl: config.BaseUrl,
+            apiKey: config.ApiKey);
     }
 
     public override string SettingsCategory() =>

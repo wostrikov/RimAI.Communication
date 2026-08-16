@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Client.OpenAI;
 using Ustas.RimAI.Communication.Client.Player2;
@@ -57,13 +58,27 @@ public static class AIClientFactory
             case AIProvider.Custom:  return new OpenAIClient(config.BaseUrl, config.CustomModelName, config.ApiKey);
         }
 
-        // 2. Handle Standard Clients via Registry
-        if (AIProviderRegistry.Defs.TryGetValue(config.Provider, out var def))
+        var endpoint = GameplayTextAiProviderCatalog.ChatEndpoint(config.Provider.ToString());
+        if (!string.IsNullOrWhiteSpace(endpoint))
         {
-            return new OpenAIClient(def.EndpointUrl, model, config.ApiKey, def.ExtraHeaders);
+            return new OpenAIClient(
+                endpoint,
+                model,
+                config.ApiKey,
+                ToMutableHeaders(GameplayTextAiProviderCatalog.ExtraHeaders(config.Provider.ToString())));
         }
 
         return null;
+    }
+
+    static Dictionary<string, string> ToMutableHeaders(IReadOnlyDictionary<string, string> headers)
+    {
+        if (headers == null || headers.Count == 0)
+            return null;
+        var copy = new Dictionary<string, string>();
+        foreach (var pair in headers)
+            copy[pair.Key] = pair.Value;
+        return copy;
     }
 
     /// <summary>
