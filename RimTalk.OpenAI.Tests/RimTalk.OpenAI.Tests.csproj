@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><ImplicitUsings>disable</ImplicitUsings><Nullable>disable</Nullable></PropertyGroup>
-  <ItemGroup><Compile Include="..\Source\Client\OpenAI\OpenAIProviderAdapter.cs" Link="OpenAIProviderAdapter.cs" /></ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Source\Client\OpenAI\OpenAIProviderAdapter.cs" Link="OpenAIProviderAdapter.cs" />
+    <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj" />
+  </ItemGroup>
 </Project>

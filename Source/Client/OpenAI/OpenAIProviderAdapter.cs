@@ -11,7 +11,7 @@ public enum OpenAIErrorCategory { Unknown, Authentication, Permission, InvalidRe
 
 public static class OpenAIProviderAdapter
 {
-    public const string CredentialVariable = AiCredentialResolver.LegacyTalk;
+    public const string CredentialVariable = AiCredentialResolver.Canonical;
     public const string ResponsesEndpoint = "https://api.openai.com/v1/responses";
     public const string ModelsEndpoint = "https://api.openai.com/v1/models";
     public static string ResolveCredential() => AiCredentialResolver.Resolve().Value ?? string.Empty;
