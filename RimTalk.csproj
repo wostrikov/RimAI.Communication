@@ -35,7 +35,9 @@
     <ItemGroup>
         <PackageReference Include="Lib.Harmony.Ref" Version="2.*" PrivateAssets="All"/>
         <PackageReference Include="IndexRange" Version="1.0.3" />
-        <ProjectReference Include="..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj" />
+        <ProjectReference Include="..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj">
+            <Private>false</Private>
+        </ProjectReference>
     </ItemGroup>
 
     <!-- Use reference assemblies by default (for other users and CI) -->
