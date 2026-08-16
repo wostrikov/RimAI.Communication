@@ -91,7 +91,7 @@
     <!-- Deploy to RimWorld client (macOS) -->
     <Target Name="MacDeploy">
         <PropertyGroup>
-            <DeployPath>$(RimWorldDir)/RimWorldMac.app/Mods/RimTalk/</DeployPath>
+            <DeployPath>$(RimWorldDir)/RimWorldMac.app/Mods/$(ModFolderName)/</DeployPath>
         </PropertyGroup>
         <MakeDir Directories="$(DeployPath)"/>
         <Exec Command='rsync -a --delete --checksum "$(ProjectDir)About/"     "$(DeployPath)About/"'/>
@@ -106,7 +106,7 @@
     <!-- Deploy to RimWorld client (Windows) -->
     <Target Name="WinDeploy">
         <PropertyGroup>
-            <WinModPath>$(RimWorldDir)\Mods\RimTalk\</WinModPath>
+            <WinModPath>$(RimWorldDir)\Mods\$(ModFolderName)\</WinModPath>
         </PropertyGroup>
         <Message Text="Copying to $(WinModPath)" Importance="high"/>
         <ItemGroup>
