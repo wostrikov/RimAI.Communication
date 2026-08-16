@@ -1,14 +1,13 @@
 using System;
 using System.Text;
 using Ustas.RimAI.Communication.Util;
-using UnityEngine.Networking;
 
 namespace Ustas.RimAI.Communication.Client.OpenAI;
 
 /// <summary>
-/// A custom download handler that processes Server-Sent Events (SSE) streams for OpenAI.
+/// Domain SSE parser for OpenAI chat streams. Generic chunk plumbing is owned by IHttpTransport.
 /// </summary>
-public class OpenAIStreamHandler(Action<string> onContentReceived) : DownloadHandlerScript
+public class OpenAIStreamHandler(Action<string> onContentReceived)
 {
     private readonly StringBuilder _buffer = new();
     private readonly StringBuilder _fullText = new();
@@ -22,8 +21,15 @@ public class OpenAIStreamHandler(Action<string> onContentReceived) : DownloadHan
 
     public string DetectedError { get; private set; }
 
+    public void AppendUtf8(string chunk)
+    {
+        if (string.IsNullOrEmpty(chunk))
+            return;
+        byte[] data = Encoding.UTF8.GetBytes(chunk);
+        ReceiveData(data, data.Length);
+    }
 
-    protected override bool ReceiveData(byte[] data, int dataLength)
+    public bool ReceiveData(byte[] data, int dataLength)
     {
         if (data == null || dataLength == 0) return false;
 

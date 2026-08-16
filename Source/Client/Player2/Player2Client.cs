@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Error;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Net;
 using Ustas.RimAI.Core.Player2;
 using RimWorld;
-using UnityEngine.Networking;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Client.Player2;
@@ -65,8 +65,7 @@ public class Player2Client : IAIClient
     {
         string jsonContent = BuildRequestJson(prefixMessages, messages, stream: false);
         onRequestPrepared?.Invoke(new Payload(CurrentApiUrl, null, jsonContent, null, 0));
-        string responseText = await SendRequestAsync($"{CurrentApiUrl}/v1/chat/completions", jsonContent,
-            new DownloadHandlerBuffer());
+        string responseText = await SendRequestAsync($"{CurrentApiUrl}/v1/chat/completions", jsonContent);
 
         var response = JsonUtil.DeserializeFromJson<Player2Response>(responseText);
         var content = response?.Choices?[0]?.Message?.Content;
@@ -138,63 +137,54 @@ public class Player2Client : IAIClient
         };
     }
 
-    private async Task<string> SendRequestAsync(string url, string jsonContent, DownloadHandler downloadHandler)
+    private async Task<string> SendRequestAsync(string url, string jsonContent, Player2StreamHandler streamHandler = null)
     {
         Logger.Debug($"Player2 Request ({(_isLocalConnection ? "local" : "remote")}): {url}\n{jsonContent}");
 
-        using var webRequest = new UnityWebRequest(url, "POST");
-        webRequest.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonContent));
-        webRequest.downloadHandler = downloadHandler;
-        webRequest.SetRequestHeader("Content-Type", "application/json");
-        webRequest.SetRequestHeader("Authorization", $"Bearer {_apiKey}");
-        webRequest.SetRequestHeader(Player2GameKeys.HeaderName, Player2GameKeys.Canonical);
-
-        var asyncOp = webRequest.SendWebRequest();
-
-        float inactivityTimer = 0f;
-        ulong lastBytes = 0;
-        const float connectTimeout = 60f;
-        const float readTimeout = 60f;
-
-        while (!asyncOp.isDone)
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            if (Current.Game == null) return null;
+            ["Authorization"] = $"Bearer {_apiKey}",
+            [Player2GameKeys.HeaderName] = Player2GameKeys.Canonical
+        };
+
+        using var cts = new CancellationTokenSource();
+        var send = SharedHttpTransport.Current.SendAsync(
+            new HttpTransportRequest
+            {
+                Method = "POST",
+                Url = url,
+                Headers = headers,
+                Body = jsonContent,
+                ContentType = "application/json",
+                TimeoutMilliseconds = 120000,
+                FirstByteTimeoutMilliseconds = 60000,
+                IdleTimeoutMilliseconds = 60000,
+                CorrelationId = "communication-player2"
+            },
+            streamHandler == null ? (Action<string>)null : streamHandler.AppendUtf8,
+            cts.Token);
+
+        while (!send.IsCompleted)
+        {
+            if (Current.Game == null)
+            {
+                cts.Cancel();
+                return null;
+            }
+
             await Task.Delay(100);
-
-            ulong currentBytes = webRequest.downloadedBytes;
-            bool hasStartedReceiving = currentBytes > 0;
-
-            if (currentBytes > lastBytes)
-            {
-                inactivityTimer = 0f;
-                lastBytes = currentBytes;
-            }
-            else
-            {
-                inactivityTimer += 0.1f;
-            }
-
-            if (!hasStartedReceiving && inactivityTimer > connectTimeout)
-            {
-                webRequest.Abort();
-                throw new TimeoutException($"Connection timed out ({connectTimeout}s)");
-            }
-
-            if (hasStartedReceiving && inactivityTimer > readTimeout)
-            {
-                webRequest.Abort();
-                throw new TimeoutException($"Read timed out ({readTimeout}s)");
-            }
         }
 
-        if (downloadHandler is Player2StreamHandler sHandler)
-        {
-            sHandler.Flush();
+        HttpTransportResponse http = await send;
 
-            if (!string.IsNullOrEmpty(sHandler.DetectedError))
+        if (streamHandler != null)
+        {
+            streamHandler.Flush();
+
+            if (!string.IsNullOrEmpty(streamHandler.DetectedError))
             {
-                string errorMsg = sHandler.DetectedError;
-                string allText = sHandler.GetAllReceivedText();
+                string errorMsg = streamHandler.DetectedError;
+                string allText = streamHandler.GetAllReceivedText();
 
                 if (errorMsg.Contains("ResourceExhausted") || errorMsg.Contains("Insufficient"))
                 {
@@ -206,21 +196,29 @@ public class Player2Client : IAIClient
             }
         }
 
-        string responseText = downloadHandler.text;
+        if (http.TimedOut)
+            throw new TimeoutException(http.ErrorMessage ?? "Request timed out");
 
-        if (webRequest.isNetworkError || webRequest.isHttpError)
+        if (http.Cancelled)
+            return null;
+
+        string responseText = !string.IsNullOrEmpty(http.BodyText)
+            ? http.BodyText
+            : streamHandler?.GetAllReceivedText();
+
+        if (!http.Succeeded)
         {
-            string errorMsg = ErrorUtil.ExtractErrorMessage(responseText) ?? webRequest.error;
-            Logger.Error($"Player2 failed: {webRequest.responseCode} - {errorMsg}");
-            if (webRequest.responseCode == 401)
+            string errorMsg = ErrorUtil.ExtractErrorMessage(responseText) ?? http.ErrorMessage;
+            Logger.Error($"Player2 failed: {http.StatusCode} - {errorMsg}");
+            if (http.StatusCode == 401)
                 Player2Session.Current.Invalidate("communication-401");
             throw new AIRequestException(errorMsg, new Payload(url, null, jsonContent, responseText, 0, errorMsg));
         }
 
-        if (downloadHandler is DownloadHandlerBuffer)
+        if (streamHandler == null)
             Logger.Debug($"Player2 Response: \n{responseText}");
-        else if (downloadHandler is Player2StreamHandler sh)
-            Logger.Debug($"Player2 Streaming complete. Tokens: {sh.GetTotalTokens()}");
+        else
+            Logger.Debug($"Player2 Streaming complete. Tokens: {streamHandler.GetTotalTokens()}");
 
         return responseText;
     }

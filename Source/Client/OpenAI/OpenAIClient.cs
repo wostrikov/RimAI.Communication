@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Error;
 using Ustas.RimAI.Communication.Util;
-using UnityEngine.Networking;
 using Ustas.RimAI.Core.AI;
+using Ustas.RimAI.Core.Net;
 using Verse;
 using Enumerable = System.Linq.Enumerable;
 
@@ -210,7 +211,7 @@ public class OpenAIClient(
         };
     }
 
-    private async Task<string> SendRequestAsync(string jsonContent, DownloadHandler downloadHandler)
+    private async Task<string> SendRequestAsync(string jsonContent, OpenAIStreamHandler streamHandler)
     {
         if (string.IsNullOrEmpty(_endpointUrl))
         {
@@ -220,117 +221,115 @@ public class OpenAIClient(
 
         Logger.Debug($"API request: {_endpointUrl}");
 
-        using var webRequest = new UnityWebRequest(_endpointUrl, "POST");
-        webRequest.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonContent));
-        webRequest.downloadHandler = downloadHandler;
-        webRequest.SetRequestHeader("Content-Type", "application/json");
-
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         if (!string.IsNullOrEmpty(apiKey))
-            webRequest.SetRequestHeader("Authorization", $"Bearer {apiKey}");
-
+            headers["Authorization"] = $"Bearer {apiKey}";
         if (extraHeaders != null)
         {
             foreach (var header in extraHeaders)
-                webRequest.SetRequestHeader(header.Key, header.Value);
+                headers[header.Key] = header.Value;
         }
 
-        var asyncOp = webRequest.SendWebRequest();
-
-        // Determine if target is local
         bool isLocal = _endpointUrl.Contains("localhost") || _endpointUrl.Contains("127.0.0.1") ||
                        _endpointUrl.Contains("192.168.") || _endpointUrl.Contains("10.");
-
-        float inactivityTimer = 0f;
-        ulong lastBytes = 0;
         float connectTimeout = isLocal ? 300f : 60f;
-        float readTimeout = 60f;
+        const float readTimeout = 60f;
 
-        while (!asyncOp.isDone)
+        using var cts = new CancellationTokenSource();
+        var send = SharedHttpTransport.Current.SendAsync(
+            new HttpTransportRequest
+            {
+                Method = "POST",
+                Url = _endpointUrl,
+                Headers = headers,
+                Body = jsonContent,
+                ContentType = "application/json",
+                TimeoutMilliseconds = (int)((connectTimeout + readTimeout) * 1000),
+                FirstByteTimeoutMilliseconds = (int)(connectTimeout * 1000),
+                IdleTimeoutMilliseconds = (int)(readTimeout * 1000),
+                CorrelationId = "communication-openai"
+            },
+            streamHandler == null ? (Action<string>)null : streamHandler.AppendUtf8,
+            cts.Token);
+
+        while (!send.IsCompleted)
         {
-            if (Current.Game == null) return null;
+            if (Current.Game == null)
+            {
+                cts.Cancel();
+                return null;
+            }
+
             await Task.Delay(100);
-
-            ulong currentBytes = webRequest.downloadedBytes;
-            bool hasStartedReceiving = currentBytes > 0;
-
-            if (currentBytes > lastBytes)
-            {
-                inactivityTimer = 0f;
-                lastBytes = currentBytes;
-            }
-            else
-            {
-                inactivityTimer += 0.1f;
-            }
-
-            if (!hasStartedReceiving && inactivityTimer > connectTimeout)
-            {
-                webRequest.Abort();
-                throw new TimeoutException($"Connection timed out (Waited {connectTimeout}s for first token)");
-            }
-
-            if (hasStartedReceiving && inactivityTimer > readTimeout)
-            {
-                webRequest.Abort();
-                throw new TimeoutException($"Read timed out (Stalled for {readTimeout}s during generation)");
-            }
         }
 
-        string responseText = downloadHandler.text;
+        HttpTransportResponse http = await send;
+        string responseText = http.BodyText;
 
-        // Recover text for streaming errors
-        if (downloadHandler is OpenAIStreamHandler sHandler)
+        if (streamHandler != null)
         {
-            if (!string.IsNullOrEmpty(sHandler.DetectedError))
+            if (!string.IsNullOrEmpty(streamHandler.DetectedError))
             {
-                string errorMsg = sHandler.DetectedError;
-                string allText = sHandler.GetAllReceivedText();
+                string errorMsg = streamHandler.DetectedError;
+                string allText = streamHandler.GetAllReceivedText();
                 throw new AIRequestException(errorMsg,
                     new Payload(_endpointUrl, model, jsonContent, allText, 0, errorMsg));
             }
 
-            if (webRequest.responseCode >= 400 || webRequest.isNetworkError || webRequest.isHttpError)
+            if (http.StatusCode >= 400 || !http.Succeeded)
             {
-                responseText = sHandler.GetAllReceivedText();
-                if (string.IsNullOrEmpty(responseText)) responseText = sHandler.GetRawJson();
+                responseText = streamHandler.GetAllReceivedText();
+                if (string.IsNullOrEmpty(responseText)) responseText = streamHandler.GetRawJson();
             }
         }
 
-        if (webRequest.responseCode == 429)
+        if (http.TimedOut)
+            throw new TimeoutException(http.ErrorMessage ?? "Request timed out");
+
+        if (http.Cancelled)
+            return null;
+
+        if (http.StatusCode == 429)
         {
             string errorMsg = ErrorUtil.ExtractErrorMessage(responseText) ?? "Quota exceeded";
             throw new QuotaExceededException(errorMsg,
                 new Payload(_endpointUrl, model, jsonContent, responseText, 0, errorMsg));
         }
 
-        if (webRequest.isNetworkError || webRequest.isHttpError)
+        if (!http.Succeeded)
         {
-            string errorMsg = ErrorUtil.ExtractErrorMessage(responseText) ?? webRequest.error;
-            Logger.Error($"Request failed: {webRequest.responseCode} - {errorMsg}");
+            string errorMsg = ErrorUtil.ExtractErrorMessage(responseText) ?? http.ErrorMessage;
+            Logger.Error($"Request failed: {http.StatusCode} - {errorMsg}");
             throw new AIRequestException(errorMsg,
                 new Payload(_endpointUrl, model, jsonContent, responseText, 0, errorMsg));
         }
 
-        Logger.Debug($"API response received: HTTP {webRequest.responseCode}");
-
+        Logger.Debug($"API response received: HTTP {http.StatusCode}");
         return responseText;
     }
 
     public static async Task<List<string>> FetchModelsAsync(string apiKey, string url)
     {
-        using var webRequest = UnityWebRequest.Get(url);
-        webRequest.SetRequestHeader("Authorization", "Bearer " + apiKey);
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (!string.IsNullOrEmpty(apiKey))
+            headers["Authorization"] = "Bearer " + apiKey;
 
-        var asyncOp = webRequest.SendWebRequest();
-        while (!asyncOp.isDone) await Task.Delay(100);
-
-        if (webRequest.isNetworkError || webRequest.isHttpError)
+        var http = await SharedHttpTransport.Current.SendAsync(new HttpTransportRequest
         {
-            Logger.Error($"Failed to fetch models: {webRequest.error}");
+            Method = "GET",
+            Url = url,
+            Headers = headers,
+            TimeoutMilliseconds = 60000,
+            CorrelationId = "communication-openai-models"
+        });
+
+        if (!http.Succeeded)
+        {
+            Logger.Error($"Failed to fetch models: {http.ErrorMessage}");
             return new List<string>();
         }
 
-        var response = JsonUtil.DeserializeFromJson<OpenAIModelsResponse>(webRequest.downloadHandler.text);
+        var response = JsonUtil.DeserializeFromJson<OpenAIModelsResponse>(http.BodyText);
         return response?.Data?.Select(m => m.Id).ToList() ?? new List<string>();
     }
 }
