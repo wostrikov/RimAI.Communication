@@ -5,6 +5,7 @@ using UnityEngine;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Core.Communication;
 using Ustas.RimAI.Core.Configuration;
+using Ustas.RimAI.Core.Handshake;
 using Ustas.RimAI.Core.Modules;
 using Verse;
 
@@ -57,11 +58,16 @@ public partial class Settings : Mod
 
     public Settings(ModContentPack content) : base(content)
     {
-        var harmony = new Harmony("ustas.rimai.communication");
         var settings = GetSettings<CommunicationSettings>();
-        harmony.PatchAll();
         _apiSettingsHash = GetApiSettingsHash(settings);
-        RegisterRimAIContributions();
+        RimAiHandshake.TryActivate(
+            RimAiHandshakeDescriptor.Current(RimAiModuleIds.Communication, Version, isOptional: true),
+            () =>
+            {
+                var harmony = new Harmony("ustas.rimai.communication");
+                harmony.PatchAll();
+                RegisterRimAIContributions();
+            });
     }
 
     void RegisterRimAIContributions()
