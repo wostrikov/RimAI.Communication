@@ -425,4 +425,6 @@ Crucial Tips:
     <Ustas.RimAI.Settings.SharedAi.Language>AI language</Ustas.RimAI.Settings.SharedAi.Language>
     <Ustas.RimAI.Settings.SharedAi.LanguageAuto>Auto (game language) → {0}</Ustas.RimAI.Settings.SharedAi.LanguageAuto>
     <Ustas.RimAI.Settings.SharedAi.LanguageTooltip>Target natural language for gameplay text AI. Modules including Voices use this shared value.</Ustas.RimAI.Settings.SharedAi.LanguageTooltip>
+    <Ustas.RimAI.Settings.FetchingModels>Fetching models…</Ustas.RimAI.Settings.FetchingModels>
+    <Ustas.RimAI.Settings.NoModelsFound>(no models found — check API key)</Ustas.RimAI.Settings.NoModelsFound>
 </LanguageData>

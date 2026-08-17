@@ -6,6 +6,7 @@ using Ustas.RimAI.Communication.Client.OpenAI;
 using Ustas.RimAI.Communication.Client.Player2;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Core.Configuration;
+using Ustas.RimAI.Core.Threading;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -387,7 +388,14 @@ public partial class Settings
         {
             if (Widgets.ButtonText(modelRect, config.SelectedModel))
             {
-                ShowModelSelectionMenu(config);
+                try
+                {
+                    ShowModelSelectionMenu(config);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("[RimAI.Communication] Model picker click failed.\n" + ex);
+                }
             }
         }
     }
@@ -473,27 +481,41 @@ public partial class Settings
             : config.CustomModelName;
     }
 
+    private int _modelFetchSerial;
+
     private void ShowModelSelectionMenu(ApiConfig config)
     {
+        var provider = config.Provider;
+        Log.Message("[RimAI.Communication] Model picker opened. provider=" + provider
+            + " selected=" + config.SelectedModel
+            + " scheduler=" + (MainThreadSchedulerAccess.IsAvailable ? "available" : "missing")
+            + " syncContext=" + (System.Threading.SynchronizationContext.Current?.GetType().FullName ?? "null"));
+
         // Allow Player2 to work without API key (local app detection)
-        if ((config.Provider == AIProvider.OpenAI ? !OpenAIProviderAdapter.CredentialPresent : string.IsNullOrWhiteSpace(config.ApiKey))
-            && config.Provider != AIProvider.Player2)
+        if ((provider == AIProvider.OpenAI ? !OpenAIProviderAdapter.CredentialPresent : string.IsNullOrWhiteSpace(config.ApiKey))
+            && provider != AIProvider.Player2)
         {
+            Log.Warning("[RimAI.Communication] Model picker blocked: API credential is missing. provider=" + provider);
             Find.WindowStack.Add(new FloatMenu([new FloatMenuOption("RimTalk.Settings.EnterApiKey".Translate(), null)]));
             return;
         }
 
-        if (config.Provider == AIProvider.Player2)
+        if (provider == AIProvider.Player2)
         {
             config.SelectedModel = "Default";
             return;
         }
 
-        string url = config.Provider.GetListModelsUrl();
-        if (string.IsNullOrEmpty(url)) return;
-        
+        string url = provider.GetListModelsUrl();
+
         void OpenMenu(List<string> models)
         {
+            if (Find.WindowStack == null)
+            {
+                Log.Error("[RimAI.Communication] Model picker cannot open a menu: WindowStack is null.");
+                return;
+            }
+
             var options = new List<FloatMenuOption>();
 
             if (models != null && models.Any())
@@ -502,32 +524,86 @@ public partial class Settings
             }
             else
             {
-                options.Add(new FloatMenuOption("(no models found - check API Key)", null));
+                Log.Warning("[RimAI.Communication] Model picker has no models. provider=" + provider + " url=" + url);
+                options.Add(new FloatMenuOption("Ustas.RimAI.Settings.NoModelsFound".Translate(), null));
             }
 
             options.Add(new FloatMenuOption("Custom", () => config.SelectedModel = "Custom"));
             Find.WindowStack.Add(new FloatMenu(options));
         }
 
-        if (ModelCache.ContainsKey(url))
+        if (string.IsNullOrEmpty(url))
         {
-            OpenMenu(ModelCache[url]);
+            Log.Warning("[RimAI.Communication] Model picker has no list-models URL. provider=" + provider
+                + "; opening Custom-only menu.");
+            OpenMenu(null);
+            return;
         }
-        else
-        {
-            string credential = config.Provider == AIProvider.OpenAI ? OpenAIProviderAdapter.ResolveCredential() : config.ApiKey;
-            Task<List<string>> fetchTask = OpenAIClient.FetchModelsAsync(credential, url);
 
-            fetchTask.ContinueWith(task =>
-            {
-                var models = task.Result;
-                if (models != null && models.Any())
-                {
-                    ModelCache[url] = models;
-                }
-                OpenMenu(models);
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+        if (ModelCache.TryGetValue(url, out var cached))
+        {
+            OpenMenu(cached);
+            return;
         }
+
+        int fetchId = ++_modelFetchSerial;
+        Find.WindowStack.Add(new FloatMenu(
+        [
+            new FloatMenuOption("Custom", () => config.SelectedModel = "Custom"),
+            new FloatMenuOption("Ustas.RimAI.Settings.FetchingModels".Translate(), null)
+        ]));
+
+        string credential = provider == AIProvider.OpenAI ? OpenAIProviderAdapter.ResolveCredential() : config.ApiKey;
+        Log.Message("[RimAI.Communication] Fetching models. provider=" + provider + " url=" + url);
+        OpenAIClient.FetchModelsAsync(credential, url).ContinueWith(task =>
+        {
+            try
+            {
+                List<string> models = null;
+                if (task.Status == TaskStatus.RanToCompletion)
+                {
+                    models = task.Result;
+                    Log.Message("[RimAI.Communication] Model fetch completed. count="
+                        + (models?.Count ?? 0) + " url=" + url);
+                }
+                else
+                {
+                    Log.Error("[RimAI.Communication] Model fetch failed. status=" + task.Status
+                        + " url=" + url + "\n" + (task.Exception?.ToString() ?? "no exception"));
+                }
+
+                MainThreadSchedulerAccess.RunInlineOrEnqueue(() =>
+                {
+                    try
+                    {
+                        if (fetchId != _modelFetchSerial)
+                        {
+                            Log.Warning("[RimAI.Communication] Ignoring stale model fetch " + fetchId
+                                + "; current=" + _modelFetchSerial);
+                            return;
+                        }
+                        if (models != null && models.Count > 0)
+                            ModelCache[url] = models;
+                        if (config.SelectedModel != Constant.ChooseModel)
+                        {
+                            Log.Message("[RimAI.Communication] Model already chosen (" + config.SelectedModel
+                                + "); not replacing the menu.");
+                            return;
+                        }
+                        Find.WindowStack?.TryRemove(typeof(FloatMenu));
+                        OpenMenu(models);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("[RimAI.Communication] Model picker failed to open the result menu.\n" + ex);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("[RimAI.Communication] Model picker continuation failed.\n" + ex);
+            }
+        });
     }
 
     private void DrawEnableToggle(Rect rowRect, float y, float height, ApiConfig config)

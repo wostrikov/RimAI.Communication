@@ -384,4 +384,6 @@
   <Ustas.RimAI.Settings.SharedAi.Language>Мова ШІ</Ustas.RimAI.Settings.SharedAi.Language>
   <Ustas.RimAI.Settings.SharedAi.LanguageAuto>Авто (мова гри) → {0}</Ustas.RimAI.Settings.SharedAi.LanguageAuto>
   <Ustas.RimAI.Settings.SharedAi.LanguageTooltip>Цільова природна мова для ігрового текстового ШІ. Модулі, включно з Voices, використовують це спільне значення.</Ustas.RimAI.Settings.SharedAi.LanguageTooltip>
+  <Ustas.RimAI.Settings.FetchingModels>Завантаження моделей…</Ustas.RimAI.Settings.FetchingModels>
+  <Ustas.RimAI.Settings.NoModelsFound>(моделей не знайдено — перевірте ключ API)</Ustas.RimAI.Settings.NoModelsFound>
 </LanguageData>
