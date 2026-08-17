@@ -2,6 +2,7 @@ using System;
 using HarmonyLib;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Handshake;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Compatibility;
@@ -16,6 +17,11 @@ public static class CharacterEditorCompatibilityPatch
 
     static CharacterEditorCompatibilityPatch()
     {
+        if (!RimAiHandshake.IsApproved(RimAiModuleIds.Communication))
+        {
+            return;
+        }
+
         var harmony = new Harmony("ustas.rimai.communication.compat.charactereditor");
         TryPatch(harmony);
     }
