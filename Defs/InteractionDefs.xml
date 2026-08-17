@@ -2,7 +2,7 @@
 <Defs>
   <InteractionDef>
     <defName>RimTalkInteraction</defName>
-    <label>rimtalk</label>
+    <label>RimAI talk</label>
     <symbol>Things/Mote/SpeechSymbols/Chitchat</symbol>
     <logRulesInitiator>
       <rulesStrings>
