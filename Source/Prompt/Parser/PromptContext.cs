@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Core.Personas;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Prompt;
@@ -103,6 +104,27 @@ public class PromptContext
     {
         projection = TypedKnowledgeProjection;
         return UsedTypedKnowledgeContext;
+    }
+
+    /// <summary>
+    /// Per-pawn Persona Projections (Wave C). Bag exists today so characterization can
+    /// bind to the property; consumption is gated by
+    /// <see cref="PersonaProjectionDefaults.UseTypedPersonaProjection"/> (false until Wave C).
+    /// Key = Pawn.ThingID.
+    /// </summary>
+    public Dictionary<string, string> TypedPersonaProjections { get; set; } = new();
+
+    /// <summary>Looks up a precomputed Persona Projection when typed persona path is enabled.</summary>
+    public bool TryGetTypedPersonaProjection(string pawnThingId, out string projection)
+    {
+        projection = null;
+        if (!PersonaProjectionDefaults.UseTypedPersonaProjection)
+            return false;
+        if (string.IsNullOrEmpty(pawnThingId) || TypedPersonaProjections == null)
+            return false;
+        if (!TypedPersonaProjections.TryGetValue(pawnThingId, out projection))
+            return false;
+        return true;
     }
 
     public PromptContext()

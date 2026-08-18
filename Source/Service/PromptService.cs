@@ -7,6 +7,7 @@ using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
 using Ustas.RimAI.Core.Communication;
+using Ustas.RimAI.Core.Personas;
 using RimWorld;
 using Verse;
 using Verse.AI.Group;
@@ -96,7 +97,12 @@ public static class PromptService
 
         var personality = Cache.Get(pawn)?.Personality;
         if (personality != null)
-            sb.AppendLine($"Personality: {personality}");
+        {
+            // Shared with Core characterization / Wave C PersonaProjectionDefaults.
+            // When UseTypedPersonaProjection becomes true, Talk presents TypedPersonaProjections instead.
+            if (!PersonaProjectionDefaults.UseTypedPersonaProjection)
+                sb.Append(PersonaProjectionDefaults.FormatTalkPersonalityLine(personality));
+        }
 
         // Stop here for invaders
         if (pawn.IsEnemy())
