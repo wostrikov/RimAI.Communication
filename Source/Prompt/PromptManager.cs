@@ -451,17 +451,41 @@ public class PromptManager : IExposable
             }
         }
 
-        var result = provider.GetContext(new MemoryContextRequest
+        if (ids.Count == 0)
         {
-            PawnId = talkRequest?.Initiator?.ThingID ?? ids.FirstOrDefault(),
-            PawnIds = ids,
-            Query = talkRequest?.Prompt,
-            TokenBudget = 2000
-        });
+            var fallbackId = talkRequest?.Initiator?.ThingID;
+            if (!string.IsNullOrEmpty(fallbackId))
+                ids.Add(fallbackId);
+        }
+
+        if (ids.Count == 0)
+            return;
+
+        context.TypedMemoryProjections ??= new Dictionary<string, string>();
+        context.TypedMemoryProjections.Clear();
+        string query = talkRequest?.Prompt;
+        string lastSource = "typed";
+
+        // OPTION A: one query-aware GetContext per talk pawn; Scriban only presents stored Projection.
+        foreach (var pawnId in ids)
+        {
+            var result = provider.GetContext(new MemoryContextRequest
+            {
+                PawnId = pawnId,
+                PawnIds = ids,
+                Query = query,
+                TokenBudget = MemoryContextDefaults.DefaultTokenBudget,
+            });
+            context.TypedMemoryProjections[pawnId] = result?.Projection ?? string.Empty;
+            lastSource = result?.Source ?? "typed";
+        }
+
         context.UsedTypedMemoryContext = true;
-        context.TypedMemorySource = result?.Source ?? "typed";
+        context.TypedMemorySource = lastSource;
         if (Prefs.DevMode)
-            RimAiLog.Info(RimAiLogCategory.Communication, "[RIMAI_MEMORY] typed_context provider=IMemoryContextProvider scriban_required=false");
+            RimAiLog.Info(
+                RimAiLogCategory.Communication,
+                $"[RIMAI_MEMORY] typed_context provider=IMemoryContextProvider pawns={ids.Count} projections_stored=true");
     }
 
     private List<(PromptRole role, string content)> BuildMessagesFromPreset(

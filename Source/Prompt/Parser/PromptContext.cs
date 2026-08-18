@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Data;
 using Verse;
 
@@ -71,6 +71,23 @@ public class PromptContext
     public bool UsedTypedMemoryContext { get; set; }
 
     public string TypedMemorySource { get; set; }
+
+    /// <summary>
+    /// Canonical per-pawn Memory Projections prepared by AttachTypedMemoryContext.
+    /// Key = Pawn.ThingID. Scriban {{p.memory}} presents these; it must not re-retrieve on the Talk path.
+    /// </summary>
+    public Dictionary<string, string> TypedMemoryProjections { get; set; } = new();
+
+    /// <summary>Looks up a precomputed Projection for a pawn ThingID, or null if absent.</summary>
+    public bool TryGetTypedMemoryProjection(string pawnThingId, out string projection)
+    {
+        projection = null;
+        if (string.IsNullOrEmpty(pawnThingId) || TypedMemoryProjections == null)
+            return false;
+        if (!TypedMemoryProjections.TryGetValue(pawnThingId, out projection))
+            return false;
+        return true;
+    }
 
     public PromptContext()
     {
