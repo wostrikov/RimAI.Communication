@@ -8,6 +8,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 using Logger = Ustas.RimAI.Communication.Util.Logger;
+using Ustas.RimAI.Core.Storage;
 
 namespace Ustas.RimAI.Communication.UI;
 public static class UIUtil
@@ -79,7 +80,7 @@ public static class UIUtil
             string fileName = $"RimTalk_Export_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName);
 
-            File.WriteAllText(path, sb.ToString());
+            LocalStorage.Current.WriteAllText(path, sb.ToString());
 
             Messages.Message($"Exported to: {path}", MessageTypeDefOf.TaskCompletion, false);
         }

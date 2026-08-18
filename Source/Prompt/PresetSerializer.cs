@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Ustas.RimAI.Communication.Util;
 using Verse;
+using Ustas.RimAI.Core.Storage;
 
 namespace Ustas.RimAI.Communication.Prompt;
 
@@ -62,9 +63,9 @@ public static class PresetSerializer
     public static string GetExportDirectory()
     {
         var path = Path.Combine(GenFilePaths.ConfigFolderPath, "Ustas.RimAI.Communication", "Presets");
-        if (!Directory.Exists(path))
+        if (!LocalStorage.Current.DirectoryExists(path))
         {
-            Directory.CreateDirectory(path);
+            LocalStorage.Current.CreateDirectory(path);
         }
         return path;
     }
@@ -86,7 +87,7 @@ public static class PresetSerializer
             }
             
             var path = Path.Combine(GetExportDirectory(), filename + ".json");
-            File.WriteAllText(path, json, Encoding.UTF8);
+            LocalStorage.Current.WriteAllText(path, json, Encoding.UTF8);
             
             Logger.Debug($"Exported preset to: {path}");
             return true;
@@ -105,13 +106,13 @@ public static class PresetSerializer
     {
         try
         {
-            if (!File.Exists(path))
+            if (!LocalStorage.Current.FileExists(path))
             {
                 Logger.Warning($"Preset file not found: {path}");
                 return null;
             }
             
-            var json = File.ReadAllText(path, Encoding.UTF8);
+            var json = LocalStorage.Current.ReadAllText(path, Encoding.UTF8);
             return ImportFromJson(json);
         }
         catch (Exception ex)
@@ -127,9 +128,9 @@ public static class PresetSerializer
     public static List<string> GetAvailablePresetFiles()
     {
         var dir = GetExportDirectory();
-        if (!Directory.Exists(dir)) return new List<string>();
+        if (!LocalStorage.Current.DirectoryExists(dir)) return new List<string>();
         
-        return Directory.GetFiles(dir, "*.json")
+        return LocalStorage.Current.GetFiles(dir, "*.json")
             .OrderBy(f => Path.GetFileName(f))
             .ToList();
     }
