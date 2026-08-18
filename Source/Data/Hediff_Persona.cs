@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Personas;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -10,18 +11,18 @@ namespace Ustas.RimAI.Communication.Data;
 
 public class Hediff_Persona : Hediff
 {
-    private const string RimtalkHediff = "RimTalk_PersonaData";
+    private const string RimtalkHediff = PersonaScribeLabels.Hediff.DefName;
     private Dictionary<string, int> _spokenThoughtTicks = new();
     public string Personality;
-    public float TalkInitiationWeight = 1.0f;
+    public float TalkInitiationWeight = PersonaScribeLabels.Hediff.DefaultTalkInitiationWeight;
     public override bool Visible => false;
     
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref Personality, "Personality");
-        Scribe_Values.Look(ref TalkInitiationWeight, "TalkInitiationWeight", 1.0f);
-        Scribe_Collections.Look(ref _spokenThoughtTicks, "SpokenThoughtTicks", LookMode.Value, LookMode.Value);
+        Scribe_Values.Look(ref Personality, PersonaScribeLabels.Hediff.Personality);
+        Scribe_Values.Look(ref TalkInitiationWeight, PersonaScribeLabels.Hediff.TalkInitiationWeight, PersonaScribeLabels.Hediff.DefaultTalkInitiationWeight);
+        Scribe_Collections.Look(ref _spokenThoughtTicks, PersonaScribeLabels.Hediff.SpokenThoughtTicks, LookMode.Value, LookMode.Value);
         
         if (_spokenThoughtTicks == null)
         {
