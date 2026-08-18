@@ -11,6 +11,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication;
 
@@ -236,7 +237,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("[RimAI.Communication] Model picker click failed.\n" + ex);
+                    RimAiLog.Error(RimAiLogCategory.Communication, "[RimAI.Communication] Model picker click failed.\n" + ex);
                 }
             }
         }
@@ -326,7 +327,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
     internal void ShowModelSelectionMenu(ApiConfig config)
     {
         var provider = config.Provider;
-        Log.Message("[RimAI.Communication] Model picker opened. provider=" + provider
+        RimAiLog.Info(RimAiLogCategory.Communication, "[RimAI.Communication] Model picker opened. provider=" + provider
             + " selected=" + config.SelectedModel
             + " scheduler=" + (MainThreadSchedulerAccess.IsAvailable ? "available" : "missing")
             + " syncContext=" + (System.Threading.SynchronizationContext.Current?.GetType().FullName ?? "null"));
@@ -335,7 +336,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
         if ((provider == AIProvider.OpenAI ? !OpenAIProviderAdapter.CredentialPresent : string.IsNullOrWhiteSpace(config.ApiKey))
             && provider != AIProvider.Player2)
         {
-            Log.Warning("[RimAI.Communication] Model picker blocked: API credential is missing. provider=" + provider);
+            RimAiLog.Warning(RimAiLogCategory.Communication, "[RimAI.Communication] Model picker blocked: API credential is missing. provider=" + provider);
             Find.WindowStack.Add(new FloatMenu([new FloatMenuOption("RimTalk.Settings.EnterApiKey".Translate(), null)]));
             return;
         }
@@ -352,7 +353,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
         {
             if (Find.WindowStack == null)
             {
-                Log.Error("[RimAI.Communication] Model picker cannot open a menu: WindowStack is null.");
+                RimAiLog.Error(RimAiLogCategory.Communication, "[RimAI.Communication] Model picker cannot open a menu: WindowStack is null.");
                 return;
             }
 
@@ -364,7 +365,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
             }
             else
             {
-                Log.Warning("[RimAI.Communication] Model picker has no models. provider=" + provider + " url=" + url);
+                RimAiLog.Warning(RimAiLogCategory.Communication, "[RimAI.Communication] Model picker has no models. provider=" + provider + " url=" + url);
                 options.Add(new FloatMenuOption("Ustas.RimAI.Settings.NoModelsFound".Translate(), null));
             }
 
@@ -374,7 +375,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
 
         if (string.IsNullOrEmpty(url))
         {
-            Log.Warning("[RimAI.Communication] Model picker has no list-models URL. provider=" + provider
+            RimAiLog.Warning(RimAiLogCategory.Communication, "[RimAI.Communication] Model picker has no list-models URL. provider=" + provider
                 + "; opening Custom-only menu.");
             OpenMenu(null);
             return;
@@ -394,7 +395,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
         ]));
 
         string credential = provider == AIProvider.OpenAI ? OpenAIProviderAdapter.ResolveCredential() : config.ApiKey;
-        Log.Message("[RimAI.Communication] Fetching models. provider=" + provider + " url=" + url);
+        RimAiLog.Info(RimAiLogCategory.Communication, "[RimAI.Communication] Fetching models. provider=" + provider + " url=" + url);
         OpenAIClient.FetchModelsAsync(credential, url).ContinueWith(task =>
         {
             try
@@ -403,12 +404,12 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
                 if (task.Status == TaskStatus.RanToCompletion)
                 {
                     models = task.Result;
-                    Log.Message("[RimAI.Communication] Model fetch completed. count="
+                    RimAiLog.Info(RimAiLogCategory.Communication, "[RimAI.Communication] Model fetch completed. count="
                         + (models?.Count ?? 0) + " url=" + url);
                 }
                 else
                 {
-                    Log.Error("[RimAI.Communication] Model fetch failed. status=" + task.Status
+                    RimAiLog.Error(RimAiLogCategory.Communication, "[RimAI.Communication] Model fetch failed. status=" + task.Status
                         + " url=" + url + "\n" + (task.Exception?.ToString() ?? "no exception"));
                 }
 
@@ -418,7 +419,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
                     {
                         if (fetchId != _modelFetchSerial)
                         {
-                            Log.Warning("[RimAI.Communication] Ignoring stale model fetch " + fetchId
+                            RimAiLog.Warning(RimAiLogCategory.Communication, "[RimAI.Communication] Ignoring stale model fetch " + fetchId
                                 + "; current=" + _modelFetchSerial);
                             return;
                         }
@@ -426,7 +427,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
                             ModelCache[url] = models;
                         if (config.SelectedModel != Constant.ChooseModel)
                         {
-                            Log.Message("[RimAI.Communication] Model already chosen (" + config.SelectedModel
+                            RimAiLog.Info(RimAiLogCategory.Communication, "[RimAI.Communication] Model already chosen (" + config.SelectedModel
                                 + "); not replacing the menu.");
                             return;
                         }
@@ -435,13 +436,13 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
                     }
                     catch (Exception ex)
                     {
-                        Log.Error("[RimAI.Communication] Model picker failed to open the result menu.\n" + ex);
+                        RimAiLog.Error(RimAiLogCategory.Communication, "[RimAI.Communication] Model picker failed to open the result menu.\n" + ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Log.Error("[RimAI.Communication] Model picker continuation failed.\n" + ex);
+                RimAiLog.Error(RimAiLogCategory.Communication, "[RimAI.Communication] Model picker continuation failed.\n" + ex);
             }
         });
     }

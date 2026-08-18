@@ -7,6 +7,7 @@ using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Core.Memory;
 using Ustas.RimAI.Core.Communication;
 using Verse;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Prompt;
 
@@ -460,7 +461,7 @@ public class PromptManager : IExposable
         context.UsedTypedMemoryContext = true;
         context.TypedMemorySource = result?.Source ?? "typed";
         if (Prefs.DevMode)
-            Log.Message("[RIMAI_MEMORY] typed_context provider=IMemoryContextProvider scriban_required=false");
+            RimAiLog.Info(RimAiLogCategory.Communication, "[RIMAI_MEMORY] typed_context provider=IMemoryContextProvider scriban_required=false");
     }
 
     private List<(PromptRole role, string content)> BuildMessagesFromPreset(

@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using RimWorld;
 using Verse;
 using Vector2 = UnityEngine.Vector2;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Util;
 
@@ -63,7 +64,7 @@ public static class CommonUtil
         // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — prompt scene context must fail closed to N/A
         catch (Exception ex)
         {
-            Log.Warning("[RimAI.Communication] GetInGameData failed: " + ex);
+            RimAiLog.Warning(RimAiLogCategory.Communication, "[RimAI.Communication] GetInGameData failed: " + ex);
             return new InGameData
                 { Hour12HString = "N/A", DateString = "N/A", SeasonString = "N/A", WeatherString = "N/A" };
         }

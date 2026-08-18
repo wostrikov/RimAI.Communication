@@ -9,6 +9,7 @@ using Ustas.RimAI.Core.Configuration;
 using Ustas.RimAI.Core.Handshake;
 using Ustas.RimAI.Core.Modules;
 using Verse;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication;
 
@@ -157,7 +158,7 @@ public class Settings : Mod
         // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — boot-time language lookup must not fail settings
         catch (Exception ex)
         {
-            Log.Warning("[RimAI.Communication] TryActiveGameLanguageEnglish failed: " + ex);
+            RimAiLog.Warning(RimAiLogCategory.Communication, "[RimAI.Communication] TryActiveGameLanguageEnglish failed: " + ex);
             return null;
         }
     }

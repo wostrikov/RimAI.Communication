@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Service;
 
@@ -72,7 +73,7 @@ public static class RelationsService
             // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — prompt relation labels must not abort nearby-pawn context
             catch (Exception ex)
             {
-                Log.WarningOnce("[RimAI.Communication] Relation label skipped: " + ex, otherPawn.thingIDNumber);
+                RimAiLog.WarningOnce(RimAiLogCategory.Communication, "[RimAI.Communication] Relation label skipped: " + ex, otherPawn.thingIDNumber);
             }
         }
 
@@ -201,7 +202,7 @@ public static class RelationsService
             // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — modded play-log entries must not abort prompt context
             catch (Exception ex)
             {   
-                Log.WarningOnce("[RimAI.Communication] Play log entry skipped: " + ex, entry.GetHashCode());
+                RimAiLog.WarningOnce(RimAiLogCategory.Communication, "[RimAI.Communication] Play log entry skipped: " + ex, entry.GetHashCode());
             }
         }
 
@@ -247,7 +248,7 @@ public static class RelationsService
         // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — optional social label must not abort prompt context
         catch (Exception ex)
         {
-            Log.WarningOnce("[RimAI.Communication] OpinionOf failed: " + ex, otherPawn.thingIDNumber);
+            RimAiLog.WarningOnce(RimAiLogCategory.Communication, "[RimAI.Communication] OpinionOf failed: " + ex, otherPawn.thingIDNumber);
             return false;
         }
 
