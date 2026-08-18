@@ -82,17 +82,13 @@ public class Settings : Mod
         Pages = new CommunicationSettingsPages(this);
         var settings = GetSettings<CommunicationSettings>();
         _apiSettingsHash = GetApiSettingsHash(settings);
+        CommunicationComposition.Current.Bind(this);
         RimAiHandshake.TryActivate(
             RimAiHandshakeDescriptor.Current(RimAiModuleIds.Communication, Version, isOptional: true),
-            () =>
-            {
-                var harmony = new Harmony("ustas.rimai.communication");
-                harmony.PatchAll();
-                RegisterRimAIContributions();
-            });
+            CommunicationComposition.Current.Start);
     }
 
-    void RegisterRimAIContributions()
+    internal void RegisterRimAIContributions()
     {
         CommunicationApplicationAccess.Register(new CommunicationApplication());
         PromptTemplateAccess.Register(new CommunicationPromptTemplateRenderer());
