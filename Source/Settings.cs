@@ -11,19 +11,38 @@ using Verse;
 
 namespace Ustas.RimAI.Communication;
 
-public partial class Settings : Mod
+public class Settings : Mod
 {
     public const string Version = "1.0.16";
 
-    private Vector2 _mainScrollPosition = Vector2.zero;
-    private Vector2 _aiInstructionScrollPos = Vector2.zero;
-    private Vector2 _promptContentScrollPos = Vector2.zero;
-    private string _textAreaBuffer = "";
-    private bool _textAreaInitialized;
-    private string _aiInstructionPresetId = "";
-    private int _lastTextAreaCursorPos = -1;
-    private int _lastPromptEditorCursorPos = -1;
-    private int _apiSettingsHash = 0;
+    internal CommunicationSettingsPages Pages;
+
+    internal Vector2 _mainScrollPosition = Vector2.zero;
+    internal Vector2 _aiInstructionScrollPos = Vector2.zero;
+    internal Vector2 _promptContentScrollPos = Vector2.zero;
+    internal string _textAreaBuffer = "";
+    internal bool _textAreaInitialized;
+    internal string _aiInstructionPresetId = "";
+    internal int _lastTextAreaCursorPos = -1;
+    internal int _lastPromptEditorCursorPos = -1;
+    internal int _apiSettingsHash = 0;
+
+    internal Vector2 _presetListScrollPos = Vector2.zero;
+    internal Vector2 _entryListScrollPos = Vector2.zero;
+    internal Vector2 _auxScrollPos = Vector2.zero;
+    internal Vector2 _previewScrollPos = Vector2.zero;
+    internal string _selectedPresetId;
+    internal string _selectedEntryId;
+    internal bool _showPreview = false;
+    internal bool _showSidePanel = false;
+    internal int _sidePanelMode = 0;
+    internal float _splitRatioVert = 0.5f;
+    internal float _splitRatioHoriz = 0.7f;
+    internal bool _isDraggingVert = false;
+    internal bool _isDraggingHoriz = false;
+    internal string _variableSearchQuery = "";
+    internal string _depthBuffer = "";
+    internal string _depthBufferEntryId = "";
 
     // Tab system
     private enum SettingsTab
@@ -58,6 +77,7 @@ public partial class Settings : Mod
 
     public Settings(ModContentPack content) : base(content)
     {
+        Pages = new CommunicationSettingsPages(this);
         var settings = GetSettings<CommunicationSettings>();
         _apiSettingsHash = GetApiSettingsHash(settings);
         RimAiHandshake.TryActivate(
@@ -86,7 +106,7 @@ public partial class Settings : Mod
             "AI",
             RimAISettingsSection.SharedAi,
             0,
-            listing => DrawSharedAiSettings((Listing_Standard)listing),
+            listing => Pages.Api.DrawSharedAiSettings((Listing_Standard)listing),
             "communication",
             "ai"));
         RimAISettingsContributionRegistry.Current.Register(new DelegateSettingsContributor(
@@ -94,7 +114,7 @@ public partial class Settings : Mod
             "Communication",
             RimAISettingsSection.Module,
             10,
-            listing => DrawBasicSettings((Listing_Standard)listing),
+            listing => Pages.Basic.DrawBasicSettings((Listing_Standard)listing),
             "communication",
             "general"));
     }
@@ -122,7 +142,7 @@ public partial class Settings : Mod
             gameLanguageFallback: TryActiveGameLanguageEnglish());
     }
 
-    static string? TryActiveGameLanguageEnglish()
+    internal static string TryActiveGameLanguageEnglish()
     {
         try
         {
@@ -225,9 +245,9 @@ public partial class Settings : Mod
         if (Widgets.ButtonText(filterTabRect, "RimTalk.Settings.EventFilter".Translate()))
         {
             _currentTab = SettingsTab.EventFilter;
-            if (!_archivableTypesScanned)
+            if (!Pages.EventFilter.ArchivableTypesScanned)
             {
-                ScanForArchivableTypes();
+                Pages.EventFilter.ScanForArchivableTypes();
             }
         }
 
@@ -290,7 +310,7 @@ public partial class Settings : Mod
         {
             Listing_Standard promptListing = new Listing_Standard();
             promptListing.Begin(contentRect);
-            DrawPromptPresetSettings(promptListing, contentRect);
+            Pages.PromptPreset.DrawPromptPresetSettings(promptListing, contentRect);
             promptListing.End();
             return;
         }
@@ -305,16 +325,16 @@ public partial class Settings : Mod
         switch (_currentTab)
         {
             case SettingsTab.Basic:
-                DrawBasicSettings(listing);
+                Pages.Basic.DrawBasicSettings(listing);
                 break;
             case SettingsTab.PromptPreset:
-                DrawPromptPresetSettings(listing, contentRect);
+                Pages.PromptPreset.DrawPromptPresetSettings(listing, contentRect);
                 break;
             case SettingsTab.Context:
-                DrawContextFilterSettings(listing);
+                Pages.ContextFilter.DrawContextFilterSettings(listing);
                 break;
             case SettingsTab.EventFilter:
-                DrawEventFilterSettings(listing);
+                Pages.EventFilter.DrawEventFilterSettings(listing);
                 break;
         }
 
@@ -331,16 +351,16 @@ public partial class Settings : Mod
         switch (_currentTab)
         {
             case SettingsTab.Basic:
-                DrawBasicSettings(listing);
+                Pages.Basic.DrawBasicSettings(listing);
                 break;
             case SettingsTab.PromptPreset:
-                DrawPromptPresetSettings(listing, contentRect);
+                Pages.PromptPreset.DrawPromptPresetSettings(listing, contentRect);
                 break;
             case SettingsTab.Context:
-                DrawContextFilterSettings(listing);
+                Pages.ContextFilter.DrawContextFilterSettings(listing);
                 break;
             case SettingsTab.EventFilter:
-                DrawEventFilterSettings(listing);
+                Pages.EventFilter.DrawEventFilterSettings(listing);
                 break;
         }
 
@@ -351,5 +371,10 @@ public partial class Settings : Mod
     private static void ClearCache()
     {
         _settings = null;
+    }
+
+    public void DrawPromptPresetSettings(Listing_Standard listingStandard, Rect inRect)
+    {
+        Pages.PromptPreset.DrawPromptPresetSettings(listingStandard, inRect);
     }
 }

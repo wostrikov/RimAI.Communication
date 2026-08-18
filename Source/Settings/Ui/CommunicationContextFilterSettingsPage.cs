@@ -5,9 +5,9 @@ using Ustas.RimAI.Communication.Data;
 using UnityEngine;
 using Verse;
 
-namespace Ustas.RimAI.Communication
-{
-    public enum ContextPreset
+namespace Ustas.RimAI.Communication;
+
+public enum ContextPreset
     {
         Essential,
         Standard,
@@ -15,11 +15,15 @@ namespace Ustas.RimAI.Communication
         Custom
     }
 
-    public partial class Settings
-    {
+    
+
+internal sealed class CommunicationContextFilterSettingsPage : CommunicationSettingsCollaborator
+{
+    internal CommunicationContextFilterSettingsPage(Settings owner) : base(owner) { }
+
         private ContextPreset _currentPreset = ContextPreset.Custom;
         private readonly ContextSettings _changeBuffer = new();
-        private bool _presetInitialized; 
+        private bool _presetInitialized;
 
         private static readonly Dictionary<ContextPreset, ContextSettings> PresetDefinitions = new()
         {
@@ -112,9 +116,9 @@ namespace Ustas.RimAI.Communication
             }}
         };
 
-        private void DrawContextFilterSettings(Listing_Standard listing)
+        internal void DrawContextFilterSettings(Listing_Standard listing)
         {
-            CommunicationSettings settings = Get();
+            CommunicationSettings settings = Settings.Get();
             ContextSettings context = settings.Context;
             
             if (!_presetInitialized)
@@ -174,7 +178,7 @@ namespace Ustas.RimAI.Communication
             }
         }
 
-        private void DrawPresetSelector(Listing_Standard listing, ContextSettings context)
+        internal void DrawPresetSelector(Listing_Standard listing, ContextSettings context)
         {
             GUI.color = new Color(1f, 0.85f, 0.5f);
             Widgets.Label(listing.GetRect(Text.LineHeight), "RimTalk.Settings.ContextPresets".Translate());
@@ -197,7 +201,7 @@ namespace Ustas.RimAI.Communication
             listing.Gap();
         }
 
-        private void DrawSinglePresetBox(Rect rect, ContextPreset preset, ContextSettings context)
+        internal void DrawSinglePresetBox(Rect rect, ContextPreset preset, ContextSettings context)
         {
             bool isSelected = _currentPreset == preset;
             
@@ -230,7 +234,7 @@ namespace Ustas.RimAI.Communication
             Text.Font = GameFont.Small;
         }
 
-        private void DrawColumns(Listing_Standard listing, ContextSettings context)
+        internal void DrawColumns(Listing_Standard listing, ContextSettings context)
         {
             const float columnGap = 200f;
             float columnWidth = (listing.ColumnWidth - columnGap) / 2;
@@ -289,7 +293,7 @@ namespace Ustas.RimAI.Communication
             listing.Gap(Mathf.Max(leftListing.CurHeight, rightListing.CurHeight));
         }
 
-        private void ApplyPreset(ContextSettings context, ContextPreset preset)
+        internal void ApplyPreset(ContextSettings context, ContextPreset preset)
         {
             if (PresetDefinitions.TryGetValue(preset, out var source))
             {
@@ -298,7 +302,7 @@ namespace Ustas.RimAI.Communication
             }
         }
 
-        private void CopyFields<T>(T source, T target)
+        internal void CopyFields<T>(T source, T target)
         {
             foreach (var field in typeof(T).GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
@@ -306,7 +310,7 @@ namespace Ustas.RimAI.Communication
             }
         }
 
-        private bool AreSettingsEqual(ContextSettings a, ContextSettings b)
+        internal bool AreSettingsEqual(ContextSettings a, ContextSettings b)
         {
             foreach (var field in typeof(ContextSettings).GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
@@ -317,7 +321,7 @@ namespace Ustas.RimAI.Communication
             return true;
         }
 
-        private void DrawDropdown(Listing_Standard listing, string labelKey, int currentValue, Action<int> onSelect, int min, int max)
+        internal void DrawDropdown(Listing_Standard listing, string labelKey, int currentValue, Action<int> onSelect, int min, int max)
         {
             const float dropdownWidth = 120f;
             Rect rowRect = listing.GetRect(24f);
@@ -339,7 +343,7 @@ namespace Ustas.RimAI.Communication
             }
         }
         
-        private void DetermineCurrentPreset(ContextSettings current)
+        internal void DetermineCurrentPreset(ContextSettings current)
         {
             _currentPreset = ContextPreset.Custom;
             foreach (var entry in PresetDefinitions)
@@ -351,5 +355,5 @@ namespace Ustas.RimAI.Communication
                 }
             }
         }
-    }
+    
 }

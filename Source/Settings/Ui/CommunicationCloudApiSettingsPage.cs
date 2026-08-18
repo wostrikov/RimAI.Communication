@@ -14,171 +14,13 @@ using Verse.Sound;
 
 namespace Ustas.RimAI.Communication;
 
-public partial class Settings
+internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsCollaborator
 {
+    internal CommunicationCloudApiSettingsPage(Settings owner) : base(owner) { }
     private static readonly Dictionary<string, List<string>> ModelCache = new();
+    private int _modelFetchSerial;
 
-    internal void DrawSharedAiSettings(Listing_Standard listingStandard)
-    {
-        if (!Get().UseSimpleConfig)
-            DrawAdvancedApiSettings(listingStandard);
-        else
-            DrawSimpleApiSettings(listingStandard);
-        DrawSharedAiLanguageSettings(listingStandard);
-    }
-
-    internal void DrawSharedAiLanguageSettings(Listing_Standard listingStandard)
-    {
-        CommunicationSettings settings = Get();
-        listingStandard.Gap();
-        listingStandard.Label("Ustas.RimAI.Settings.SharedAi.Language".Translate());
-        string resolved = GameplayAiLanguage.Resolve(settings.GameplayAiLanguage, TryActiveGameLanguageEnglish());
-        string current = string.IsNullOrWhiteSpace(settings.GameplayAiLanguage)
-            ? "Ustas.RimAI.Settings.SharedAi.LanguageAuto".Translate(resolved)
-            : resolved;
-        Rect languageRect = listingStandard.GetRect(30f);
-        if (Widgets.ButtonText(languageRect, current))
-        {
-            var options = new List<FloatMenuOption>
-            {
-                new("Ustas.RimAI.Settings.SharedAi.LanguageAuto".Translate(resolved), () => settings.GameplayAiLanguage = "")
-            };
-            foreach (var language in SharedAiLanguageChoices)
-            {
-                string choice = language;
-                options.Add(new FloatMenuOption(choice, () => settings.GameplayAiLanguage = choice));
-            }
-            Find.WindowStack.Add(new FloatMenu(options));
-        }
-        Text.Font = GameFont.Tiny;
-        GUI.color = Color.gray;
-        listingStandard.Label("Ustas.RimAI.Settings.SharedAi.LanguageTooltip".Translate());
-        GUI.color = Color.white;
-        Text.Font = GameFont.Small;
-    }
-
-    static readonly string[] SharedAiLanguageChoices =
-    {
-        "English",
-        "Ukrainian",
-        "ChineseSimplified",
-        "ChineseTraditional",
-        "Japanese",
-        "Korean",
-        "French",
-        "German",
-        "Spanish",
-        "Russian",
-        "Polish"
-    };
-
-    private void DrawSimpleApiSettings(Listing_Standard listingStandard)
-    {
-        CommunicationSettings settings = Get();
-
-        // API Key section
-        listingStandard.Label("RimTalk.Settings.GoogleApiKeyLabel".Translate());
-
-        const float buttonWidth = 150f;
-        const float spacing = 5f;
-
-        Rect rowRect = listingStandard.GetRect(30f);
-        rowRect.width -= buttonWidth + spacing;
-
-        settings.SimpleApiKey = Widgets.TextField(rowRect, settings.SimpleApiKey);
-
-        Rect buttonRect = new Rect(rowRect.xMax + spacing, rowRect.y, buttonWidth, rowRect.height);
-        if (Widgets.ButtonText(buttonRect, "RimTalk.Settings.GetFreeApiKeyButton".Translate()))
-        {
-            Application.OpenURL("https://aistudio.google.com/app/apikey");
-        }
-
-        // Add description for free Google providers
-        Text.Font = GameFont.Tiny;
-        GUI.color = Color.gray;
-        Rect cloudDescRect = listingStandard.GetRect(Text.LineHeight);
-        Widgets.Label(cloudDescRect, "RimTalk.Settings.GoogleApiKeyDesc".Translate());
-        GUI.color = Color.white;
-        Text.Font = GameFont.Small;
-
-        listingStandard.Gap();
-
-        // Show Advanced Settings button
-        Rect advancedButtonRect = listingStandard.GetRect(30f);
-        if (Widgets.ButtonText(advancedButtonRect, "RimTalk.Settings.SwitchToAdvancedSettings".Translate()))
-        {
-            settings.UseSimpleConfig = false;
-        }
-    }
-
-    private void DrawAdvancedApiSettings(Listing_Standard listingStandard)
-    {
-        CommunicationSettings settings = Get();
-
-        // Show Simple Settings button
-        Rect simpleButtonRect = listingStandard.GetRect(30f);
-        if (Widgets.ButtonText(simpleButtonRect, "RimTalk.Settings.SwitchToSimpleSettings".Translate()))
-        {
-            if (string.IsNullOrWhiteSpace(settings.SimpleApiKey))
-            {
-                var firstValidCloudConfig = settings.CloudConfigs.FirstOrDefault(c => c.IsValid());
-                if (firstValidCloudConfig != null)
-                {
-                    settings.SimpleApiKey = firstValidCloudConfig.ApiKey;
-                }
-            }
-            settings.UseSimpleConfig = true;
-        }
-
-        listingStandard.Gap();
-
-        // Cloud providers option with description
-        Rect radioRect1 = listingStandard.GetRect(24f);
-        if (Widgets.RadioButtonLabeled(radioRect1, "RimTalk.Settings.CloudProviders".Translate(), settings.UseCloudProviders))
-        {
-            settings.UseCloudProviders = true;
-        }
-
-        // Add description for cloud providers
-        Text.Font = GameFont.Tiny;
-        GUI.color = Color.gray;
-        Rect cloudDescRect = listingStandard.GetRect(Text.LineHeight);
-        Widgets.Label(cloudDescRect, "RimTalk.Settings.CloudProvidersDesc".Translate());
-        GUI.color = Color.white;
-        Text.Font = GameFont.Small;
-
-        listingStandard.Gap(3f);
-
-        // Local provider option with description
-        Rect radioRect2 = listingStandard.GetRect(24f);
-        if (Widgets.RadioButtonLabeled(radioRect2, "RimTalk.Settings.LocalProvider".Translate(), !settings.UseCloudProviders))
-        {
-            settings.UseCloudProviders = false;
-            settings.LocalConfig.Provider = AIProvider.Local;
-        }
-
-        // Add description for local provider
-        Text.Font = GameFont.Tiny;
-        GUI.color = Color.gray;
-        Rect localDescRect = listingStandard.GetRect(Text.LineHeight);
-        Widgets.Label(localDescRect, "RimTalk.Settings.LocalProviderDesc".Translate());
-        GUI.color = Color.white;
-        Text.Font = GameFont.Small;
-
-        listingStandard.Gap();
-
-        // Draw appropriate section based on selection
-        if (settings.UseCloudProviders)
-        {
-            DrawCloudProvidersSection(listingStandard, settings);
-        }
-        else
-        {
-            DrawLocalProviderSection(listingStandard, settings);
-        }
-    }
-    
-    private void DrawCloudProvidersSection(Listing_Standard listingStandard, CommunicationSettings settings)
+    internal void DrawCloudProvidersSection(Listing_Standard listingStandard, CommunicationSettings settings)
     {
         Rect headerRect = listingStandard.GetRect(24f);
 
@@ -247,7 +89,7 @@ public partial class Settings
         Text.Font = GameFont.Small;
     }
 
-    private bool DrawCloudConfigRow(Listing_Standard listingStandard, ApiConfig config, int index, List<ApiConfig> configs)
+    internal bool DrawCloudConfigRow(Listing_Standard listingStandard, ApiConfig config, int index, List<ApiConfig> configs)
     {
         Text.Font = GameFont.Tiny;
 
@@ -345,7 +187,7 @@ public partial class Settings
         return deleteClicked;
     }
 
-    private void DrawReorderButtons(float x, float y, float height, int index, List<ApiConfig> configs)
+    internal void DrawReorderButtons(float x, float y, float height, int index, List<ApiConfig> configs)
     {
         float btnSize = 22f;
         Rect upButtonRect = new Rect(x, y, btnSize, height);
@@ -365,7 +207,7 @@ public partial class Settings
         }
     }
 
-    private void DrawDefaultModelSelector(float x, float y, float height, float width, ApiConfig config)
+    internal void DrawDefaultModelSelector(float x, float y, float height, float width, ApiConfig config)
     {
         Rect modelRect = new Rect(x, y, width, height);
         if (config.SelectedModel == "Custom")
@@ -400,7 +242,7 @@ public partial class Settings
         }
     }
 
-    private string DrawTextFieldWithPlaceholder(Rect rect, string text, string placeholder)
+    internal string DrawTextFieldWithPlaceholder(Rect rect, string text, string placeholder)
     {
         string result = Widgets.TextField(rect, text);
         
@@ -422,7 +264,7 @@ public partial class Settings
         return result;
     }
 
-    private void DrawProviderDropdown(float x, float y, float height, float width, ApiConfig config)
+    internal void DrawProviderDropdown(float x, float y, float height, float width, ApiConfig config)
     {
         Rect providerRect = new Rect(x, y, width, height);
         if (Widgets.ButtonText(providerRect, config.Provider.GetLabel()))
@@ -454,7 +296,7 @@ public partial class Settings
         }
     }
 
-    private void DrawApiKeyInput(float x, float y, float height, float width, ApiConfig config)
+    internal void DrawApiKeyInput(float x, float y, float height, float width, ApiConfig config)
     {
         Rect apiKeyRect = new Rect(x, y, width, height);
         if (config.Provider == AIProvider.OpenAI)
@@ -465,14 +307,14 @@ public partial class Settings
         config.ApiKey = DrawTextFieldWithPlaceholder(apiKeyRect, config.ApiKey, "Paste API Key...");
     }
 
-    private void DrawBaseUrlInput(float x, float y, float height, float width, ApiConfig config)
+    internal void DrawBaseUrlInput(float x, float y, float height, float width, ApiConfig config)
     {
         Rect baseUrlRect = new Rect(x, y, width, height);
         config.BaseUrl = DrawTextFieldWithPlaceholder(baseUrlRect, config.BaseUrl, "https://...");
         if (Mouse.IsOver(baseUrlRect)) TooltipHandler.TipRegion(baseUrlRect, "RimTalk_Settings_Api_BaseUrlInfo".Translate());
     }
 
-    private void DrawCustomModelInput(float x, float y, float height, float width, ApiConfig config)
+    internal void DrawCustomModelInput(float x, float y, float height, float width, ApiConfig config)
     {
         Rect customModelRect = new Rect(x, y, width, height);
         config.CustomModelName = DrawTextFieldWithPlaceholder(customModelRect, config.CustomModelName, "Model ID");
@@ -481,9 +323,7 @@ public partial class Settings
             : config.CustomModelName;
     }
 
-    private int _modelFetchSerial;
-
-    private void ShowModelSelectionMenu(ApiConfig config)
+    internal void ShowModelSelectionMenu(ApiConfig config)
     {
         var provider = config.Provider;
         Log.Message("[RimAI.Communication] Model picker opened. provider=" + provider
@@ -606,7 +446,7 @@ public partial class Settings
         });
     }
 
-    private void DrawEnableToggle(Rect rowRect, float y, float height, ApiConfig config)
+    internal void DrawEnableToggle(Rect rowRect, float y, float height, ApiConfig config)
     {
         Rect toggleRect = new Rect(rowRect.xMax - 70f, y, 24f, height);
         Widgets.Checkbox(new Vector2(toggleRect.x, toggleRect.y), ref config.IsEnabled);
@@ -616,41 +456,4 @@ public partial class Settings
         }
     }
 
-    private void DrawLocalProviderSection(Listing_Standard listingStandard, CommunicationSettings settings)
-    {
-        listingStandard.Label("RimTalk.Settings.LocalProviderConfiguration".Translate());
-        listingStandard.Gap(6f);
-
-        if (settings.LocalConfig == null)
-        {
-            settings.LocalConfig = new ApiConfig { Provider = AIProvider.Local };
-        }
-
-        DrawLocalConfigRow(listingStandard, settings.LocalConfig);
-    }
-
-    private void DrawLocalConfigRow(Listing_Standard listingStandard, ApiConfig config)
-    {
-        Rect rowRect = listingStandard.GetRect(24f);
-        float x = rowRect.x;
-        float y = rowRect.y;
-        float height = rowRect.height;
-
-        Rect baseUrlLabelRect = new Rect(x, y, 80f, height);
-        var labelText = "RimTalk.Settings.BaseUrlLabel".Translate() + " [?]";
-        Widgets.Label(baseUrlLabelRect, labelText);
-        TooltipHandler.TipRegion(baseUrlLabelRect, "RimTalk_Settings_Api_BaseUrlInfo".Translate());
-        x += 85f;
-
-        Rect urlRect = new Rect(x, y, 250f, height);
-        config.BaseUrl = Widgets.TextField(urlRect, config.BaseUrl);
-        x += 285f;
-
-        Rect modelLabelRect = new Rect(x, y, 70f, height);
-        Widgets.Label(modelLabelRect, "RimTalk.Settings.ModelLabel".Translate());
-        x += 75f;
-
-        Rect modelRect = new Rect(x, y, 200f, height);
-        config.CustomModelName = Widgets.TextField(modelRect, config.CustomModelName);
-    }
 }

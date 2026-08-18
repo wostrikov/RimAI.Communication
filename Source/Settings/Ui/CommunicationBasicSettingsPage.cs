@@ -6,9 +6,11 @@ using Verse;
 
 namespace Ustas.RimAI.Communication;
 
-public partial class Settings
+internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsCollaborator
 {
-    private string GetFormattedSpeedLabel(TimeSpeed speed)
+    internal CommunicationBasicSettingsPage(Settings owner) : base(owner) { }
+
+    internal string GetFormattedSpeedLabel(TimeSpeed speed)
     {
         switch (speed)
         {
@@ -25,26 +27,26 @@ public partial class Settings
         }
     }
     
-    private string GetPlayerDialogueModeLabel(PlayerDialogueMode mode)
+    internal string GetPlayerDialogueModeLabel(Settings.PlayerDialogueMode mode)
     {
         switch (mode)
         {
-            case PlayerDialogueMode.Disabled:
+            case Settings.PlayerDialogueMode.Disabled:
                 return "RimTalk.Settings.Disabled".Translate().ToString();
-            case PlayerDialogueMode.Manual:
+            case Settings.PlayerDialogueMode.Manual:
                 return "RimTalk.Settings.PlayerDialogueMode.Manual".Translate().ToString();
-            case PlayerDialogueMode.AIDriven:
+            case Settings.PlayerDialogueMode.AIDriven:
                 return "RimTalk.Settings.PlayerDialogueMode.AIDriven".Translate().ToString();
-            case PlayerDialogueMode.AIDrivenPawnOnly:
+            case Settings.PlayerDialogueMode.AIDrivenPawnOnly:
                 return "RimTalk.Settings.PlayerDialogueMode.AIDrivenPawnOnly".Translate().ToString();
             default:
                 return mode.ToString();
         }
     }
 
-    private void DrawBasicSettings(Listing_Standard listingStandard)
+    internal void DrawBasicSettings(Listing_Standard listingStandard)
     {
-        CommunicationSettings settings = Get();
+        CommunicationSettings settings = Settings.Get();
 
         listingStandard.Label("RimAI.Settings.TextAiOwnedByCore".Translate());
         listingStandard.Label(Ustas.RimAI.Core.Configuration.AiCredentialResolver.Resolve().Display);
@@ -205,7 +207,7 @@ public partial class Settings
         if (Widgets.ButtonText(buttonDisplayDropdownRect, settings.ButtonDisplay.ToString()))
         {
             var options = new List<FloatMenuOption>();
-            foreach (ButtonDisplayMode mode in Enum.GetValues(typeof(ButtonDisplayMode)))
+            foreach (Settings.ButtonDisplayMode mode in Enum.GetValues(typeof(Settings.ButtonDisplayMode)))
             {
                 var currentMode = mode;
                 options.Add(new FloatMenuOption(currentMode.ToString(), () => settings.ButtonDisplay = currentMode));
@@ -232,17 +234,17 @@ public partial class Settings
             settings.AllowBabiesToTalk = true;
             settings.AllowNonHumanToTalk = true;
             settings.AllowCustomConversation = true;
-            settings.PlayerDialogueMode = PlayerDialogueMode.Manual;
+            settings.PlayerDialogueMode = Settings.PlayerDialogueMode.Manual;
             settings.PlayerName = "Player";
             settings.ContinueDialogueWhileSleeping = false;
             settings.ApplyMoodAndSocialEffects = false;
             settings.UseSimpleConfig = true;
             settings.DisableAiAtSpeed = 0;
-            settings.ButtonDisplay = ButtonDisplayMode.Toggle;
+            settings.ButtonDisplay = Settings.ButtonDisplayMode.Toggle;
         }
     }
     
-    private void DrawCustomConversationOptions(Listing_Standard listingStandard, CommunicationSettings settings)
+    internal void DrawCustomConversationOptions(Listing_Standard listingStandard, CommunicationSettings settings)
     {
         const float indent = 30f;
         const float dropdownWidth = 120f;
@@ -266,7 +268,7 @@ public partial class Settings
         
         if (Widgets.ButtonText(playerDialogueDropdownRect, currentModeLabel))
         {
-            var options = (from PlayerDialogueMode currentMode in Enum.GetValues(typeof(PlayerDialogueMode)) 
+            var options = (from Settings.PlayerDialogueMode currentMode in Enum.GetValues(typeof(Settings.PlayerDialogueMode)) 
                 select new FloatMenuOption(GetPlayerDialogueModeLabel(currentMode), () => settings.PlayerDialogueMode = currentMode)).ToList();
             Find.WindowStack.Add(new FloatMenu(options));
         }
@@ -274,7 +276,7 @@ public partial class Settings
         TooltipHandler.TipRegion(playerDialogueRect, "RimTalk.Settings.PlayerDialogueModeTooltip".Translate().ToString());
         
         // 2. Player Name TextField
-        bool isPlayerDialogueEnabled = settings.PlayerDialogueMode != PlayerDialogueMode.Disabled;
+        bool isPlayerDialogueEnabled = settings.PlayerDialogueMode != Settings.PlayerDialogueMode.Disabled;
         
         Rect playerNameRect = listingStandard.GetRect(30f);
         playerNameRect.x += indent;
@@ -310,4 +312,5 @@ public partial class Settings
         
         TooltipHandler.TipRegion(playerNameRect, "RimTalk.Settings.PlayerNameTooltip".Translate().ToString());
     }
+
 }

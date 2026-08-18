@@ -9,17 +9,20 @@ using Logger = Ustas.RimAI.Communication.Util.Logger;
 
 namespace Ustas.RimAI.Communication;
 
-public partial class Settings
+internal sealed class CommunicationEventFilterSettingsPage : CommunicationSettingsCollaborator
 {
+    internal CommunicationEventFilterSettingsPage(Settings owner) : base(owner) { }
+
     private List<string> _discoveredArchivableTypes = [];
     private Dictionary<string, List<string>> _typeHierarchy = new();
     private Dictionary<string, string> _sourceMap = new();
     private readonly HashSet<string> _expandedParents = new();
-    private bool _archivableTypesScanned;
+    internal bool _archivableTypesScanned;
+    internal bool ArchivableTypesScanned => _archivableTypesScanned;
     private const string Core = "Core";
     private const string VerseMessage = "Verse.Message";
 
-    private void ScanForArchivableTypes()
+    internal void ScanForArchivableTypes()
     {
         if (_archivableTypesScanned) return;
 
@@ -189,7 +192,7 @@ public partial class Settings
 
         _archivableTypesScanned = true;
 
-        CommunicationSettings settings = Get();
+        CommunicationSettings settings = Settings.Get();
 
         // Identify all Message-related types (Parent + Children) to disable them by default
         var messageTypes = new HashSet<string> { VerseMessage };
@@ -212,9 +215,9 @@ public partial class Settings
             $"Discovered {_discoveredArchivableTypes.Count} archivable types across {_typeHierarchy.Count} parent categories.");
     }
 
-    private void DrawEventFilterSettings(Listing_Standard listingStandard)
+    internal void DrawEventFilterSettings(Listing_Standard listingStandard)
     {
-        CommunicationSettings settings = Get();
+        CommunicationSettings settings = Settings.Get();
 
         // Instructions
         Text.Font = GameFont.Tiny;
@@ -362,4 +365,5 @@ public partial class Settings
             }
         }
     }
+
 }

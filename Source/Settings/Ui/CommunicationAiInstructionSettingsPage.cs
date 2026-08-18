@@ -8,11 +8,13 @@ using Verse;
 
 namespace Ustas.RimAI.Communication;
 
-public partial class Settings
+internal sealed class CommunicationAiInstructionSettingsPage : CommunicationSettingsCollaborator
 {
-    private void DrawAIInstructionSettings(Listing_Standard listingStandard, bool showAdvancedSwitch = false)
+    internal CommunicationAiInstructionSettingsPage(Settings owner) : base(owner) { }
+
+    internal void DrawAIInstructionSettings(Listing_Standard listingStandard, bool showAdvancedSwitch = false)
     {
-        CommunicationSettings settings = Get();
+        CommunicationSettings settings = Settings.Get();
 
         bool isSimpleMode = !settings.UseAdvancedPromptMode;
 
@@ -36,17 +38,17 @@ public partial class Settings
             baseEntry = GetOrCreateBaseInstructionEntry(activePreset);
             currentContent = baseEntry?.Content ?? Constant.DefaultInstruction;
 
-            if (_aiInstructionPresetId != (activePreset?.Id ?? ""))
+            if (Owner._aiInstructionPresetId != (activePreset?.Id ?? ""))
             {
-                _textAreaInitialized = false;
-                _aiInstructionPresetId = activePreset?.Id ?? "";
+                Owner._textAreaInitialized = false;
+                Owner._aiInstructionPresetId = activePreset?.Id ?? "";
             }
         }
 
-        if (!_textAreaInitialized)
+        if (!Owner._textAreaInitialized)
         {
-            _textAreaBuffer = currentContent;
-            _textAreaInitialized = true;
+            Owner._textAreaBuffer = currentContent;
+            Owner._textAreaInitialized = true;
         }
 
         var activeConfig = settings.GetActiveConfig();
@@ -71,8 +73,8 @@ public partial class Settings
                     () =>
                     {
                         settings.UseAdvancedPromptMode = true;
-                        _textAreaInitialized = false;
-                        _aiInstructionPresetId = "";
+                        Owner._textAreaInitialized = false;
+                        Owner._aiInstructionPresetId = "";
                     }));
             }
 
@@ -109,7 +111,7 @@ public partial class Settings
         listingStandard.Gap(6f);
 
         // Token info display
-        int currentTokens = CommonUtil.EstimateTokenCount(_textAreaBuffer);
+        int currentTokens = CommonUtil.EstimateTokenCount(Owner._textAreaBuffer);
         int maxAllowedTokens = CommonUtil.GetMaxAllowedTokens(settings.TalkInterval);
         string tokenInfo = "RimTalk.Settings.TokenInfo".Translate(currentTokens, maxAllowedTokens);
 
@@ -126,34 +128,34 @@ public partial class Settings
         Rect textAreaRect = listingStandard.GetRect(textAreaHeight);
 
         float innerWidth = textAreaRect.width - 16f;
-        float contentHeight = Mathf.Max(textAreaHeight, Text.CalcHeight(_textAreaBuffer, innerWidth) + 40f);
+        float contentHeight = Mathf.Max(textAreaHeight, Text.CalcHeight(Owner._textAreaBuffer, innerWidth) + 40f);
         Rect viewRect = new Rect(0f, 0f, innerWidth, contentHeight);
 
         const string controlName = "RimTalk_AIInstruction_TextArea";
-        Widgets.BeginScrollView(textAreaRect, ref _aiInstructionScrollPos, viewRect);
+        Widgets.BeginScrollView(textAreaRect, ref Owner._aiInstructionScrollPos, viewRect);
         GUI.SetNextControlName(controlName);
-        string newInstruction = Widgets.TextArea(new Rect(0f, 0f, innerWidth, contentHeight), _textAreaBuffer);
+        string newInstruction = Widgets.TextArea(new Rect(0f, 0f, innerWidth, contentHeight), Owner._textAreaBuffer);
 
         // Auto-scroll logic: only scroll if the cursor position changed
         if (GUI.GetNameOfFocusedControl() == controlName)
         {
             TextEditor te = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
-            if (te != null && te.cursorIndex != _lastTextAreaCursorPos)
+            if (te != null && te.cursorIndex != Owner._lastTextAreaCursorPos)
             {
-                _lastTextAreaCursorPos = te.cursorIndex;
+                Owner._lastTextAreaCursorPos = te.cursorIndex;
                 float cursorY = te.graphicalCursorPos.y;
-                if (cursorY < _aiInstructionScrollPos.y)
-                    _aiInstructionScrollPos.y = cursorY;
-                else if (cursorY + 25f > _aiInstructionScrollPos.y + textAreaHeight)
-                    _aiInstructionScrollPos.y = cursorY + 25f - textAreaHeight;
+                if (cursorY < Owner._aiInstructionScrollPos.y)
+                    Owner._aiInstructionScrollPos.y = cursorY;
+                else if (cursorY + 25f > Owner._aiInstructionScrollPos.y + textAreaHeight)
+                    Owner._aiInstructionScrollPos.y = cursorY + 25f - textAreaHeight;
             }
         }
 
         Widgets.EndScrollView();
 
-        if (newInstruction != _textAreaBuffer)
+        if (newInstruction != Owner._textAreaBuffer)
         {
-            _textAreaBuffer = newInstruction;
+            Owner._textAreaBuffer = newInstruction;
 
             // Write back to correct target
             if (isSimpleMode)
@@ -178,7 +180,7 @@ public partial class Settings
         Rect resetButtonRect = listingStandard.GetRect(30f);
         if (Widgets.ButtonText(resetButtonRect, "RimTalk.Settings.ResetToDefault".Translate()))
         {
-            _textAreaBuffer = Constant.DefaultInstruction;
+            Owner._textAreaBuffer = Constant.DefaultInstruction;
 
             if (isSimpleMode)
             {
@@ -197,7 +199,7 @@ public partial class Settings
         }
     }
 
-    private static PromptEntry GetOrCreateBaseInstructionEntry(PromptPreset preset)
+    internal static PromptEntry GetOrCreateBaseInstructionEntry(PromptPreset preset)
     {
         if (preset == null) return null;
 
@@ -219,4 +221,5 @@ public partial class Settings
         preset.Entries.Insert(0, entry);
         return entry;
     }
+
 }
