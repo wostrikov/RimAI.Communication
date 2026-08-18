@@ -69,9 +69,10 @@ public static class RelationsService
                     relationsSb.Append($"{pawnName}({label}) {opinion}, ");
                 }
             }
-            catch (Exception)
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — prompt relation labels must not abort nearby-pawn context
+            catch (Exception ex)
             {
-                // Skip this pawn if opinion calculation fails due to mod conflicts
+                Log.WarningOnce("[RimAI.Communication] Relation label skipped: " + ex, otherPawn.thingIDNumber);
             }
         }
 
@@ -197,9 +198,10 @@ public static class RelationsService
                 sb.Append("- ");
                 sb.AppendLine(text);
             }
-            catch (Exception)
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — modded play-log entries must not abort prompt context
+            catch (Exception ex)
             {   
-                // Skip if something's wrong with the entry (e.g., modded entry)
+                Log.WarningOnce("[RimAI.Communication] Play log entry skipped: " + ex, entry.GetHashCode());
             }
         }
 
@@ -242,8 +244,10 @@ public static class RelationsService
         {
             opinionValue = pawn.relations.OpinionOf(otherPawn);
         }
-        catch (Exception)
+        // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — optional social label must not abort prompt context
+        catch (Exception ex)
         {
+            Log.WarningOnce("[RimAI.Communication] OpinionOf failed: " + ex, otherPawn.thingIDNumber);
             return false;
         }
 

@@ -60,9 +60,10 @@ public static class CommonUtil
 
             return mapData;
         }
-        catch (Exception)
+        // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — prompt scene context must fail closed to N/A
+        catch (Exception ex)
         {
-            // Return default data in case of an exception
+            Log.Warning("[RimAI.Communication] GetInGameData failed: " + ex);
             return new InGameData
                 { Hour12HString = "N/A", DateString = "N/A", SeasonString = "N/A", WeatherString = "N/A" };
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using Verse;
 
@@ -35,8 +34,10 @@ public static class ThoughtTracker
         {
             offset = thought.MoodOffset();
         }
-        catch
+        // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — broken thought defs must not abort talk labeling
+        catch (Exception ex)
         {
+            Log.WarningOnce("[RimAI.Communication] Thought MoodOffset failed: " + ex, thought.def?.defName?.GetHashCode() ?? 0);
             return null; 
         }
 
@@ -97,8 +98,10 @@ public static class PatchMemoryThoughtHandlerTryGainMemory
         {
             moodImpact = newThought.MoodOffset();
         }
-        catch (Exception)
+        // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — Harmony thought postfix must not destabilize memory gain
+        catch (Exception ex)
         {
+            Log.WarningOnce("[RimAI.Communication] Thought postfix MoodOffset failed: " + ex, newThought.def?.defName?.GetHashCode() ?? 0);
             return; // Skip this thought if another mod has issues
         }
 
@@ -165,8 +168,10 @@ public static class PatchThoughtHandlerGetDistinctMoodThoughtGroups
                         ThoughtTracker.TryMarkAsProcessed(__instance.pawn, thought);
                     }
                 }
-                catch
+                // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — Harmony situational-thought scan must not abort the postfix
+                catch (Exception ex)
                 {
+                    Log.WarningOnce("[RimAI.Communication] Situational thought scan failed: " + ex, thought.def?.defName?.GetHashCode() ?? 0);
                 }
             }
         }

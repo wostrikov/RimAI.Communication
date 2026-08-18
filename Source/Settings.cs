@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using HarmonyLib;
 using RimWorld;
@@ -153,8 +154,10 @@ public class Settings : Mod
                 return language.info.friendlyNameEnglish;
             return language.folderName;
         }
-        catch
+        // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — boot-time language lookup must not fail settings
+        catch (Exception ex)
         {
+            Log.Warning("[RimAI.Communication] TryActiveGameLanguageEnglish failed: " + ex);
             return null;
         }
     }
