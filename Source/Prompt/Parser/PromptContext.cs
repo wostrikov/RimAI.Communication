@@ -78,6 +78,15 @@ public class PromptContext
     /// </summary>
     public Dictionary<string, string> TypedMemoryProjections { get; set; } = new();
 
+    /// <summary>
+    /// Canonical conversation Knowledge Projection prepared once by AttachTypedMemoryContext.
+    /// Scriban {{knowledge}} presents this; it must not re-match on the normal Talk path.
+    /// </summary>
+    public string TypedKnowledgeProjection { get; set; }
+
+    /// <summary>True when Attach prepared <see cref="TypedKnowledgeProjection"/> for this turn.</summary>
+    public bool UsedTypedKnowledgeContext { get; set; }
+
     /// <summary>Looks up a precomputed Projection for a pawn ThingID, or null if absent.</summary>
     public bool TryGetTypedMemoryProjection(string pawnThingId, out string projection)
     {
@@ -87,6 +96,13 @@ public class PromptContext
         if (!TypedMemoryProjections.TryGetValue(pawnThingId, out projection))
             return false;
         return true;
+    }
+
+    /// <summary>Returns precomputed knowledge text when Attach prepared it this turn.</summary>
+    public bool TryGetTypedKnowledgeProjection(out string projection)
+    {
+        projection = TypedKnowledgeProjection;
+        return UsedTypedKnowledgeContext;
     }
 
     public PromptContext()

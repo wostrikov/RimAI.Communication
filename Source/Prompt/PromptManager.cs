@@ -463,21 +463,46 @@ public class PromptManager : IExposable
 
         context.TypedMemoryProjections ??= new Dictionary<string, string>();
         context.TypedMemoryProjections.Clear();
+        context.TypedKnowledgeProjection = string.Empty;
+        context.UsedTypedKnowledgeContext = false;
+
         string query = talkRequest?.Prompt;
         string lastSource = "typed";
 
-        // OPTION A: one query-aware GetContext per talk pawn; Scriban only presents stored Projection.
+        // Shared conversation ceiling: one DefaultTokenBudget split across talk pawns
+        // so sum of per-pawn entry caps ≤ TokenBudget/TokensPerMemoryEntry (not N×budget).
+        int conversationEntryBudget = Math.Max(
+            1,
+            MemoryContextDefaults.DefaultTokenBudget / MemoryContextDefaults.TokensPerMemoryEntry);
+        int perPawnEntries = Math.Max(1, conversationEntryBudget / ids.Count);
+        int perPawnTokenBudget = perPawnEntries * MemoryContextDefaults.TokensPerMemoryEntry;
+
+        // OPTION A: one query-aware GetContext per talk pawn (no nested knowledge).
         foreach (var pawnId in ids)
         {
             var result = provider.GetContext(new MemoryContextRequest
             {
                 PawnId = pawnId,
-                PawnIds = ids,
                 Query = query,
-                TokenBudget = MemoryContextDefaults.DefaultTokenBudget,
+                TokenBudget = perPawnTokenBudget,
+                IncludeKnowledge = false,
             });
             context.TypedMemoryProjections[pawnId] = result?.Projection ?? string.Empty;
             lastSource = result?.Source ?? "typed";
+        }
+
+        // One conversation-level knowledge match for {{knowledge}} (not N nested matches).
+        var knowledgeProvider = MemoryContextAccess.Knowledge;
+        if (knowledgeProvider != null)
+        {
+            var knowledge = knowledgeProvider.GetKnowledge(new MemoryContextRequest
+            {
+                Query = query,
+                PawnId = talkRequest?.Initiator?.ThingID ?? ids[0],
+                TokenBudget = MemoryContextDefaults.DefaultTokenBudget,
+            });
+            context.TypedKnowledgeProjection = knowledge?.Projection ?? string.Empty;
+            context.UsedTypedKnowledgeContext = true;
         }
 
         context.UsedTypedMemoryContext = true;
@@ -485,7 +510,7 @@ public class PromptManager : IExposable
         if (Prefs.DevMode)
             RimAiLog.Info(
                 RimAiLogCategory.Communication,
-                $"[RIMAI_MEMORY] typed_context provider=IMemoryContextProvider pawns={ids.Count} projections_stored=true");
+                $"[RIMAI_MEMORY] typed_context pawns={ids.Count} per_pawn_budget={perPawnTokenBudget} knowledge_once=true");
     }
 
     private List<(PromptRole role, string content)> BuildMessagesFromPreset(
