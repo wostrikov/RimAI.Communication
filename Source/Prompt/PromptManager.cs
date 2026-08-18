@@ -456,22 +456,28 @@ public class PromptManager : IExposable
 
         // Ensure Personas provider can resolve ThingID → Pawn while rendering templates.
         TalkLifecycle.PublishContextBuildStarted(pawns);
-
-        var provider = PersonaProjectionAccess.Current;
-        foreach (var pawn in pawns)
+        try
         {
-            if (pawn == null || string.IsNullOrEmpty(pawn.ThingID))
-                continue;
-
-            string raw = Cache.Get(pawn)?.Personality ?? string.Empty;
-            string projection = raw;
-            if (provider != null)
+            var provider = PersonaProjectionAccess.Current;
+            foreach (var pawn in pawns)
             {
-                var result = provider.GetProjection(pawn.ThingID, raw);
-                projection = result?.Projection ?? raw;
-            }
+                if (pawn == null || string.IsNullOrEmpty(pawn.ThingID))
+                    continue;
 
-            context.TypedPersonaProjections[pawn.ThingID] = projection ?? string.Empty;
+                string raw = Cache.Get(pawn)?.Personality ?? string.Empty;
+                string projection = raw;
+                if (provider != null)
+                {
+                    var result = provider.GetProjection(pawn.ThingID, raw);
+                    projection = result?.Projection ?? raw;
+                }
+
+                context.TypedPersonaProjections[pawn.ThingID] = projection ?? string.Empty;
+            }
+        }
+        finally
+        {
+            TalkLifecycle.PublishContextBuildCompleted();
         }
     }
 
