@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Ustas.RimAI.Communication.API;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Prompt;
 using Ustas.RimAI.Communication.Util;
 using Ustas.RimAI.Core.Communication;
 using Ustas.RimAI.Core.Personas;
@@ -96,12 +97,31 @@ public static class PromptService
         AppendWithHook(sb, pawn, ContextCategories.Pawn.Health, ContextBuilder.GetHealthContext(pawn, infoLevel));
 
         var personality = Cache.Get(pawn)?.Personality;
-        if (personality != null)
+        if (personality != null || PersonaProjectionDefaults.UseTypedPersonaProjection)
         {
-            // Shared with Core characterization / Wave C PersonaProjectionDefaults.
-            // When UseTypedPersonaProjection becomes true, Talk presents TypedPersonaProjections instead.
-            if (!PersonaProjectionDefaults.UseTypedPersonaProjection)
+            if (PersonaProjectionDefaults.UseTypedPersonaProjection)
+            {
+                string presented = personality ?? string.Empty;
+                if (PromptManager.LastContext != null
+                    && !string.IsNullOrEmpty(pawn.ThingID)
+                    && PromptManager.LastContext.TryGetTypedPersonaProjection(pawn.ThingID, out var projection)
+                    && projection != null)
+                {
+                    presented = projection;
+                }
+                else if (PersonaProjectionAccess.Current != null && !string.IsNullOrEmpty(pawn.ThingID))
+                {
+                    var result = PersonaProjectionAccess.Current.GetProjection(pawn.ThingID, personality ?? string.Empty);
+                    presented = result?.Projection ?? personality ?? string.Empty;
+                }
+
+                if (!string.IsNullOrEmpty(presented))
+                    sb.Append(PersonaProjectionDefaults.FormatTalkPersonalityLine(presented));
+            }
+            else if (personality != null)
+            {
                 sb.Append(PersonaProjectionDefaults.FormatTalkPersonalityLine(personality));
+            }
         }
 
         // Stop here for invaders

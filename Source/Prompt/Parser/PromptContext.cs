@@ -107,10 +107,9 @@ public class PromptContext
     }
 
     /// <summary>
-    /// Per-pawn Persona Projections (Wave C). Bag exists today so characterization can
-    /// bind to the property; consumption is gated by
-    /// <see cref="PersonaProjectionDefaults.UseTypedPersonaProjection"/> (false until Wave C).
-    /// Key = Pawn.ThingID.
+    /// Per-pawn Persona Projections prepared by AttachTypedPersonaContext (Wave C).
+    /// Key = Pawn.ThingID. Talk CreatePawnContext and Scriban {{pawn.personality}} present these;
+    /// late Transform replace is a no-op when <see cref="PersonaProjectionDefaults.UseTypedPersonaProjection"/>.
     /// </summary>
     public Dictionary<string, string> TypedPersonaProjections { get; set; } = new();
 

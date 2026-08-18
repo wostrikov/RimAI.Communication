@@ -7,6 +7,7 @@ using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Communication.Util;
 using Ustas.RimAI.Core.Communication;
+using Ustas.RimAI.Core.Personas;
 using Scriban;
 using Scriban.Parsing;
 using Scriban.Runtime;
@@ -281,6 +282,23 @@ public static class ScribanParser
         }
     }
 
+    private static string ResolvePersonalityForScriban(Pawn pawn)
+    {
+        if (pawn == null)
+            return "";
+
+        if (PersonaProjectionDefaults.UseTypedPersonaProjection
+            && PromptManager.LastContext != null
+            && !string.IsNullOrEmpty(pawn.ThingID)
+            && PromptManager.LastContext.TryGetTypedPersonaProjection(pawn.ThingID, out var projection)
+            && projection != null)
+        {
+            return projection;
+        }
+
+        return Cache.Get(pawn)?.Personality ?? "";
+    }
+
     private static string GetMagicPawnValue(Pawn pawn, string member) {
         return member.ToLowerInvariant() switch {
             "name" => pawn.LabelShort,
@@ -298,7 +316,7 @@ public static class ScribanParser
             "moodpercent" => pawn.needs?.mood != null
                 ? pawn.needs.mood.CurLevelPercentage.ToString("P0")
                 : "",
-            "personality" => Cache.Get(pawn)?.Personality ?? "",
+            "personality" => ResolvePersonalityForScriban(pawn),
             "profile" => PromptService.CreatePawnContext(pawn, PromptService.InfoLevel.Normal) ?? "",
             "backstory" => ContextBuilder.GetBackstoryContext(pawn, PromptService.InfoLevel.Normal) ?? "",
             "traits" => ContextBuilder.GetTraitsContext(pawn, PromptService.InfoLevel.Normal) ?? "",

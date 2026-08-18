@@ -5,9 +5,11 @@ using System.Text.RegularExpressions;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Core.Memory;
+using Ustas.RimAI.Core.Personas;
 using Ustas.RimAI.Core.Communication;
 using Verse;
 using Ustas.RimAI.Core.Diagnostics;
+using Cache = Ustas.RimAI.Communication.Data.Cache;
 
 namespace Ustas.RimAI.Communication.Prompt;
 
@@ -386,15 +388,20 @@ public class PromptManager : IExposable
         // 1. Prepare shared context data
         TalkLifecycle.PublishPromptBuildStarted();
         var (dialogueType, intent, topic) = PromptContextProvider.GetDialogueTypeData(talkRequest, pawns);
-        talkRequest.Context = PromptService.BuildContext(pawns);
-        PromptService.DecoratePrompt(talkRequest, pawns, status);
 
-        // 2. Build Context Object
+        // Wave C: build PromptContext and Attach persona projections BEFORE BuildContext
+        // so CreatePawnContext / Scriban present the same precomputed bag (no late Transform).
         var context = PromptContext.FromTalkRequest(talkRequest, pawns);
         context.DialogueType = dialogueType;
         context.Intent = intent;
         context.ConversationTopic = topic;
         context.DialogueStatus = status;
+        AttachTypedPersonaContext(context, pawns);
+        LastContext = context;
+
+        talkRequest.Context = PromptService.BuildContext(pawns);
+        context.PawnContext = talkRequest.Context;
+        PromptService.DecoratePrompt(talkRequest, pawns, status);
         context.DialoguePrompt = talkRequest.Prompt;
         AttachTypedMemoryContext(context, talkRequest, pawns);
         LastContext = context;
@@ -434,6 +441,38 @@ public class PromptManager : IExposable
         talkRequest.PromptMessageSegments = segments.Count > 0 ? segments : null;
         
         return messages.Select(m => ((Role)m.role, m.content)).ToList();
+    }
+
+    static void AttachTypedPersonaContext(PromptContext context, List<Pawn> pawns)
+    {
+        if (!PersonaProjectionDefaults.UseTypedPersonaProjection || context == null)
+            return;
+
+        context.TypedPersonaProjections ??= new Dictionary<string, string>();
+        context.TypedPersonaProjections.Clear();
+
+        if (pawns == null || pawns.Count == 0)
+            return;
+
+        // Ensure Personas provider can resolve ThingID → Pawn while rendering templates.
+        TalkLifecycle.PublishContextBuildStarted(pawns);
+
+        var provider = PersonaProjectionAccess.Current;
+        foreach (var pawn in pawns)
+        {
+            if (pawn == null || string.IsNullOrEmpty(pawn.ThingID))
+                continue;
+
+            string raw = Cache.Get(pawn)?.Personality ?? string.Empty;
+            string projection = raw;
+            if (provider != null)
+            {
+                var result = provider.GetProjection(pawn.ThingID, raw);
+                projection = result?.Projection ?? raw;
+            }
+
+            context.TypedPersonaProjections[pawn.ThingID] = projection ?? string.Empty;
+        }
     }
 
     static void AttachTypedMemoryContext(PromptContext context, TalkRequest talkRequest, List<Pawn> pawns)
