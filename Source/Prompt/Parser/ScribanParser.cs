@@ -7,7 +7,6 @@ using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Communication.Util;
 using Ustas.RimAI.Core.Communication;
-using Ustas.RimAI.Core.Personas;
 using Scriban;
 using Scriban.Parsing;
 using Scriban.Runtime;
@@ -287,8 +286,7 @@ public static class ScribanParser
         if (pawn == null)
             return "";
 
-        if (PersonaProjectionDefaults.UseTypedPersonaProjection
-            && PromptManager.LastContext != null
+        if (PromptManager.LastContext != null
             && !string.IsNullOrEmpty(pawn.ThingID)
             && PromptManager.LastContext.TryGetTypedPersonaProjection(pawn.ThingID, out var projection)
             && projection != null)

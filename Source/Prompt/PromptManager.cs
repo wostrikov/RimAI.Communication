@@ -445,7 +445,7 @@ public class PromptManager : IExposable
 
     static void AttachTypedPersonaContext(PromptContext context, List<Pawn> pawns)
     {
-        if (!PersonaProjectionDefaults.UseTypedPersonaProjection || context == null)
+        if (context == null)
             return;
 
         context.TypedPersonaProjections ??= new Dictionary<string, string>();
@@ -454,30 +454,21 @@ public class PromptManager : IExposable
         if (pawns == null || pawns.Count == 0)
             return;
 
-        // Ensure Personas provider can resolve ThingID → Pawn while rendering templates.
-        TalkLifecycle.PublishContextBuildStarted(pawns);
-        try
+        var provider = PersonaProjectionAccess.Current;
+        foreach (var pawn in pawns)
         {
-            var provider = PersonaProjectionAccess.Current;
-            foreach (var pawn in pawns)
+            if (pawn == null || string.IsNullOrEmpty(pawn.ThingID))
+                continue;
+
+            string raw = Cache.Get(pawn)?.Personality ?? string.Empty;
+            string projection = raw;
+            if (provider != null)
             {
-                if (pawn == null || string.IsNullOrEmpty(pawn.ThingID))
-                    continue;
-
-                string raw = Cache.Get(pawn)?.Personality ?? string.Empty;
-                string projection = raw;
-                if (provider != null)
-                {
-                    var result = provider.GetProjection(pawn.ThingID, raw);
-                    projection = result?.Projection ?? raw;
-                }
-
-                context.TypedPersonaProjections[pawn.ThingID] = projection ?? string.Empty;
+                var result = provider.GetProjection(pawn.ThingID, raw, pawn);
+                projection = result?.Projection ?? raw;
             }
-        }
-        finally
-        {
-            TalkLifecycle.PublishContextBuildCompleted();
+
+            context.TypedPersonaProjections[pawn.ThingID] = projection ?? string.Empty;
         }
     }
 

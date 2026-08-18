@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Core.Personas;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Prompt;
@@ -107,9 +106,8 @@ public class PromptContext
     }
 
     /// <summary>
-    /// Per-pawn Persona Projections prepared by AttachTypedPersonaContext (Wave C).
-    /// Key = Pawn.ThingID. Talk CreatePawnContext and Scriban {{pawn.personality}} present these;
-    /// late Transform replace is a no-op when <see cref="PersonaProjectionDefaults.UseTypedPersonaProjection"/>.
+    /// Per-pawn Persona Projections prepared by AttachTypedPersonaContext.
+    /// Key = Pawn.ThingID. Talk CreatePawnContext and Scriban {{pawn.personality}} present these.
     /// </summary>
     public Dictionary<string, string> TypedPersonaProjections { get; set; } = new();
 
@@ -117,8 +115,6 @@ public class PromptContext
     public bool TryGetTypedPersonaProjection(string pawnThingId, out string projection)
     {
         projection = null;
-        if (!PersonaProjectionDefaults.UseTypedPersonaProjection)
-            return false;
         if (string.IsNullOrEmpty(pawnThingId) || TypedPersonaProjections == null)
             return false;
         if (!TypedPersonaProjections.TryGetValue(pawnThingId, out projection))
