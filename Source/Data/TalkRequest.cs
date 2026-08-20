@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Ustas.RimAI.Communication.Patch;
+using Ustas.RimAI.Communication.Patches;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
 using Verse;

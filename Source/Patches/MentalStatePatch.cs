@@ -3,7 +3,7 @@ using Ustas.RimAI.Communication.Data;
 using Verse;
 using Verse.AI;
 
-namespace Ustas.RimAI.Communication.Patch;
+namespace Ustas.RimAI.Communication.Patches;
 
 [HarmonyPatch(typeof(MentalStateHandler), nameof(MentalStateHandler.TryStartMentalState))]
 public static class MentalStatePatch

@@ -7,7 +7,7 @@ using RimWorld;
 using Verse;
 using Ustas.RimAI.Core.Diagnostics;
 
-namespace Ustas.RimAI.Communication.Patch;
+namespace Ustas.RimAI.Communication.Patches;
 
 public static class ThoughtTracker
 {

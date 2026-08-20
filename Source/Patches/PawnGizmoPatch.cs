@@ -7,7 +7,7 @@ using UnityEngine;
 using Verse;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace Ustas.RimAI.Communication.Patch
+namespace Ustas.RimAI.Communication.Patches
 {
     [HarmonyPatch(typeof(Pawn), "GetGizmos")]
     public static class PawnGizmoPatch

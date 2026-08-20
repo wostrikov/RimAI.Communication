@@ -1,10 +1,10 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using Verse;
 
-namespace Ustas.RimAI.Communication.Patch;
+namespace Ustas.RimAI.Communication.Patches;
 
 [HarmonyPatch(typeof(SkillRecord), nameof(SkillRecord.Learn))]
 public class SkillLevelUpPatch

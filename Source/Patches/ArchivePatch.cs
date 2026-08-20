@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
@@ -8,7 +8,7 @@ using RimWorld;
 using Verse;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace Ustas.RimAI.Communication.Patch;
+namespace Ustas.RimAI.Communication.Patches;
 
 [HarmonyPatch(typeof(Archive), nameof(Archive.Add))]
 public static class ArchivePatch

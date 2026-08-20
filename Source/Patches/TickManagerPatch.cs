@@ -6,7 +6,7 @@ using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
 
-namespace Ustas.RimAI.Communication.Patch;
+namespace Ustas.RimAI.Communication.Patches;
 
 [HarmonyPatch(typeof(TickManager), nameof(TickManager.DoSingleTick))]
 internal static class TickManagerPatch

@@ -2,7 +2,7 @@ using System.Linq;
 using Ustas.RimAI.Communication.Client;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Error;
-using Ustas.RimAI.Communication.Patch;
+using Ustas.RimAI.Communication.Patches;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Core.Communication;
 using Verse;

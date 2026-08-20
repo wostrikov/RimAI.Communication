@@ -8,7 +8,7 @@ using Verse;
 using Verse.AI;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
 
-namespace Ustas.RimAI.Communication.Patch;
+namespace Ustas.RimAI.Communication.Patches;
 
 #if V1_5
 [HarmonyPatch(typeof(FloatMenuMakerMap), nameof(FloatMenuMakerMap.ChoicesAtFor))]

@@ -16,6 +16,7 @@
 
         <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
         <ModFolderName>RimAI.Communication</ModFolderName>
+        <ModRoot>$(MSBuildProjectDirectory)\..</ModRoot>
         <LangVersion>latest</LangVersion>
         <EnableBubbles>true</EnableBubbles>
     </PropertyGroup>
@@ -35,7 +36,7 @@
     <ItemGroup>
         <PackageReference Include="Lib.Harmony.Ref" Version="2.*" PrivateAssets="All"/>
         <PackageReference Include="IndexRange" Version="1.0.3" />
-        <ProjectReference Include="..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj">
+        <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj">
             <Private>false</Private>
         </ProjectReference>
     </ItemGroup>
@@ -64,10 +65,10 @@
 
     <!-- Remove BubblePatch.cs when bubble is disabled -->
     <ItemGroup Condition=" '$(EnableBubbles)' == 'false' ">
-        <Compile Remove="Source/Patch/BubblePatch.cs"/>
+        <Compile Remove="Patches/BubblePatch.cs"/>
     </ItemGroup>
     <ItemGroup>
-        <Compile Remove="tests/**/*.cs" />
+        <Compile Remove="../tests/**/*.cs" />
     </ItemGroup>
 
     <!-- Include External Libraries -->
@@ -77,7 +78,7 @@
             <Private>false</Private>
         </Reference>
         <Reference Include="Scriban">
-            <HintPath>Libs/Scriban.dll</HintPath>
+            <HintPath>$(ModRoot)\Libs\Scriban.dll</HintPath>
             <Private>true</Private>
         </Reference>
     </ItemGroup>
@@ -94,23 +95,23 @@
             <DeployPath>$(RimWorldDir)/RimWorldMac.app/Mods/$(ModFolderName)/</DeployPath>
         </PropertyGroup>
         <MakeDir Directories="$(DeployPath)"/>
-        <Exec Command='rsync -a --delete --checksum "$(ProjectDir)About/"     "$(DeployPath)About/"'/>
-        <Exec Command='rsync -a --delete --checksum "$(ProjectDir)Defs/"      "$(DeployPath)Defs/"'/>
-        <Exec Command='rsync -a --delete --checksum "$(ProjectDir)Languages/" "$(DeployPath)Languages/"'/>
-        <Exec Command='rsync -a --delete --checksum "$(ProjectDir)Textures/"  "$(DeployPath)Textures/"'/>
-        <Exec Command='rsync -a --delete --checksum "$(ProjectDir)$(GameVersion)/"       "$(DeployPath)$(GameVersion)/"'/>
+        <Exec Command='rsync -a --delete --checksum "$(ModRoot)/About/"     "$(DeployPath)About/"'/>
+        <Exec Command='rsync -a --delete --checksum "$(ModRoot)/Defs/"      "$(DeployPath)Defs/"'/>
+        <Exec Command='rsync -a --delete --checksum "$(ModRoot)/Languages/" "$(DeployPath)Languages/"'/>
+        <Exec Command='rsync -a --delete --checksum "$(ModRoot)/Textures/"  "$(DeployPath)Textures/"'/>
+        <Exec Command='rsync -a --delete --checksum "$(ModRoot)/$(GameVersion)/"       "$(DeployPath)$(GameVersion)/"'/>
         <Message Text="--- macOS deployment finished successfully ---" Importance="high"/>
     </Target>
 
     <!-- Stage primary + private deps into versioned Assemblies before MIR (Assemblies is not source-owned). -->
     <Target Name="StageModAssemblies">
-        <MakeDir Directories="$(ProjectDir)$(GameVersion)\Assemblies" />
+        <MakeDir Directories="$(ModRoot)\$(GameVersion)\Assemblies" />
         <ItemGroup>
             <_StagedAssemblies Include="$(TargetPath)" />
             <_StagedAssemblies Include="$(OutputPath)IndexRange.dll" Condition="Exists('$(OutputPath)IndexRange.dll')" />
-            <_StagedAssemblies Include="$(ProjectDir)Libs\Scriban.dll" Condition="Exists('$(ProjectDir)Libs\Scriban.dll')" />
+            <_StagedAssemblies Include="$(ModRoot)\Libs\Scriban.dll" Condition="Exists('$(ModRoot)\Libs\Scriban.dll')" />
         </ItemGroup>
-        <Copy SourceFiles="@(_StagedAssemblies)" DestinationFolder="$(ProjectDir)$(GameVersion)\Assemblies\" SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(_StagedAssemblies)" DestinationFolder="$(ModRoot)\$(GameVersion)\Assemblies\" SkipUnchangedFiles="true" />
     </Target>
 
     <!-- Deploy to RimWorld client (Windows) -->
@@ -123,12 +124,14 @@
             <_CopyDirs Include="About;Defs;Languages;Textures;$(GameVersion)"/>
         </ItemGroup>
         <MakeDir Directories="$(WinModPath)"/>
-        <Exec Command='robocopy "$(ProjectDir)About"     "$(WinModPath)About" /MIR' IgnoreExitCode="true"/>
-        <Exec Command='robocopy "$(ProjectDir)Defs"      "$(WinModPath)Defs" /MIR' IgnoreExitCode="true"/>
-        <Exec Command='robocopy "$(ProjectDir)Languages" "$(WinModPath)Languages" /MIR' IgnoreExitCode="true"/>
-        <Exec Command='robocopy "$(ProjectDir)Textures"  "$(WinModPath)Textures" /MIR' IgnoreExitCode="true"/>
-        <Exec Command='robocopy "$(ProjectDir)$(GameVersion)"       "$(WinModPath)$(GameVersion)" /MIR' IgnoreExitCode="true"/>
+        <Exec Command='robocopy "$(ModRoot)\About"     "$(WinModPath)About" /MIR' IgnoreExitCode="true"/>
+        <Exec Command='robocopy "$(ModRoot)\Defs"      "$(WinModPath)Defs" /MIR' IgnoreExitCode="true"/>
+        <Exec Command='robocopy "$(ModRoot)\Languages" "$(WinModPath)Languages" /MIR' IgnoreExitCode="true"/>
+        <Exec Command='robocopy "$(ModRoot)\Textures"  "$(WinModPath)Textures" /MIR' IgnoreExitCode="true"/>
+        <Exec Command='robocopy "$(ModRoot)\$(GameVersion)"       "$(WinModPath)$(GameVersion)" /MIR' IgnoreExitCode="true"/>
         <Message Text="--- Windows deployment finished successfully ---" Importance="high"/>
     </Target>
 
 </Project>
+
+

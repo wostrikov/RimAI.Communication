@@ -4,7 +4,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace Ustas.RimAI.Communication.Patch
+namespace Ustas.RimAI.Communication.Patches
 {
     [StaticConstructorOnStartup]
     [HarmonyPatch(typeof(PlaySettings), nameof(PlaySettings.DoPlaySettingsGlobalControls))]

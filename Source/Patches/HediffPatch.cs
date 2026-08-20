@@ -5,7 +5,7 @@ using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
 using Verse;
 
-namespace Ustas.RimAI.Communication.Patch;
+namespace Ustas.RimAI.Communication.Patches;
 
 [HarmonyPatch(typeof(Pawn_HealthTracker))]
 [HarmonyPatch(nameof(Pawn_HealthTracker.AddHediff), new Type[] { typeof(Hediff), typeof(BodyPartRecord), typeof(DamageInfo), typeof(DamageWorker.DamageResult) })]

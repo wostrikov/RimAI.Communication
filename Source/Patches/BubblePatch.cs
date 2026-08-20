@@ -10,7 +10,7 @@ using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
 
-namespace Ustas.RimAI.Communication.Patch;
+namespace Ustas.RimAI.Communication.Patches;
 
 [HarmonyPatch(typeof(Bubbler), nameof(Bubbler.Add))]
 public static class Bubbler_Add
