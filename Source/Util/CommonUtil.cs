@@ -46,7 +46,7 @@ public static class CommonUtil
             Map currentMap = Find.CurrentMap;
             if (currentMap?.Tile == null)
             {
-                return mapData; // Return default value if invalid
+                return mapData;
             }
 
             // Perform redundant calculations only once beforehand

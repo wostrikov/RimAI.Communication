@@ -25,7 +25,6 @@ public static class Bubbler_Add
         Pawn recipient = GetRecipient(entry);
         var prompt = entry.ToGameStringFromPOV(initiator).StripTags();
 
-        // For RimTalk interaction, display normal bubble
         if (IsRimTalkInteraction(entry))
         {
             if (settings.DisplayTalkWhenDrafted)
@@ -42,7 +41,6 @@ public static class Bubbler_Add
             return true;
         }
 
-        // If Rimtalk disabled or  non-RimTalk interactions is disabled, show the original bubble.
         if (!settings.IsEnabled || !settings.ProcessNonRimTalkInteractions)
         {
             return true;
@@ -53,7 +51,6 @@ public static class Bubbler_Add
         bool isChitchat = interactionDef == InteractionDefOf.Chitchat ||
                           interactionDef == InteractionDefOf.DeepTalk;
 
-        // if in danger then stop chitchat
         if (isChitchat
             && (initiator.IsInDanger()
                 || initiator.GetHostilePawnNearBy() != null

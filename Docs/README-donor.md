@@ -1,3 +1,5 @@
+<!-- HISTORICAL DONOR README — not current RimAI.Communication architecture. License/attribution text below is retained. -->
+
 <p align="center">
   <a href="https://github.com/jlibrary/RimTalk/pulls">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">

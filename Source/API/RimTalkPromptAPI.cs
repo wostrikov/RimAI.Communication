@@ -8,9 +8,6 @@ using Verse;
 
 namespace Ustas.RimAI.Communication.API;
 
-/// <summary>
-/// RimTalk prompt system public API for other mods to use.
-/// </summary>
 public static class RimTalkPromptAPI
 {
     // ===== Custom Variable Registration API =====

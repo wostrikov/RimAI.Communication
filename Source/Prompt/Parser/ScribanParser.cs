@@ -145,7 +145,6 @@ public static class ScribanParser
                 string varName = variable.Name;
                 if (string.IsNullOrEmpty(varName)) return false;
 
-                // A. RimTalk API Context Variables
                 if (ContextHookRegistry.TryGetContextVariable(varName, context, out var apiValue))
                 {
                     value = apiValue;
@@ -170,7 +169,6 @@ public static class ScribanParser
             {
                 value = null;
                 
-                // A. RimTalk Magic Hooks
                 if (target is PromptContext ctx)
                 {
                     if (ContextHookRegistry.TryGetContextVariable(member, ctx, out var ctxValue)) { value = ctxValue; return true; }

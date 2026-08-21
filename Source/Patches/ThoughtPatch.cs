@@ -137,7 +137,6 @@ public static class PatchThoughtHandlerGetDistinctMoodThoughtGroups
         if (__instance.pawn == null || !__instance.pawn.Spawned)
             return;
 
-        // Get current situational thoughts
         var currentThoughts = new HashSet<string>();
         foreach (var thought in outThoughts)
         {
@@ -147,7 +146,6 @@ public static class PatchThoughtHandlerGetDistinctMoodThoughtGroups
             }
         }
 
-        // Get previous thoughts for this pawn
         if (!LastSituationalThoughts.TryGetValue(__instance.pawn, out var previousThoughts))
         {
             previousThoughts = new HashSet<string>();
@@ -158,7 +156,6 @@ public static class PatchThoughtHandlerGetDistinctMoodThoughtGroups
         var newThoughts = currentThoughts.Except(previousThoughts).ToList();
         foreach (var thoughtDefName in newThoughts)
         {
-            // Get the actual thought object
             var thought = outThoughts.FirstOrDefault(t => t.def.defName == thoughtDefName);
             if (thought != null)
             {

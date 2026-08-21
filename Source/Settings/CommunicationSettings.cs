@@ -250,7 +250,6 @@ public class CommunicationSettings : ModSettings
         if (PromptSystem == null)
             PromptSystem = new PromptManager();
         
-        // Set the singleton instance
         PromptManager.SetInstance(PromptSystem);
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit && LanguageDatabase.activeLanguage != null)

@@ -57,10 +57,6 @@ public class PromptEntry : IExposable
     /// <summary>Whether enabled</summary>
     public bool Enabled = true;
     
-    /// <summary>
-    /// Source mod's package ID (null means RimTalk built-in or user created).
-    /// Setting this will automatically generate a deterministic ID based on SourceModId and Name.
-    /// </summary>
     public string SourceModId
     {
         get => _sourceModId;

@@ -170,7 +170,6 @@ public static class RelationsService
         const int maxEntries = 5;
         var sb = new StringBuilder();
 
-        // Also filter out rimtalk history, as this is already handled by a different context
         var entries = Find.PlayLog.AllEntries
         .Where(entry =>
             entry.Concerns(pawn) &&
