@@ -29,12 +29,6 @@ public class RimTalk : GameComponent
 
     public static void Reset(bool soft = false)
     {
-        var settings = Settings.Get();
-        if (settings != null)
-        {
-            settings.CurrentCloudConfigIndex = 0;
-        }
-
         AIErrorHandler.ResetQuotaWarning();
         TickManagerPatch.Reset();
         AIClientFactory.Clear();

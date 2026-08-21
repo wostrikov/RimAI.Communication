@@ -16,6 +16,9 @@ public class CommunicationSettings : ModSettings
     public bool UseCloudProviders = true;
     public bool UseSimpleConfig = true;
     public string SimpleApiKey = "";
+    /// <summary>
+    /// Transient simple-mode retry flag. Not persisted; restart resetting it is intentional.
+    /// </summary>
     public bool IsUsingFallbackModel = false;
     public bool IsEnabled = true;
     public int TalkInterval = 7;
@@ -162,6 +165,7 @@ public class CommunicationSettings : ModSettings
 
         Scribe_Collections.Look(ref CloudConfigs, "cloudConfigs", LookMode.Deep);
         Scribe_Deep.Look(ref LocalConfig, "localConfig");
+        Scribe_Values.Look(ref CurrentCloudConfigIndex, CommunicationCloudSettingsPersistence.CurrentCloudConfigIndexScribeKey, 0, true);
         Scribe_Values.Look(ref UseCloudProviders, "useCloudProviders", true);
         Scribe_Values.Look(ref UseSimpleConfig, "useSimpleConfig", true);
         Scribe_Values.Look(ref SimpleApiKey, "simpleApiKey", "");
@@ -317,6 +321,15 @@ public class CommunicationSettings : ModSettings
         {
             CloudConfigs.Add(new ApiConfig());
         }
+
+        NormalizeActiveCloudConfigIndex();
+    }
+
+    public void NormalizeActiveCloudConfigIndex()
+    {
+        CurrentCloudConfigIndex = CommunicationCloudSettingsPersistence.NormalizeIndex(
+            CurrentCloudConfigIndex,
+            CloudConfigs?.Count ?? 0);
     }
 
     private static PromptEntry GetOrCreateBaseInstructionEntry(PromptPreset preset)

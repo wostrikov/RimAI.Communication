@@ -82,6 +82,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
             if (DrawCloudConfigRow(listingStandard, settings.CloudConfigs[i], i, settings.CloudConfigs))
             {
                 settings.CloudConfigs.RemoveAt(i);
+                settings.NormalizeActiveCloudConfigIndex();
                 i--;
             }
             listingStandard.Gap(2f);
@@ -277,20 +278,9 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
                 
                 providerOptions.Add(new FloatMenuOption(provider.GetLabel(), () =>
                 {
-                    config.Provider = provider;
-                    switch (provider)
-                    {
-                        case AIProvider.Player2:
-                            config.SelectedModel = "Default";
-                            Player2Client.CheckPlayer2StatusAndNotify();
-                            break;
-                        case AIProvider.Custom:
-                            config.SelectedModel = "Custom";
-                            break;
-                        default:
-                            config.SelectedModel = Constant.ChooseModel;
-                            break;
-                    }
+                    ApplyProviderSelection(config, provider);
+                    if (provider == AIProvider.Player2)
+                        Player2Client.CheckPlayer2StatusAndNotify();
                 }));
             }
             Find.WindowStack.Add(new FloatMenu(providerOptions));
@@ -425,7 +415,7 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
                         }
                         if (models != null && models.Count > 0)
                             ModelCache[url] = models;
-                        if (config.SelectedModel != Constant.ChooseModel)
+                        if (CommunicationProviderSelection.PreserveSelectedModelOnRefresh(config.SelectedModel))
                         {
                             RimAiLog.Info(RimAiLogCategory.Communication, "[RimAI.Communication] Model already chosen (" + config.SelectedModel
                                 + "); not replacing the menu.");
@@ -455,6 +445,21 @@ internal sealed class CommunicationCloudApiSettingsPage : CommunicationSettingsC
         {
             TooltipHandler.TipRegion(toggleRect, "RimTalk.Settings.EnableDisableApiConfigTooltip".Translate());
         }
+    }
+
+    internal static void ApplyProviderSelection(ApiConfig config, AIProvider provider)
+    {
+        var state = new CloudProviderSelectionState
+        {
+            Provider = config.Provider,
+            SelectedModel = config.SelectedModel,
+            CustomModelName = config.CustomModelName
+        };
+        if (!CommunicationProviderSelection.ApplyProvider(state, provider))
+            return;
+        config.Provider = state.Provider;
+        config.SelectedModel = state.SelectedModel;
+        config.CustomModelName = state.CustomModelName;
     }
 
 }

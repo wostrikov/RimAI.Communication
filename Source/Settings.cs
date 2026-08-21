@@ -71,6 +71,7 @@ public class Settings : Mod
     private SettingsTab _currentTab = SettingsTab.Basic;
 
     private static CommunicationSettings _settings;
+    static bool _hostedCommitInProgress;
 
     public static CommunicationSettings Get()
     {
@@ -86,6 +87,7 @@ public class Settings : Mod
         RimAiHandshake.TryActivate(
             RimAiHandshakeDescriptor.Current(RimAiModuleIds.Communication, Version, isOptional: true),
             CommunicationComposition.Current.Start);
+        LongEventHandler.ExecuteWhenFinished(RimAICommunicationPersistenceLiveProbe.TryRun);
     }
 
     internal void RegisterRimAIContributions()
@@ -106,7 +108,8 @@ public class Settings : Mod
             0,
             listing => Pages.Api.DrawSharedAiSettings((Listing_Standard)listing),
             "communication",
-            "ai"));
+            "ai",
+            CommitHostedSettings));
         RimAISettingsContributionRegistry.Current.Register(new DelegateSettingsContributor(
             "communication",
             "Communication",
@@ -114,7 +117,23 @@ public class Settings : Mod
             10,
             listing => Pages.Basic.DrawBasicSettings((Listing_Standard)listing),
             "communication",
-            "general"));
+            "general",
+            CommitHostedSettings));
+    }
+
+    internal static void CommitHostedSettings()
+    {
+        if (_hostedCommitInProgress)
+            return;
+        _hostedCommitInProgress = true;
+        try
+        {
+            LoadedModManager.GetMod<Settings>()?.WriteSettings();
+        }
+        finally
+        {
+            _hostedCommitInProgress = false;
+        }
     }
 
     static SharedTextAiSnapshot ResolveSharedTextSnapshot()
@@ -171,10 +190,28 @@ public class Settings : Mod
 
         if (newHash != _apiSettingsHash)
         {
-            settings.CurrentCloudConfigIndex = 0;
             _apiSettingsHash = newHash;
             RimTalk.Reset(true);
         }
+
+        RimAiLog.Info(
+            RimAiLogCategory.Communication,
+            "[RimAI.Communication] settings committed configs=" + (settings.CloudConfigs?.Count ?? 0)
+            + " index=" + settings.CurrentCloudConfigIndex
+            + " useSimpleConfig=" + settings.UseSimpleConfig
+            + " useCloudProviders=" + settings.UseCloudProviders
+            + " selected=" + DescribeSelectedModel(settings));
+    }
+
+    static string DescribeSelectedModel(CommunicationSettings settings)
+    {
+        if (settings?.CloudConfigs == null || settings.CloudConfigs.Count == 0)
+            return CommunicationCloudSettingsPersistence.SelectedModelDefault;
+        int index = CommunicationCloudSettingsPersistence.NormalizeIndex(
+            settings.CurrentCloudConfigIndex,
+            settings.CloudConfigs.Count);
+        return settings.CloudConfigs[index]?.SelectedModel
+            ?? CommunicationCloudSettingsPersistence.SelectedModelDefault;
     }
 
     private int GetApiSettingsHash(CommunicationSettings settings)
@@ -193,6 +230,9 @@ public class Settings : Mod
                 sb.AppendLine(config.BaseUrl);
             }
         }
+        sb.AppendLine(settings.CurrentCloudConfigIndex.ToString());
+        sb.AppendLine(settings.UseSimpleConfig.ToString());
+        sb.AppendLine(settings.UseCloudProviders.ToString());
         if (settings.LocalConfig != null)
         {
             sb.AppendLine(settings.LocalConfig.Provider.ToString());
