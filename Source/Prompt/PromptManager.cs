@@ -7,6 +7,7 @@ using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Core.Memory;
 using Ustas.RimAI.Core.Personas;
 using Ustas.RimAI.Core.Communication;
+using RimAI.Core.Runtime;
 using Verse;
 using Ustas.RimAI.Core.Diagnostics;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
@@ -561,8 +562,23 @@ public class PromptManager : IExposable
 
         static PromptRole GetEffectiveRole(PromptEntry entry)
         {
+            if (IsRuntimeOwnedMemoryEntry(entry))
+                return ToPromptRole(RimAiRuntimeGateway.ResolveMemoryPromptPolicy(entry.Name).Role);
             return string.IsNullOrWhiteSpace(entry.CustomRole) ? entry.Role : PromptRole.User;
         }
+
+        static bool IsRuntimeOwnedMemoryEntry(PromptEntry entry)
+        {
+            if (entry is null) return false;
+            if (string.Equals(entry.Name, "Memory & Knowledge Context", StringComparison.Ordinal))
+                return true;
+            return string.Equals(entry.SourceModId, "Ustas.RimAI.Communication.Memory", StringComparison.Ordinal);
+        }
+
+        static PromptRole ToPromptRole(RimAiPromptRole role) =>
+            role == RimAiPromptRole.User ? PromptRole.User
+            : role == RimAiPromptRole.Assistant ? PromptRole.Assistant
+            : PromptRole.System;
 
         static string ApplyCustomRolePrefix(PromptEntry entry, string content)
         {

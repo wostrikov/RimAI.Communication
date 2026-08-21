@@ -1,7 +1,7 @@
 using HarmonyLib;
+using RimAI.Core.Runtime;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Service;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
@@ -104,6 +104,13 @@ internal static class TickManagerPatch
         int intervalTicks = CommonUtil.GetTicksForDuration(TalkInterval);
         if (intervalTicks > 0 && GenTicks.TicksGame - _lastTalkEndTick >= intervalTicks)
         {
+            var policy = RimAiRuntimeGateway.ResolveCommunicationRequestPolicy("tick-talk");
+            if (!policy.Admit)
+            {
+                _lastTalkEndTick = GenTicks.TicksGame;
+                return;
+            }
+
             // Select a pawn based on the current iteration strategy
             Pawn selectedPawn = PawnSelector.SelectNextAvailablePawn();
 
