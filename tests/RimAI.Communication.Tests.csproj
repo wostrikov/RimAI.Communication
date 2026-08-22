@@ -5,6 +5,13 @@
     <Compile Include="..\Source\Settings\AIProvider.cs" Link="AIProvider.cs" />
     <Compile Include="..\Source\Settings\CommunicationCloudSettingsPersistence.cs" Link="CommunicationCloudSettingsPersistence.cs" />
     <Compile Include="..\Source\Settings\CommunicationProviderSelection.cs" Link="CommunicationProviderSelection.cs" />
+    <Compile Include="..\Source\Client\ProviderPolicy\CommunicationFailureClass.cs" Link="CommunicationFailureClass.cs" />
+    <Compile Include="..\Source\Client\ProviderPolicy\CommunicationFailureClassifier.cs" Link="CommunicationFailureClassifier.cs" />
+    <Compile Include="..\Source\Client\ProviderPolicy\CommunicationProviderChain.cs" Link="CommunicationProviderChain.cs" />
+    <Compile Include="..\Source\Client\ProviderPolicy\CommunicationProviderOrchestrator.cs" Link="CommunicationProviderOrchestrator.cs" />
+    <Compile Include="..\Source\Client\ProviderPolicy\TalkResponseRecovery.cs" Link="TalkResponseRecovery.cs" />
+    <None Include="..\Source\Error\AIErrorHandler.cs" Link="AIErrorHandler.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\AIService.cs" Link="AIService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj" />
   </ItemGroup>
 </Project>

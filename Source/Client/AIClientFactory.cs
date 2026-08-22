@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Client.OpenAI;
 using Ustas.RimAI.Communication.Client.Player2;
+using Ustas.RimAI.Communication.Client.ProviderPolicy;
 using Ustas.RimAI.Core.Configuration;
 
 namespace Ustas.RimAI.Communication.Client;
@@ -32,19 +33,43 @@ public static class AIClientFactory
 
         if (_instance == null || _currentProvider != config.Provider)
         {
-            _instance = await CreateServiceInstanceAsync(config);
+            _instance = await CreateClientAsync(config);
             _currentProvider = config.Provider;
         }
 
         return _instance;
     }
 
+    public static ApiConfig ToApiConfig(CommunicationProviderSlot slot)
+    {
+        if (slot == null)
+            return null;
+        return new ApiConfig
+        {
+            IsEnabled = true,
+            Provider = slot.Provider,
+            ApiKey = slot.ApiKey ?? string.Empty,
+            SelectedModel = slot.SelectedModel ?? string.Empty,
+            CustomModelName = slot.CustomModelName ?? string.Empty,
+            BaseUrl = slot.BaseUrl ?? string.Empty
+        };
+    }
+
+    /// <summary>
+    /// Creates a client for one ephemeral provider slot without mutating the
+    /// cached singleton used by <see cref="GetAIClientAsync"/>.
+    /// </summary>
+    public static Task<IAIClient> CreateClientAsync(CommunicationProviderSlot slot) =>
+        CreateClientAsync(ToApiConfig(slot));
+
     /// <summary>
     /// Creates appropriate AI client instance based on provider configuration
     /// Player2 uses async factory method for local app detection
     /// </summary>
-    private static async Task<IAIClient> CreateServiceInstanceAsync(ApiConfig config)
+    public static async Task<IAIClient> CreateClientAsync(ApiConfig config)
     {
+        if (config == null)
+            return null;
         var model = config.SelectedModel == "Custom" ? config.CustomModelName : config.SelectedModel;
 
         // 1. Handle Special/Dynamic cases

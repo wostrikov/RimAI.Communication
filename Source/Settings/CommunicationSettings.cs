@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ustas.RimAI.Communication.Client.OpenAI;
+using Ustas.RimAI.Communication.Client.ProviderPolicy;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Prompt;
 using UnityEngine;
@@ -63,6 +65,48 @@ public class CommunicationSettings : ModSettings
     public bool OverlayDrawAboveUI = true;
     public Rect OverlayRectDebug = new(200f, 200f, 600f, 450f);
     public Rect OverlayRectNonDebug = new(200f, 200f, 400f, 250f);
+
+    public CommunicationProviderChainRequest ToProviderChainRequest()
+    {
+        var snapshot = new CommunicationCloudSettingsSnapshot
+        {
+            CurrentCloudConfigIndex = CurrentCloudConfigIndex,
+            UseSimpleConfig = UseSimpleConfig,
+            UseCloudProviders = UseCloudProviders,
+            IsUsingFallbackModel = IsUsingFallbackModel,
+            LocalConfig = ToRecord(LocalConfig)
+        };
+        if (CloudConfigs != null)
+        {
+            foreach (var config in CloudConfigs)
+                snapshot.CloudConfigs.Add(ToRecord(config));
+        }
+
+        return new CommunicationProviderChainRequest
+        {
+            Settings = snapshot,
+            SimpleApiKey = SimpleApiKey,
+            SimpleDefaultModel = Constant.DefaultCloudModel,
+            SimpleFallbackModel = Constant.FallbackCloudModel,
+            OpenAiCredentialPresent = OpenAIProviderAdapter.CredentialPresent,
+            AllowLocalFailover = true
+        };
+    }
+
+    static CloudConfigRecord ToRecord(ApiConfig config)
+    {
+        if (config == null)
+            return null;
+        return new CloudConfigRecord
+        {
+            IsEnabled = config.IsEnabled,
+            Provider = config.Provider,
+            SelectedModel = config.SelectedModel,
+            CustomModelName = config.CustomModelName,
+            BaseUrl = config.BaseUrl,
+            ApiKey = config.ApiKey
+        };
+    }
 
     /// <summary>
     /// Gets the first active and valid API configuration.

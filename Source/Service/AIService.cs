@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Client;
+using Ustas.RimAI.Communication.Client.ProviderPolicy;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Error;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
 
 namespace Ustas.RimAI.Communication.Service;
@@ -26,14 +26,15 @@ public static class AIService
         var apiLog = ApiHistory.AddRequest(request, Channel.Stream);
         var lastApiLog = apiLog;
 
+        var delivered = 0;
         var payload = await ExecuteWithRetry(apiLog, async client =>
         {
             // All prompt messages are already in prefixMessages, pass empty list for messages
             return await client.GetStreamingChatCompletionAsync<TalkResponse>(prefixMessages, [],
                 response =>
                 {
-                    if (Cache.GetByName(response.Name) == null) return; 
-                    
+                    if (Cache.GetByName(response.Name) == null) return;
+                    delivered++;
                     response.TalkType = request.TalkType;
 
                     // Calculate timing relative to the correct previous log
@@ -49,7 +50,7 @@ public static class AIService
                     onPlayerResponseReceived?.Invoke(response);
                 },
                 prep => ApiHistory.UpdatePayload(apiLog.Id, prep));
-        });
+        }, () => delivered, expectTalkObjects: true);
 
         HandleFinalStatus(apiLog, payload);
         _firstInstruction = false;
@@ -62,8 +63,11 @@ public static class AIService
         var prefixMessages = new List<(Role role, string message)> { (Role.System, request.Context) };
         var apiLog = ApiHistory.AddRequest(request, Channel.Query);
 
-        var payload = await ExecuteWithRetry(apiLog, async client =>
-            await client.GetChatCompletionAsync(prefixMessages, messages, prep => ApiHistory.UpdatePayload(apiLog.Id, prep)));
+        var payload = await ExecuteWithRetry(
+            apiLog,
+            async client =>
+                await client.GetChatCompletionAsync(prefixMessages, messages, prep => ApiHistory.UpdatePayload(apiLog.Id, prep)),
+            expectTalkObjects: false);
 
         if (string.IsNullOrEmpty(payload.Response) || !string.IsNullOrEmpty(payload.ErrorMessage))
         {
@@ -84,43 +88,88 @@ public static class AIService
         }
     }
 
-    private static async Task<Payload> ExecuteWithRetry(ApiLog apiLog, Func<IAIClient, Task<Payload>> action)
+    private static async Task<Payload> ExecuteWithRetry(
+        ApiLog apiLog,
+        Func<IAIClient, Task<Payload>> action,
+        Func<int> deliveredTalkObjects = null,
+        bool expectTalkObjects = true)
     {
         _busy = true;
         try
         {
-            Exception capturedEx = null;
-            
-            var payload = await AIErrorHandler.HandleWithRetry(async () =>
-            {
-                var client = await AIClientFactory.GetAIClientAsync();
-                return await action(client);
-            }, ex =>
-            {
-                capturedEx = ex;
-                apiLog.Response = ex.Message;
-                apiLog.IsError = true;
-            });
+            var requestId = apiLog?.Id.ToString("N");
+            var outcome = await AIErrorHandler.ExecuteLogicalRequest(
+                async slot =>
+                {
+                    var client = await AIClientFactory.CreateClientAsync(slot);
+                    if (client == null)
+                        return CommunicationProviderAttempt.Fail(CommunicationFailureClass.ProviderUnavailable);
+                    try
+                    {
+                        var payload = await action(client);
+                        if (payload == null)
+                            return CommunicationProviderAttempt.Fail(CommunicationFailureClass.Cancelled);
+                        return AIErrorHandler.ToAttempt(
+                            payload,
+                            deliveredTalkObjects?.Invoke() ?? 0,
+                            expectTalkObjects: expectTalkObjects);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        return CommunicationProviderAttempt.Fail(CommunicationFailureClass.Cancelled);
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        return DeliveredOrFail(deliveredTalkObjects, CommunicationFailureClass.Timeout, ex.Message);
+                    }
+                    catch (QuotaExceededException ex)
+                    {
+                        return DeliveredOrFail(deliveredTalkObjects, CommunicationFailureClass.RateLimited, ex.Message, ex.Payload);
+                    }
+                    catch (AIRequestException ex)
+                    {
+                        return DeliveredOrFail(
+                            deliveredTalkObjects,
+                            CommunicationFailureClassifier.FromException(ex),
+                            ex.Message,
+                            ex.Payload);
+                    }
+                },
+                default,
+                requestId);
 
-            // Handle failure case where we need to reconstruct a payload from the exception
-            if (payload == null)
+            if (outcome.Succeeded)
             {
-                payload = capturedEx is AIRequestException { Payload: not null } rex 
-                    ? rex.Payload 
-                    : new Payload("Unknown", "Unknown", "", null, 0, capturedEx?.Message ?? "Unknown Error");
-            }
-            else
-            {
+                var payload = outcome.Value as Payload ?? new Payload("Unknown", outcome.SuccessfulProvider, "", "", 0);
                 Stats.IncrementCalls();
                 Stats.IncrementTokens(payload.TokenCount);
+                return payload;
             }
 
-            return payload;
+            if (apiLog != null)
+            {
+                apiLog.Response = outcome.TerminalClass.ToString();
+                apiLog.IsError = true;
+            }
+
+            return outcome.Value as Payload
+                ?? new Payload("Unknown", "Unknown", "", null, 0, outcome.TerminalClass.ToString());
         }
         finally
         {
             _busy = false;
         }
+    }
+
+    static CommunicationProviderAttempt DeliveredOrFail(
+        Func<int> deliveredTalkObjects,
+        CommunicationFailureClass failureClass,
+        string message,
+        Payload payload = null)
+    {
+        if ((deliveredTalkObjects?.Invoke() ?? 0) > 0)
+            return CommunicationProviderAttempt.Success(payload, payload?.Response);
+        return CommunicationProviderAttempt.Fail(failureClass, payload, message);
     }
 
     private static void HandleFinalStatus(ApiLog apiLog, Payload payload)
