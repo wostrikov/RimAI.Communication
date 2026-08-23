@@ -11,11 +11,11 @@ Key Features:
 • Context-aware dialogue based on what colonists are doing and thinking
 • Multi-language support for diverse colony experiences
 • Configurable conversation frequency and message suppression options
-• Easy setup - just get a free API key from Google AI Studio
+• Shared RimAI gameplay text-AI settings (credential domain OPENAI_RIMAI)
 
-Every conversation is unique and emergent, creating immersive storytelling experiences that evolve with your colony. Gone are the days of repetitive interactions - your pawns will now speak with personality and purpose!
+Every conversation is unique and emergent, creating immersive storytelling experiences that evolve with your colony.
 
-Setup: Get your free API key at aistudio.google.com, enable the mod, and paste your key in mod settings. Compatible with most other mods and respects API rate limits automatically.
+Setup: configure the shared RimAI text-AI provider in RimAI settings. Do not use translation or TTS credentials for gameplay dialogue.
 	</description>
 	<supportedVersions>
 		<li>1.5</li>
