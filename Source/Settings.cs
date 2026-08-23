@@ -246,6 +246,7 @@ public class Settings : Mod
         sb.AppendLine(settings.AllowOtherFactionsToTalk.ToString());
         sb.AppendLine(settings.AllowEnemiesToTalk.ToString());
         sb.AppendLine(settings.AllowBabiesToTalk.ToString());
+        sb.AppendLine(settings.AllowChildrenToTalk.ToString());
         sb.AppendLine(settings.AllowNonHumanToTalk.ToString());
         sb.AppendLine(settings.ApplyMoodAndSocialEffects.ToString());
         sb.AppendLine(settings.PlayerDialogueMode.ToString());

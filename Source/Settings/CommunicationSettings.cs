@@ -46,6 +46,7 @@ public class CommunicationSettings : ModSettings
     public string GameplayAiLanguage = "";
     public bool ContinueDialogueWhileSleeping = false;
     public bool AllowBabiesToTalk = true;
+    public bool AllowChildrenToTalk = true;
     public bool AllowNonHumanToTalk = true;
     public bool ApplyMoodAndSocialEffects = false;
     public int DisableAiAtSpeed = 0;
@@ -232,6 +233,7 @@ public class CommunicationSettings : ModSettings
         Scribe_Values.Look(ref DisableAiAtSpeed, "DisableAiAtSpeed", 0);
         Scribe_Collections.Look(ref EnabledArchivableTypes, "enabledArchivableTypes", LookMode.Value, LookMode.Value);
         Scribe_Values.Look(ref AllowBabiesToTalk, "allowBabiesToTalk", true);
+        Scribe_Values.Look(ref AllowChildrenToTalk, "allowChildrenToTalk", true);
         Scribe_Values.Look(ref AllowNonHumanToTalk, "allowNonHumanToTalk", true);
         Scribe_Values.Look(ref ApplyMoodAndSocialEffects, "applyMoodAndSocialEffects", false);
         

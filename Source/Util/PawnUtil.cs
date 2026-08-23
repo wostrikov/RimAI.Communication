@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Policy;
 using RimWorld;
 using Verse;
 using Verse.AI;
@@ -23,7 +24,9 @@ public static class PawnUtil
         if (pawn.skills?.GetSkill(SkillDefOf.Social) == null) return false;
 
         CommunicationSettings settings = Settings.Get();
-        if (!settings.AllowBabiesToTalk && pawn.IsBaby()) return false;
+        var lifeStage = TalkLifeStagePolicy.Classify(pawn.IsBaby(), pawn.IsChild());
+        if (!TalkLifeStagePolicy.AllowsTalk(lifeStage, settings.AllowBabiesToTalk, settings.AllowChildrenToTalk))
+            return false;
 
         return pawn.IsFreeColonist ||
                (settings.AllowSlavesToTalk && pawn.IsSlave) ||
@@ -143,6 +146,11 @@ public static class PawnUtil
     public static bool IsBaby(this Pawn pawn)
     {
         return pawn.ageTracker?.CurLifeStage?.developmentalStage < DevelopmentalStage.Child;
+    }
+
+    public static bool IsChild(this Pawn pawn)
+    {
+        return pawn.ageTracker?.CurLifeStage?.developmentalStage == DevelopmentalStage.Child;
     }
 
     public static (string, bool) GetPawnStatusFull(this Pawn pawn, List<Pawn> nearbyPawns)

@@ -15,12 +15,15 @@
     <Compile Include="..\Source\Prompt\Data\PresetDto.cs" Link="PresetDto.cs" />
     <Compile Include="..\Source\Prompt\PresetDtoJsonCodec.cs" Link="PresetDtoJsonCodec.cs" />
     <Compile Include="..\Source\Data\PersonaGeneratePersistPolicy.cs" Link="PersonaGeneratePersistPolicy.cs" />
+    <Compile Include="..\Source\Policy\TalkLifeStagePolicy.cs" Link="TalkLifeStagePolicy.cs" />
     <None Include="..\Source\Error\AIErrorHandler.cs" Link="AIErrorHandler.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\PersonaService.cs" Link="PersonaService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\AIService.cs" Link="AIService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\PromptService.cs" Link="PromptService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\ContextBuilder.cs" Link="ContextBuilder.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Util\PawnUtil.cs" Link="PawnUtil.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Settings\CommunicationSettings.cs" Link="CommunicationSettings.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Settings\Ui\CommunicationBasicSettingsPage.cs" Link="CommunicationBasicSettingsPage.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Prompt\PromptManager.cs" Link="PromptManager.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Prompt\PresetSerializer.cs" Link="PresetSerializer.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj" />

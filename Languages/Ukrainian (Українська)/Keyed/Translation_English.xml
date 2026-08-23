@@ -181,6 +181,8 @@
   <RimTalk.Settings.AllowEnemiesToTalkTooltip>Увімкніть, щоб дозволити ворогам вести розмови, згенеровані ШІ.</RimTalk.Settings.AllowEnemiesToTalkTooltip>
   <RimTalk.Settings.AllowBabiesToTalk>Дозволити немовлятам і малюкам розмовляти</RimTalk.Settings.AllowBabiesToTalk>
   <RimTalk.Settings.AllowBabiesToTalkTooltip>Увімкніть цю опцію, щоб дозволити немовлятам і малюкам брати участь у розмовах, згенерованих ШІ.</RimTalk.Settings.AllowBabiesToTalkTooltip>
+  <RimTalk.Settings.AllowChildrenToTalk>Дозволити дітям розмовляти</RimTalk.Settings.AllowChildrenToTalk>
+  <RimTalk.Settings.AllowChildrenToTalkTooltip>Увімкніть, щоб діти (стадія Child) могли брати участь у розмовах, згенерованих ШІ. Окремо від перемикача немовлят і малюків.</RimTalk.Settings.AllowChildrenToTalkTooltip>
   <RimTalk.Settings.AllowNonHumanToTalk>Дозволити нелюдям розмовляти</RimTalk.Settings.AllowNonHumanToTalk>
   <RimTalk.Settings.AllowNonHumanToTalkTooltip>Дозволити нелюдським істотам (тваринам, механоїдам або користувацьким расам) розмовляти, якщо їм надано каталізатор голосового зв’язку, який можна придбати в торговців.</RimTalk.Settings.AllowNonHumanToTalkTooltip>
   <RimTalk.Settings.ApplyMoodAndSocialEffects>Застосовувати ефекти настрою та стосунків</RimTalk.Settings.ApplyMoodAndSocialEffects>

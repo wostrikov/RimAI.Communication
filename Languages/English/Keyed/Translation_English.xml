@@ -201,6 +201,8 @@ Crucial Tips:
     <RimTalk.Settings.AllowEnemiesToTalkTooltip>Enable this to allow enemies to have AI-generated conversations.</RimTalk.Settings.AllowEnemiesToTalkTooltip>
     <RimTalk.Settings.AllowBabiesToTalk>Allow infants and toddlers to talk</RimTalk.Settings.AllowBabiesToTalk>
     <RimTalk.Settings.AllowBabiesToTalkTooltip>Enable this option to allow infants and toddlers to participate in AI-generated conversations.</RimTalk.Settings.AllowBabiesToTalkTooltip>
+    <RimTalk.Settings.AllowChildrenToTalk>Allow children to talk</RimTalk.Settings.AllowChildrenToTalk>
+    <RimTalk.Settings.AllowChildrenToTalkTooltip>Enable this option to allow Child-stage colonists to participate in AI-generated conversations. Distinct from the infants and toddlers toggle.</RimTalk.Settings.AllowChildrenToTalkTooltip>
     <RimTalk.Settings.AllowNonHumanToTalk>Allow Non-Humans to Talk</RimTalk.Settings.AllowNonHumanToTalk>
     <RimTalk.Settings.AllowNonHumanToTalkTooltip>Enable non-human creatures (animals, mechanoids, or custom races) to talk if they have been given a Vocal Link Catalyst, which can be acquired from merchants.</RimTalk.Settings.AllowNonHumanToTalkTooltip>
     <RimTalk.Settings.ApplyMoodAndSocialEffects>Apply Mood and Social Effects</RimTalk.Settings.ApplyMoodAndSocialEffects>

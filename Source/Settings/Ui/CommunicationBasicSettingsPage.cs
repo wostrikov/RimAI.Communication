@@ -136,6 +136,8 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
         rightListing.Gap(6f);
         rightListing.CheckboxLabeled("RimTalk.Settings.AllowBabiesToTalk".Translate().ToString(),
             ref settings.AllowBabiesToTalk, "RimTalk.Settings.AllowBabiesToTalkTooltip".Translate().ToString());
+        rightListing.CheckboxLabeled("RimTalk.Settings.AllowChildrenToTalk".Translate().ToString(),
+            ref settings.AllowChildrenToTalk, "RimTalk.Settings.AllowChildrenToTalkTooltip".Translate().ToString());
         rightListing.Gap(6f);
         rightListing.CheckboxLabeled("RimTalk.Settings.AllowNonHumanToTalk".Translate().ToString(),
             ref settings.AllowNonHumanToTalk, "RimTalk.Settings.AllowNonHumanToTalkTooltip".Translate().ToString());
@@ -232,6 +234,7 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
             settings.AllowOtherFactionsToTalk = false;
             settings.AllowEnemiesToTalk = false;
             settings.AllowBabiesToTalk = true;
+            settings.AllowChildrenToTalk = true;
             settings.AllowNonHumanToTalk = true;
             settings.AllowCustomConversation = true;
             settings.PlayerDialogueMode = Settings.PlayerDialogueMode.Manual;
