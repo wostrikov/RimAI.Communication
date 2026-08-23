@@ -24,8 +24,8 @@ public static class PresetSerializer
         
         try
         {
-            var dto = PresetDto.FromPreset(preset);
-            return JsonUtil.SerializeToJson(dto);
+            var dto = PresetDtoMapping.FromPreset(preset);
+            return PresetDtoJsonCodec.Export(dto);
         }
         catch (Exception ex)
         {
@@ -46,7 +46,7 @@ public static class PresetSerializer
             var dto = JsonUtil.DeserializeFromJson<PresetDto>(json);
             if (dto == null) return null;
             
-            var preset = dto.ToPreset();
+            var preset = PresetDtoMapping.ToPreset(dto);
             Logger.Debug($"Successfully imported preset: {preset.Name} with {preset.Entries.Count} entries");
             return preset;
         }

@@ -414,19 +414,16 @@ public class PromptManager : IExposable
         string originalBaseContent = null;
         PromptEntry baseEntry = null;
 
-        if (!settings.UseAdvancedPromptMode)
+        baseEntry = preset.Entries.FirstOrDefault(e =>
+            string.Equals(e.Name, "Base Instruction", StringComparison.OrdinalIgnoreCase));
+        if (baseEntry != null)
         {
-            // Simple Mode: Use active preset but temporarily override Base Instruction
-            baseEntry = preset.Entries.FirstOrDefault(e =>
-                string.Equals(e.Name, "Base Instruction", StringComparison.OrdinalIgnoreCase));
-            
-            if (baseEntry != null)
-            {
-                originalBaseContent = baseEntry.Content;
-                baseEntry.Content = string.IsNullOrWhiteSpace(settings.SimpleModeInstruction) 
-                    ? Constant.DefaultInstruction 
-                    : settings.SimpleModeInstruction;
-            }
+            originalBaseContent = baseEntry.Content;
+            baseEntry.Content = PromptPresetModePolicy.ResolveBaseInstruction(
+                settings.UseAdvancedPromptMode,
+                settings.SimpleModeInstruction,
+                baseEntry.Content,
+                Constant.DefaultInstruction);
         }
 
         // 4. Reset session variables and build

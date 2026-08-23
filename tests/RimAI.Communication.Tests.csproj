@@ -10,8 +10,17 @@
     <Compile Include="..\Source\Client\ProviderPolicy\CommunicationProviderChain.cs" Link="CommunicationProviderChain.cs" />
     <Compile Include="..\Source\Client\ProviderPolicy\CommunicationProviderOrchestrator.cs" Link="CommunicationProviderOrchestrator.cs" />
     <Compile Include="..\Source\Client\ProviderPolicy\TalkResponseRecovery.cs" Link="TalkResponseRecovery.cs" />
+    <Compile Include="..\Source\Prompt\PromptContextFacetPolicy.cs" Link="PromptContextFacetPolicy.cs" />
+    <Compile Include="..\Source\Prompt\PromptPresetModePolicy.cs" Link="PromptPresetModePolicy.cs" />
+    <Compile Include="..\Source\Prompt\Data\PresetDto.cs" Link="PresetDto.cs" />
+    <Compile Include="..\Source\Prompt\PresetDtoJsonCodec.cs" Link="PresetDtoJsonCodec.cs" />
     <None Include="..\Source\Error\AIErrorHandler.cs" Link="AIErrorHandler.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\AIService.cs" Link="AIService.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\PromptService.cs" Link="PromptService.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\ContextBuilder.cs" Link="ContextBuilder.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Util\PawnUtil.cs" Link="PawnUtil.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Prompt\PromptManager.cs" Link="PromptManager.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Prompt\PresetSerializer.cs" Link="PresetSerializer.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj" />
   </ItemGroup>
 </Project>
