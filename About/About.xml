@@ -4,18 +4,11 @@
 	<name>RimAI.Communication</name>
 	<modVersion>1.0.16</modVersion>
 	<author>juicy</author>
-	<description>RimAI.Communication generates dynamic, context-aware colonist dialogue. Gameplay text AI is configured in RimAI shared settings.
+	<description>RimAI.Communication generates dynamic, context-aware colonist dialogue.
 
-Key Features:
-• AI-powered conversations that reflect each pawn's current mood, thoughts, and situation
-• Context-aware dialogue based on what colonists are doing and thinking
-• Multi-language support for diverse colony experiences
-• Configurable conversation frequency and message suppression options
-• Shared RimAI gameplay text-AI settings (credential domain OPENAI_RIMAI)
+Conversations follow each pawn's mood, thoughts, and current work. You can control how often they talk and suppress messages you do not want.
 
-Every conversation is unique and emergent, creating immersive storytelling experiences that evolve with your colony.
-
-Setup: configure the shared RimAI text-AI provider in RimAI settings. Do not use translation or TTS credentials for gameplay dialogue.
+Configure the shared RimAI text-AI provider in RimAI settings. Do not use translation or TTS credentials for gameplay dialogue.
 	</description>
 	<supportedVersions>
 		<li>1.5</li>
