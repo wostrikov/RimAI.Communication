@@ -4,11 +4,14 @@
 	<name>RimAI.Communication</name>
 	<modVersion>1.0.16</modVersion>
 	<author>juicy</author>
-	<description>RimAI.Communication generates dynamic, context-aware colonist dialogue.
+	<description>RimAI.Communication створює живі розмови колоністів з урахуванням настрою, думок і поточної роботи.
 
-Conversations follow each pawn's mood, thoughts, and current work. You can control how often they talk and suppress messages you do not want.
+Основні можливості:
+• діалоги залежать від стану й занять пішака
+• можна регулювати частоту розмов і приглушувати зайві репліки
+• підтримка кількох мов
 
-Configure the shared RimAI text-AI provider in RimAI settings. Do not use translation or TTS credentials for gameplay dialogue.
+Потрібні Harmony та Interaction Bubbles. Текстовий ШІ налаштовується в спільних параметрах RimAI. Не використовуйте ключі перекладу чи озвучки для ігрових діалогів.
 	</description>
 	<supportedVersions>
 		<li>1.5</li>
