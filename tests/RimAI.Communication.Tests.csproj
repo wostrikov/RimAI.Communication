@@ -14,7 +14,9 @@
     <Compile Include="..\Source\Prompt\PromptPresetModePolicy.cs" Link="PromptPresetModePolicy.cs" />
     <Compile Include="..\Source\Prompt\Data\PresetDto.cs" Link="PresetDto.cs" />
     <Compile Include="..\Source\Prompt\PresetDtoJsonCodec.cs" Link="PresetDtoJsonCodec.cs" />
+    <Compile Include="..\Source\Data\PersonaGeneratePersistPolicy.cs" Link="PersonaGeneratePersistPolicy.cs" />
     <None Include="..\Source\Error\AIErrorHandler.cs" Link="AIErrorHandler.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\PersonaService.cs" Link="PersonaService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\AIService.cs" Link="AIService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\PromptService.cs" Link="PromptService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\ContextBuilder.cs" Link="ContextBuilder.cs.src" CopyToOutputDirectory="PreserveNewest" />

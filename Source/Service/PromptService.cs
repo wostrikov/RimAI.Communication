@@ -112,8 +112,8 @@ public static class PromptService
             presented = result?.Projection ?? personality ?? string.Empty;
         }
 
-        if (!string.IsNullOrEmpty(presented))
-            sb.Append(PersonaProjectionDefaults.FormatTalkPersonalityLine(presented));
+        if (PersonaGeneratePersistPolicy.ShouldInjectTalk(presented))
+            sb.Append(PersonaGeneratePersistPolicy.FormatTalkLine(presented));
 
         // Stop here for invaders
         if (pawn.IsEnemy())

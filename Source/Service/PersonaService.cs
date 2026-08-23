@@ -17,7 +17,10 @@ public static class PersonaService
 
     public static void SetPersonality(Pawn pawn, string personality)
     {
-        Hediff_Persona.GetOrAddNew(pawn).Personality = personality;
+        var hediff = Hediff_Persona.GetOrAddNew(pawn);
+        if (hediff == null)
+            return;
+        hediff.Personality = PersonaGeneratePersistPolicy.Sanitize(personality);
     }
 
     public static float GetTalkInitiationWeight(Pawn pawn)
@@ -33,7 +36,7 @@ public static class PersonaService
     public static async Task<PersonalityData> GeneratePersona(Pawn pawn)
     {
         if (OverrideGenerator != null && OverrideGenerator.TryGenerate(pawn, out var overrideTask) && overrideTask != null)
-            return await overrideTask;
+            return AcceptGenerated(pawn, await overrideTask);
 
         string pawnBackstory = PromptService.CreatePawnBackstory(pawn, PromptService.InfoLevel.Full);
 
@@ -43,19 +46,28 @@ public static class PersonaService
             {
                 Context = $"[Character]\n{pawnBackstory}"
             };
-            PersonalityData personalityData = await AIService.Query<PersonalityData>(request);
-
-            if (personalityData?.Persona != null)
-            {
-                personalityData.Persona = personalityData.Persona.Replace("**", "").Trim();
-            }
-
-            return personalityData;
+            return AcceptGenerated(pawn, await AIService.Query<PersonalityData>(request));
         }
         catch (Exception e)
         {
             Logger.Error(e.Message);
             return null;
         }
+    }
+
+    static PersonalityData AcceptGenerated(Pawn pawn, PersonalityData personalityData)
+    {
+        if (personalityData == null)
+            return null;
+        if (PersonaGeneratePersistPolicy.TryAcceptGenerated(personalityData.Persona, out string sanitized))
+        {
+            personalityData.Persona = sanitized;
+            SetPersonality(pawn, sanitized);
+        }
+        else
+        {
+            personalityData.Persona = sanitized;
+        }
+        return personalityData;
     }
 }
