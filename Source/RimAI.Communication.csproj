@@ -35,7 +35,9 @@
 
     <ItemGroup>
         <PackageReference Include="Lib.Harmony.Ref" Version="2.*" PrivateAssets="All"/>
-        <PackageReference Include="IndexRange" Version="1.0.3" />
+        <!-- Consumers compile against the polyfill but must not copy it; this
+             mod is the one that ships it. -->
+        <PackageReference Include="IndexRange" Version="1.0.3" PrivateAssets="runtime" />
         <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj">
             <Private>false</Private>
         </ProjectReference>
