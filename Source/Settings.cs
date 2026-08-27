@@ -350,6 +350,10 @@ public class Settings : Mod
         if (_currentTab == SettingsTab.PromptPreset && rtSettings.UseAdvancedPromptMode)
         {
             Listing_Standard promptListing = new Listing_Standard();
+            // Verse wraps a Listing into a second column, off the visible view, as soon as
+            // content passes the rect height, and CurHeight then reports that new column.
+            // A scrolling settings page never wants that; see validate_scrollable_listings.
+            promptListing.maxOneColumn = true;
             promptListing.Begin(contentRect);
             Pages.PromptPreset.DrawPromptPresetSettings(promptListing, contentRect);
             promptListing.End();
@@ -387,6 +391,9 @@ public class Settings : Mod
         Rect viewRect = new Rect(0f, 0f, contentRect.width - 16f, contentHeight);
         _mainScrollPosition = GUI.BeginScrollView(contentRect, _mainScrollPosition, viewRect);
 
+        // The measured height is exact, so a wrap should be impossible here - but
+        // it costs one line to make that a fact rather than an argument.
+        listing.maxOneColumn = true;
         listing.Begin(viewRect);
 
         switch (_currentTab)
