@@ -3,9 +3,7 @@ using System.Linq;
 using Bubbles.Core;
 using HarmonyLib;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Communication.Patches;
 using Ustas.RimAI.Communication.Service;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using Verse;
@@ -20,10 +18,6 @@ public static class Bubbler_Add
     public static bool Prefix(LogEntry entry)
     {
         CommunicationSettings settings = Settings.Get();
-
-        Pawn initiator = (Pawn)entry.GetConcerns().First();
-        Pawn recipient = GetRecipient(entry);
-        var prompt = entry.ToGameStringFromPOV(initiator).StripTags();
 
         if (IsRimTalkInteraction(entry))
         {
@@ -45,9 +39,24 @@ public static class Bubbler_Add
         {
             return true;
         }
+
+        Pawn[] pawns = entry.GetConcerns().OfType<Pawn>().Take(2).ToArray();
+        if (pawns.Length < 2
+            || pawns[0].RaceProps?.Humanlike != true
+            || pawns[1].RaceProps?.Humanlike != true)
+        {
+            // Bubbles also forwards animal interactions. Rendering their log
+            // entry from a human POV asks Verse for grammar symbols the animal
+            // interaction does not supply (for example INITIATOR_nameDef).
+            return true;
+        }
+
+        Pawn initiator = pawns[0];
+        Pawn recipient = pawns[1];
             
         InteractionDef interactionDef = GetInteractionDef(entry);
         if (interactionDef == null) return true;
+        string prompt = entry.ToGameStringFromPOV(initiator).StripTags();
         bool isChitchat = interactionDef == InteractionDefOf.Chitchat ||
                           interactionDef == InteractionDefOf.DeepTalk;
 
@@ -85,11 +94,6 @@ public static class Bubbler_Add
                 Logger.Warning($"Failed to restore bubble drafted setting: {ex.Message}");
             }
         }
-    }
-
-    private static Pawn GetRecipient(LogEntry entry)
-    {
-        return entry.GetConcerns().Skip(1).OfType<Pawn>().FirstOrDefault();
     }
 
     private static bool IsRimTalkInteraction(LogEntry entry)
