@@ -10,6 +10,7 @@ using Ustas.RimAI.Core.Net;
 using Ustas.RimAI.Core.Player2;
 using RimWorld;
 using Verse;
+using RimAI.Core.Runtime;
 
 namespace Ustas.RimAI.Communication.Client.Player2;
 
@@ -253,7 +254,7 @@ public class Player2Client : IAIClient
 
     public static void CheckPlayer2StatusAndNotify()
     {
-        Task.Run(() =>
+        RimAiBackground.Run(() =>
         {
             bool isAvailable = Player2Session.Current.ProbeHealth(Player2EndpointKind.LocalApp, force: true).Healthy;
             LongEventHandler.ExecuteWhenFinished(() =>

@@ -11,6 +11,7 @@ using Verse;
 using Verse.Sound;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
 using State = Ustas.RimAI.Communication.Data.ApiLog.State;
+using RimAI.Core.Runtime;
 
 namespace Ustas.RimAI.Communication.UI;
 
@@ -453,7 +454,7 @@ internal sealed class DebugWindowDetailsPanel : DebugWindowCollaborator
         if (Owner._selectedLog.Channel == Channel.Stream)
             TalkService.GenerateTalkDebug(debugRequest);
         else if (Owner._selectedLog.Channel == Channel.Query)
-            Task.Run(() => AIService.Query<PersonalityData>(debugRequest));
+            RimAiBackground.Run(() => AIService.Query<PersonalityData>(debugRequest));
 
         Messages.Message("RimTalk.DebugWindow.ResendSuccess".Translate(), MessageTypeDefOf.TaskCompletion);
     }

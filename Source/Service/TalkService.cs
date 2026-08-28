@@ -12,6 +12,7 @@ using RimWorld;
 using Verse;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
 using Logger = Ustas.RimAI.Communication.Util.Logger;
+using RimAI.Core.Runtime;
 
 namespace Ustas.RimAI.Communication.Service;
 
@@ -89,7 +90,7 @@ public static class TalkService
         }
         
         // Offload the AI request and processing to a background thread to avoid blocking the game's main thread.
-        Task.Run(() => GenerateAndProcessTalkAsync(talkRequest));
+        RimAiBackground.Run(() => GenerateAndProcessTalkAsync(talkRequest));
 
         pawn1.MarkRequestSpoken(talkRequest);
         
@@ -230,7 +231,7 @@ public static class TalkService
     /// </summary>
     public static void GenerateTalkDebug(TalkRequest talkRequest)
     {
-        Task.Run(() => GenerateAndProcessTalkAsync(talkRequest));
+        RimAiBackground.Run(() => GenerateAndProcessTalkAsync(talkRequest));
     }
 
     /// <summary>

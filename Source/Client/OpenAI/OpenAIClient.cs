@@ -11,6 +11,7 @@ using Ustas.RimAI.Core.AI;
 using Ustas.RimAI.Core.Net;
 using Verse;
 using Enumerable = System.Linq.Enumerable;
+using RimAI.Core.Runtime;
 
 namespace Ustas.RimAI.Communication.Client.OpenAI;
 
@@ -43,7 +44,7 @@ public class OpenAIClient(
     {
         string jsonContent = officialOpenAI ? BuildResponsesJson(prefixMessages, messages) : BuildRequestJson(prefixMessages, messages, stream: false);
         onRequestPrepared?.Invoke(new Payload(_endpointUrl, model, jsonContent, null, 0));
-        var shared = await Task.Run(() => SharedTextAiOrchestrator.Complete(new TextAiRequest
+        var shared = await RimAiBackground.Run(() => SharedTextAiOrchestrator.Complete(new TextAiRequest
         {
             Messages = ToSharedMessages(prefixMessages, messages),
             Model = model,
