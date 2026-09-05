@@ -32,7 +32,7 @@
 	</modDependencies>
 	<loadAfter>
 		<li>brrainz.harmony</li>
-		<li>Jaxe.Bubbles</li>
+		<li>ustas.jaxe.bubbles</li>
 	</loadAfter>
 	<incompatibleWith>
 		<!-- <li>username.modname</li> -->
