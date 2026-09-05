@@ -21,6 +21,25 @@
         <EnableBubbles>true</EnableBubbles>
     </PropertyGroup>
 
+    <!--
+        Interaction Bubbles is compiled against, and it can be in either of two
+        places: our fork under the game's Mods folder, or the Workshop item it
+        was forked from. Adopting it moves the mod from the second to the first,
+        and a path naming only the Workshop number turns that into eight failed
+        builds with nothing in their own sources changed.
+
+        With neither present, EnableBubbles turns itself off and BubblePatch.cs
+        leaves the compile - the switch was already there for exactly this and
+        only lacked a way to notice.
+    -->
+    <PropertyGroup>
+        <BubblesForkPath>$(RimWorldDir)\Mods\Interaction Bubbles - Ustas\1.6\Assemblies\Bubbles.dll</BubblesForkPath>
+        <BubblesWorkshopPath>$(RimWorldWorkshopDir)\1516158345\Assemblies\Bubbles.dll</BubblesWorkshopPath>
+        <BubblesPath Condition=" '$(BubblesPath)' == '' And Exists('$(BubblesForkPath)') ">$(BubblesForkPath)</BubblesPath>
+        <BubblesPath Condition=" '$(BubblesPath)' == '' And Exists('$(BubblesWorkshopPath)') ">$(BubblesWorkshopPath)</BubblesPath>
+        <EnableBubbles Condition=" '$(BubblesPath)' == '' ">false</EnableBubbles>
+    </PropertyGroup>
+
     <!-- Define version constants based on GameVersion -->
     <PropertyGroup>
         <DefineConstants>$(DefineConstants);V$(GameVersion.Replace('.', '_'))</DefineConstants>
@@ -76,7 +95,7 @@
     <!-- Include External Libraries -->
     <ItemGroup>
         <Reference Include="Bubbles" Condition=" '$(EnableBubbles)' == 'true' ">
-            <HintPath>$(RimWorldWorkshopDir)\1516158345\Assemblies\Bubbles.dll</HintPath>
+            <HintPath>$(BubblesPath)</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="Scriban">
