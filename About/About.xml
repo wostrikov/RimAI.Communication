@@ -25,14 +25,14 @@
 			<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
 		</li>
 		<li>
-			<packageId>ustas.jaxe.bubbles</packageId>
+			<packageId>jaxe.bubbles</packageId>
 			<displayName>Interaction Bubbles</displayName>
 			<steamWorkshopUrl>steam://url/CommunityFilePage/1516158345</steamWorkshopUrl>
 		</li>
 	</modDependencies>
 	<loadAfter>
 		<li>brrainz.harmony</li>
-		<li>ustas.jaxe.bubbles</li>
+		<li>jaxe.bubbles</li>
 	</loadAfter>
 	<incompatibleWith>
 		<!-- <li>username.modname</li> -->
