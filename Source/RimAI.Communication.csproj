@@ -33,7 +33,7 @@
         only lacked a way to notice.
     -->
     <PropertyGroup>
-        <BubblesForkPath>$(RimWorldDir)\Mods\Interaction Bubbles - Ustas\1.6\Assemblies\Bubbles.dll</BubblesForkPath>
+        <BubblesForkPath>$(RimWorldDir)\Mods\Interaction Bubbles\1.6\Assemblies\Bubbles.dll</BubblesForkPath>
         <BubblesWorkshopPath>$(RimWorldWorkshopDir)\1516158345\Assemblies\Bubbles.dll</BubblesWorkshopPath>
         <BubblesPath Condition=" '$(BubblesPath)' == '' And Exists('$(BubblesForkPath)') ">$(BubblesForkPath)</BubblesPath>
         <BubblesPath Condition=" '$(BubblesPath)' == '' And Exists('$(BubblesWorkshopPath)') ">$(BubblesWorkshopPath)</BubblesPath>
