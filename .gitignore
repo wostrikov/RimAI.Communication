@@ -8,7 +8,6 @@
 bin
 PublishedFileId.txt
 Folder.DotSettings.user
-Directory.Build.props
 *.sh
 .vs
 
