@@ -19,12 +19,17 @@ public static class AIService
     private static volatile bool _busy;
     private static DateTime? _busySince;
     private static bool _firstInstruction = true;
+    // The request in flight and the means to cancel it; set on the background thread,
+    // cancelled from the main thread when something more urgent arrives.
+    private static volatile System.Threading.CancellationTokenSource _currentCts;
+    private static volatile TalkRequest _currentRequest;
 
     /// <summary>
     /// Streaming chat that invokes callback as each player's dialogue is parsed
     /// </summary>
     public static async Task ChatStreaming(TalkRequest request, Action<TalkResponse> onPlayerResponseReceived)
     {
+        _currentRequest = request;
         var prefixMessages = request.PromptMessages ?? [];
         var apiLog = ApiHistory.AddRequest(request, Channel.Stream);
         var lastApiLog = apiLog;
@@ -36,6 +41,7 @@ public static class AIService
             return await client.GetStreamingChatCompletionAsync<TalkResponse>(prefixMessages, [],
                 response =>
                 {
+                    if (IsCancellationRequested()) return;
                     if (Cache.GetByName(response.Name) == null) return;
                     delivered++;
                     response.TalkType = request.TalkType;
@@ -62,6 +68,7 @@ public static class AIService
     // One time query - used for generating persona, etc
     public static async Task<T> Query<T>(TalkRequest request) where T : class, IJsonData
     {
+        _currentRequest = request;
         var messages = new List<(Role role, string message)> { (Role.User, request.Prompt) };
         var prefixMessages = new List<(Role role, string message)> { (Role.System, request.Context) };
         var apiLog = ApiHistory.AddRequest(request, Channel.Query);
@@ -99,6 +106,8 @@ public static class AIService
     {
         _busy = true;
         _busySince = DateTime.Now;
+        var cts = new System.Threading.CancellationTokenSource();
+        _currentCts = cts;
         try
         {
             var requestId = apiLog?.Id.ToString("N");
@@ -139,7 +148,7 @@ public static class AIService
                             ex.Payload);
                     }
                 },
-                default,
+                cts.Token,
                 requestId);
 
             if (outcome.Succeeded)
@@ -163,6 +172,9 @@ public static class AIService
         {
             _busy = false;
             _busySince = null;
+            _currentRequest = null;
+            _currentCts = null;
+            cts.Dispose();
         }
     }
 
@@ -197,6 +209,26 @@ public static class AIService
         ApiHistory.UpdatePayload(apiLog.Id, payload);
     }
 
+    public static bool IsCancellationRequested() => _currentCts?.IsCancellationRequested ?? false;
+
+    public static bool CanCancelFor(TalkRequest incomingRequest)
+    {
+        var current = _currentRequest;
+        if (!_busy || current == null || incomingRequest == null) return false;
+        return incomingRequest.TalkType.CanPreempt(current.TalkType);
+    }
+
+    public static void CancelCurrent()
+    {
+        try
+        {
+            var cts = _currentCts;
+            if (cts != null && !cts.IsCancellationRequested) cts.Cancel();
+        }
+        // The request finished and disposed its source between the read and the cancel: nothing to stop.
+        catch (ObjectDisposedException) { }
+    }
+
     public static bool IsFirstInstruction() => _firstInstruction;
     public static bool IsBusy()
     {
@@ -211,6 +243,7 @@ public static class AIService
 
     public static void Clear()
     {
+        CancelCurrent();
         _busy = false;
         _busySince = null;
         _firstInstruction = true;

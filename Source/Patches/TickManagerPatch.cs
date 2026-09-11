@@ -88,7 +88,24 @@ internal static class TickManagerPatch
                 }
 
                 // Bedtime and waking lines ride this pool too: they have a moment, and a normal slot would miss it.
-                if (!request.TalkType.IsFromUser() && request.TalkType != TalkType.Sleep) break;
+                if (!request.TalkType.IsFastTrack() && request.TalkType != TalkType.Sleep) break;
+
+                if (AIService.IsBusy())
+                {
+                    if (AIService.CanCancelFor(request))
+                    {
+                        AIService.CancelCurrent();
+                    }
+                    else if (request.TalkType == TalkType.Interaction)
+                    {
+                        // An interaction is about this moment; one that cannot go now is not worth voicing later.
+                        UserRequestPool.Remove(pawn);
+                        pawnState.TalkRequests.Remove(request);
+                        TalkRequestPool.AddToHistory(request, RequestStatus.Expired);
+                        continue;
+                    }
+                    return;
+                }
 
                 if (TalkService.GenerateTalk(request))
                     UserRequestPool.Remove(pawn);
@@ -96,11 +113,10 @@ internal static class TickManagerPatch
             }
         }
 
+        // The ambient cooldown counts from the last ambient talk, not from whatever else kept
+        // the AI busy - a fast-track line must not push the colony's next chat further away.
         if (AIService.IsBusy())
-        {
-            _lastTalkEndTick = GenTicks.TicksGame;
             return;
-        }
 
         int intervalTicks = CommonUtil.GetTicksForDuration(TalkInterval);
         if (intervalTicks > 0 && GenTicks.TicksGame - _lastTalkEndTick >= intervalTicks)

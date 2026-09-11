@@ -173,6 +173,12 @@ public class Player2Client : IAIClient
                 return null;
             }
 
+            if (Service.AIService.IsCancellationRequested())
+            {
+                cts.Cancel();
+                throw new OperationCanceledException("Cancelled for a more urgent talk.");
+            }
+
             await Task.Delay(100);
         }
 

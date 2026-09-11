@@ -34,6 +34,7 @@ public class CommunicationSettings : ModSettings
     public PromptManager PromptSystem = new();
     public bool UseAdvancedPromptMode = false;  // Default to Simple Mode
     public Dictionary<string, bool> EnabledArchivableTypes = new();
+    public Dictionary<string, bool> FastTrackInteractions = new();
     public bool DisplayTalkWhenDrafted = true;
     public bool AllowMonologue = true;
     public bool AllowSlavesToTalk = true;
@@ -43,12 +44,14 @@ public class CommunicationSettings : ModSettings
     public bool AllowCustomConversation = true;
     public Settings.PlayerDialogueMode PlayerDialogueMode = Settings.PlayerDialogueMode.Manual;
     public string PlayerName = "Player";
+    public string PlayerPersona = "";
     public string GameplayAiLanguage = "";
     public bool ContinueDialogueWhileSleeping = false;
     public bool EnableSleepDialogue = true;
     public bool AllowBabiesToTalk = true;
     public bool AllowChildrenToTalk = true;
     public bool AllowNonHumanToTalk = true;
+    public bool AllowAnnouncement = true;
     public bool ApplyMoodAndSocialEffects = false;
     public int DisableAiAtSpeed = 0;
     public Settings.ButtonDisplayMode ButtonDisplay = Settings.ButtonDisplayMode.Toggle;
@@ -228,15 +231,19 @@ public class CommunicationSettings : ModSettings
         Scribe_Values.Look(ref AllowCustomConversation, "allowCustomConversation", true);
         Scribe_Values.Look(ref PlayerDialogueMode, "playerDialogueMode", Settings.PlayerDialogueMode.Manual);
         Scribe_Values.Look(ref PlayerName, "playerName", "Player");
+        Scribe_Values.Look(ref PlayerPersona, "playerPersona", "");
         Scribe_Values.Look(ref GameplayAiLanguage, "gameplayAiLanguage", "");
         
         Scribe_Values.Look(ref ContinueDialogueWhileSleeping, "continueDialogueWhileSleeping", false);
         Scribe_Values.Look(ref EnableSleepDialogue, "enableSleepDialogue", true);
         Scribe_Values.Look(ref DisableAiAtSpeed, "DisableAiAtSpeed", 0);
         Scribe_Collections.Look(ref EnabledArchivableTypes, "enabledArchivableTypes", LookMode.Value, LookMode.Value);
+        Scribe_Collections.Look(ref FastTrackInteractions, "fastTrackInteractions", LookMode.Value, LookMode.Value);
+        FastTrackInteractions ??= new Dictionary<string, bool>();
         Scribe_Values.Look(ref AllowBabiesToTalk, "allowBabiesToTalk", true);
         Scribe_Values.Look(ref AllowChildrenToTalk, "allowChildrenToTalk", true);
         Scribe_Values.Look(ref AllowNonHumanToTalk, "allowNonHumanToTalk", true);
+        Scribe_Values.Look(ref AllowAnnouncement, "allowAnnouncement", true);
         Scribe_Values.Look(ref ApplyMoodAndSocialEffects, "applyMoodAndSocialEffects", false);
         
         Scribe_Deep.Look(ref Context, "context");
@@ -401,5 +408,11 @@ public class CommunicationSettings : ModSettings
         };
         preset.Entries.Insert(0, entry);
         return entry;
+    }
+
+    public bool IsFastTrackInteraction(string defName)
+    {
+        return defName != null && FastTrackInteractions != null &&
+               FastTrackInteractions.TryGetValue(defName, out bool enabled) && enabled;
     }
 }

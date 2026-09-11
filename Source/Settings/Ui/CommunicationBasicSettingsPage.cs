@@ -77,9 +77,17 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
         Listing_Standard leftListing = new Listing_Standard();
         leftListing.Begin(leftColumnRect);
 
-        leftListing.CheckboxLabeled("RimTalk.Settings.OverrideInteractions".Translate().ToString(),
-            ref settings.ProcessNonRimTalkInteractions,
-            "RimTalk.Settings.OverrideInteractionsTooltip".Translate().ToString());
+        // With interactions voiced, a button beside the checkbox picks the ones voiced at once.
+        Rect overrideRow = leftListing.GetRect(24f);
+        Rect overrideCheckbox = settings.ProcessNonRimTalkInteractions
+            ? new Rect(overrideRow.x, overrideRow.y, overrideRow.width - 81f, overrideRow.height)
+            : overrideRow;
+        Widgets.CheckboxLabeled(overrideCheckbox, "RimTalk.Settings.OverrideInteractions".Translate().ToString(),
+            ref settings.ProcessNonRimTalkInteractions);
+        TooltipHandler.TipRegion(overrideCheckbox, "RimTalk.Settings.OverrideInteractionsTooltip".Translate().ToString());
+        if (settings.ProcessNonRimTalkInteractions &&
+            Widgets.ButtonText(new Rect(overrideCheckbox.xMax + 6f, overrideRow.y, 75f, 24f), "RimTalk.Settings.SettingsButton".Translate().ToString()))
+            Find.WindowStack.Add(new UI.Dialog_FastTrackInteractions());
         leftListing.Gap(6f);
         leftListing.CheckboxLabeled("RimTalk.Settings.AllowSimultaneousConversations".Translate().ToString(),
             ref settings.AllowSimultaneousConversations,
@@ -145,6 +153,12 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
         rightListing.Gap(6f);
         rightListing.CheckboxLabeled("RimTalk.Settings.AllowNonHumanToTalk".Translate().ToString(),
             ref settings.AllowNonHumanToTalk, "RimTalk.Settings.AllowNonHumanToTalkTooltip".Translate().ToString());
+        rightListing.Gap(6f);
+        // Announcements go through the custom conversation window, so they go when it goes.
+        Rect announceRect = rightListing.GetRect(24f);
+        Widgets.CheckboxLabeled(announceRect, "RimTalk.Settings.AllowAnnouncement".Translate().ToString(),
+            ref settings.AllowAnnouncement, disabled: !settings.AllowCustomConversation);
+        TooltipHandler.TipRegion(announceRect, "RimTalk.Settings.AllowAnnouncementTooltip".Translate().ToString());
 
         rightListing.End();
 
@@ -240,6 +254,7 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
             settings.AllowBabiesToTalk = true;
             settings.AllowChildrenToTalk = true;
             settings.AllowNonHumanToTalk = true;
+            settings.AllowAnnouncement = true;
             settings.AllowCustomConversation = true;
             settings.PlayerDialogueMode = Settings.PlayerDialogueMode.Manual;
             settings.PlayerName = "Player";
@@ -319,6 +334,30 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
         GUI.color = savedColor;
         
         TooltipHandler.TipRegion(playerNameRect, "RimTalk.Settings.PlayerNameTooltip".Translate().ToString());
+
+        // 3. Player persona: who the model plays when it speaks for the player (AI-driven mode only).
+        bool isPersonaEnabled = settings.PlayerDialogueMode == Settings.PlayerDialogueMode.AIDriven;
+        Rect personaLabelRect = listingStandard.GetRect(24f);
+        personaLabelRect.x += indent;
+        personaLabelRect.width -= indent;
+        GUI.color = isPersonaEnabled ? Color.white : new Color(1f, 1f, 1f, 0.5f);
+        Widgets.Label(personaLabelRect, "RimTalk.Settings.PlayerPersona".Translate().ToString());
+        TooltipHandler.TipRegion(personaLabelRect, "RimTalk.Settings.PlayerPersonaTooltip".Translate().ToString());
+
+        Rect personaRect = listingStandard.GetRect(54f);
+        personaRect.x += indent;
+        personaRect.width -= indent;
+        if (isPersonaEnabled)
+        {
+            settings.PlayerPersona = Widgets.TextArea(personaRect, settings.PlayerPersona ?? "");
+        }
+        else
+        {
+            GUI.enabled = false;
+            Widgets.TextArea(personaRect, settings.PlayerPersona ?? "");
+            GUI.enabled = true;
+        }
+        GUI.color = Color.white;
     }
 
 }

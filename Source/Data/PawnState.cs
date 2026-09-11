@@ -70,6 +70,14 @@ public class PawnState(Pawn pawn)
             Cache.Get(recipient)?.IgnoreAllTalkResponses();
             UserRequestPool.Add(Pawn);
         }
+        else if (talkType == TalkType.Interaction)
+        {
+            TalkRequests.AddFirst(newRequest);
+            IgnoreAllTalkResponses();
+            Cache.Get(recipient)?.IgnoreAllTalkResponses();
+            LastTalkTick = 0;
+            UserRequestPool.Add(Pawn);
+        }
         else if (talkType == TalkType.Sleep)
         {
             // A bedtime or waking line belongs to that moment: first in line, and taken

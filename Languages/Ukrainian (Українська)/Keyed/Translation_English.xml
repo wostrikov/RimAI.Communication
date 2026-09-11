@@ -161,6 +161,11 @@
   <RimTalk.Settings.AICooldown>Затримка AI (секунди): {0}</RimTalk.Settings.AICooldown>
   <RimTalk.Settings.OverrideInteractions>Замінювати всі взаємодії діалогами AI</RimTalk.Settings.OverrideInteractions>
   <RimTalk.Settings.OverrideInteractionsTooltip>Увімкніть це, щоб дозволити ШІ перевизначати й повторно генерувати діалоги для всіх взаємодій, зокрема у стандартному RimWorld та інших модифікаціях. Примітка: для діалогів ШІ встановлено затримку відновлення, вказану вище. Щоб генерувати діалоги частіше, зменште затримку відновлення.</RimTalk.Settings.OverrideInteractionsTooltip>
+  <RimTalk.Settings.SettingsButton>Налаштувати</RimTalk.Settings.SettingsButton>
+  <RimTalk.Settings.FastTrackInteractionsTitle>Взаємодії без черги</RimTalk.Settings.FastTrackInteractionsTitle>
+  <RimTalk.Settings.FastTrackInteractionsDesc>Вибрані взаємодії озвучуються одразу — навіть перериваючи фонову розмову, — а не після звичайної паузи між розмовами. Решта чекають своєї черги.</RimTalk.Settings.FastTrackInteractionsDesc>
+  <RimTalk.Settings.SelectAll>Вибрати все</RimTalk.Settings.SelectAll>
+  <RimTalk.Settings.DeselectAll>Зняти все</RimTalk.Settings.DeselectAll>
   <RimTalk.Settings.AllowSimultaneousConversations>Дозволити одночасні розмови</RimTalk.Settings.AllowSimultaneousConversations>
   <RimTalk.Settings.AllowSimultaneousConversationsTooltip>Коли ввімкнено, кілька груп персонажів можуть розмовляти одночасно. Вимкніть це, якщо хочете бачити лише одну розмову за раз або якщо їх відбувається забагато.</RimTalk.Settings.AllowSimultaneousConversationsTooltip>
   <RimTalk.Settings.DisplayTalkWhenDrafted>Показувати розмови мобілізованих</RimTalk.Settings.DisplayTalkWhenDrafted>
@@ -196,6 +201,8 @@
   <RimTalk.Settings.PlayerName>Промпт гравця</RimTalk.Settings.PlayerName>
   <RimTalk.Settings.PlayerDialogueModeTooltip>Оберіть спосіб взаємодії гравця в розмовах.\n\nВимкнено: гравець не може брати участь у розмовах.\nРучні відповіді: ви самостійно вводите всі відповіді гравця; автоматична генерація не виконується.\nАвтогенерація відповідей: ШІ автоматично генерує відповіді гравця під час розмов.</RimTalk.Settings.PlayerDialogueModeTooltip>
   <RimTalk.Settings.PlayerNameTooltip>Ім’я, яке відображатиметься, коли ви братимете участь у розмовах. Воно визначає, як персонажі сприйматимуть вашу присутність.</RimTalk.Settings.PlayerNameTooltip>
+  <RimTalk.Settings.PlayerPersona>Персона гравця</RimTalk.Settings.PlayerPersona>
+  <RimTalk.Settings.PlayerPersonaTooltip>Хто ви, коли ШІ говорить за вас: рядок-два характеру, який модель грає в режимі, де ШІ веде гравця. В інших режимах не використовується.</RimTalk.Settings.PlayerPersonaTooltip>
   <RimTalk.Settings.PauseAtSpeed>Призупиняти ШІ на високій швидкості</RimTalk.Settings.PauseAtSpeed>
   <RimTalk.Settings.DisableAiAtSpeedTooltip>Щоб зменшити кількість викликів API, ШІ буде призупинено, коли швидкість гри буде встановлено на цей рівень або вище.</RimTalk.Settings.DisableAiAtSpeedTooltip>
   <RimTalk.Settings.Disabled>Вимкнено</RimTalk.Settings.Disabled>
@@ -375,6 +382,14 @@
   <RimTalk.Gizmo.ChatWithTargetDesc>Розпочати розмову з {0}.</RimTalk.Gizmo.ChatWithTargetDesc>
   <RimTalk.FloatMenu.WhatToSayToSelf>Що ви хочете сказати {0}?</RimTalk.FloatMenu.WhatToSayToSelf>
   <RimTalk.FloatMenu.WhatToSayToOther>Що ви хочете, щоб {0} сказав {1}?</RimTalk.FloatMenu.WhatToSayToOther>
+  <RimTalk.FloatMenu.WhatToAnnounceToSelf>Що ви хочете оголосити {0} і всім, хто поруч?</RimTalk.FloatMenu.WhatToAnnounceToSelf>
+  <RimTalk.FloatMenu.WhatToAnnounceToOther>Що {0} має оголосити всім, хто поруч?</RimTalk.FloatMenu.WhatToAnnounceToOther>
+  <RimTalk.FloatMenu.DirectModeTooltip>Сказати одному пішакові (Tab — перемкнути)</RimTalk.FloatMenu.DirectModeTooltip>
+  <RimTalk.FloatMenu.AnnounceModeTooltip>Оголосити всім, хто чує (Tab — перемкнути)</RimTalk.FloatMenu.AnnounceModeTooltip>
+  <RimTalk.Gizmo.Announce>Оголосити</RimTalk.Gizmo.Announce>
+  <RimTalk.Gizmo.AnnounceDesc>{0} оголошує щось усім поруч — і чути, як вони відгукуються.</RimTalk.Gizmo.AnnounceDesc>
+  <RimTalk.Settings.AllowAnnouncement>Дозволити оголошення</RimTalk.Settings.AllowAnnouncement>
+  <RimTalk.Settings.AllowAnnouncementTooltip>Пішак може оголосити щось усім, хто чує, — кнопкою на ньому або через Tab у вікні розмови. Потрібні власні розмови.</RimTalk.Settings.AllowAnnouncementTooltip>
   <RimTalk.FloatMenu.Send>Надіслати</RimTalk.FloatMenu.Send>
   <RimTalk.FloatMenu.Cancel>Скасувати</RimTalk.FloatMenu.Cancel>
   <RimTalk.ScribanVar.Category.PawnShorthands>Скорочення для персонажів</RimTalk.ScribanVar.Category.PawnShorthands>

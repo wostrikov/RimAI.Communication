@@ -400,7 +400,7 @@ public class PromptManager : IExposable
         AttachTypedPersonaContext(context, pawns);
         LastContext = context;
 
-        talkRequest.Context = PromptService.BuildContext(pawns);
+        talkRequest.Context = PromptService.BuildContext(pawns, talkRequest.IsAnnouncement);
         PromptService.DecoratePrompt(talkRequest, pawns, status);
         // Read both only after decoration: PromptDecorated subscribers append to the context
         // (Events' ongoing events, Art's book passages), and a copy taken earlier drops them

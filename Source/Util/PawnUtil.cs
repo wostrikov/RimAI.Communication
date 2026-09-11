@@ -174,14 +174,14 @@ public static class PawnUtil
         return pawn.ageTracker?.CurLifeStage?.developmentalStage == DevelopmentalStage.Child;
     }
 
-    public static (string, bool) GetPawnStatusFull(this Pawn pawn, List<Pawn> nearbyPawns)
+    public static (string, bool) GetPawnStatusFull(this Pawn pawn, List<Pawn> nearbyPawns, bool isAnnouncement = false)
     {
         var settings = Settings.Get();
 
         if (pawn == null)
             return (null, false);
 
-        if (pawn.IsPlayer())
+        if (pawn.IsPlayer() && !isAnnouncement)
             return (settings.PlayerName, false);
 
         bool isInDanger = false;

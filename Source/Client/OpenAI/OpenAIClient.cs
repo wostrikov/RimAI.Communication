@@ -160,16 +160,7 @@ public class OpenAIClient(
             }
         }
         
-        string? reasoningEffort = null;
-
-        if (!string.IsNullOrEmpty(model))
-        {
-            string m = model.ToLower();
-            if (m.Contains("gemini") && m.Contains("pro"))
-                reasoningEffort = "low";
-            else if ((m.Contains("gemini") && m.Contains("flash")) || m.Contains("gemma-4"))
-                reasoningEffort = "minimal";
-        }
+        string? reasoningEffort = DefaultReasoningEffort(model);
 
         var request = new OpenAIRequest
         {
@@ -181,6 +172,19 @@ public class OpenAIClient(
         };
 
         return JsonUtil.SerializeToJson(request);
+    }
+
+    /// <summary>
+    /// Talk lines want an answer, not deliberation. Every current Gemini takes "low" - the
+    /// newer Flash models reject "minimal" - and Gemma thinks least with "minimal".
+    /// </summary>
+    internal static string? DefaultReasoningEffort(string? model)
+    {
+        if (string.IsNullOrEmpty(model)) return null;
+        string m = model.ToLowerInvariant();
+        if (m.Contains("gemini")) return "low";
+        if (m.Contains("gemma")) return "minimal";
+        return null;
     }
 
     static List<TextAiMessage> ToSharedMessages(
@@ -259,6 +263,12 @@ public class OpenAIClient(
             {
                 cts.Cancel();
                 return null;
+            }
+
+            if (Service.AIService.IsCancellationRequested())
+            {
+                cts.Cancel();
+                throw new OperationCanceledException("Cancelled for a more urgent talk.");
             }
 
             await Task.Delay(100);

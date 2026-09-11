@@ -20,13 +20,15 @@ namespace Ustas.RimAI.Communication.Patches
             if (Settings.Get().PlayerDialogueMode == Settings.PlayerDialogueMode.Disabled) return;
             if (!__instance.Spawned || __instance.Dead) return;
             if (!__instance.IsTalkEligible()) return;
+            if (__instance.IsPlayer()) return;
 
             var selector = Find.Selector;
             if (selector.SelectedPawns.Count != 1) return;
 
             var list = (__result != null) ? __result.ToList() : new List<Gizmo>();
 
-            var cmd = new Command_Action
+            // The player talks to this pawn.
+            list.Add(new Command_Action
             {
                 defaultLabel = "RimTalk.Gizmo.ChatWithTarget".Translate(__instance.LabelShort),
                 defaultDesc = "RimTalk.Gizmo.ChatWithTargetDesc".Translate(__instance.LabelShort),
@@ -35,11 +37,22 @@ namespace Ustas.RimAI.Communication.Patches
                 {
                     Pawn player = Cache.GetPlayer();
                     if (player == null) return;
-                    Find.WindowStack.Add(new CustomDialogueWindow(player, __instance));
+                    Find.WindowStack.Add(new CustomDialogueWindow(player, __instance, DialogueMode.Direct));
                 }
-            };
+            });
 
-            list.Add(cmd);
+            // This pawn announces something to everyone in earshot; the player is not in it.
+            if (Settings.Get().AllowAnnouncement)
+            {
+                list.Add(new Command_Action
+                {
+                    defaultLabel = "RimTalk.Gizmo.Announce".Translate(),
+                    defaultDesc = "RimTalk.Gizmo.AnnounceDesc".Translate(__instance.LabelShort),
+                    icon = ContentFinder<Texture2D>.Get("UI/AnnounceGizmo", true),
+                    action = () => Find.WindowStack.Add(new CustomDialogueWindow(__instance, __instance, DialogueMode.Announce))
+                });
+            }
+
             __result = list;
         }
     }

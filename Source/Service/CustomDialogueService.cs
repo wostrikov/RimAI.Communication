@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.UI;
 using Ustas.RimAI.Communication.Util;
 using Ustas.RimAI.Core.Communication;
@@ -29,7 +28,7 @@ public static class CustomDialogueService
 
             if (!CanTalk(initiator, dialogue.Recipient)) continue;
 
-            ExecuteDialogue(initiator, dialogue.Recipient, dialogue.Message);
+            ExecuteDialogue(initiator, dialogue.Recipient, dialogue.Message, dialogue.IsAnnouncement);
             toRemove.Add(initiator);
         }
 
@@ -58,18 +57,42 @@ public static class CustomDialogueService
         return distance <= TalkDistance && InSameRoom(initiator, recipient);
     }
 
-    public static void ExecuteDialogue(Pawn initiator, Pawn recipient, string message)
+    public static void ExecuteDialogue(Pawn initiator, Pawn recipient, string message, bool isAnnouncement = false)
     {
         PawnState initiatorState = Cache.Get(initiator);
         if (initiatorState == null || !initiatorState.CanDisplayTalk())
             return;
 
-        PawnState recipientState = Cache.Get(recipient);
-        if (recipientState != null && recipientState.CanDisplayTalk())
-            recipientState.AddTalkRequest(message, initiator, TalkType.User);
+        TalkType talkType = isAnnouncement ? TalkType.Announcement : TalkType.User;
 
-        ApiLog apiLog = ApiHistory.AddUserHistory(initiator, recipient, message);
-        
+        if (isAnnouncement)
+        {
+            // An announcement is spoken by the pawn - by the player through it, or by the pawn
+            // itself - and everyone in earshot reacts; nobody in particular is being answered.
+            Pawn speaker = initiator.IsPlayer() ? recipient : initiator;
+            Pawn other = initiator.IsPlayer() ? initiator : recipient;
+
+            PawnState speakerState = Cache.Get(speaker);
+            if (speakerState != null && speakerState.CanDisplayTalk())
+            {
+                speakerState.TalkRequests.AddFirst(new TalkRequest(message, speaker, other, talkType));
+                speakerState.IgnoreAllTalkResponses();
+                UserRequestPool.Add(speaker);
+            }
+        }
+        else
+        {
+            PawnState recipientState = Cache.Get(recipient);
+            if (recipientState != null && recipientState.CanDisplayTalk())
+                recipientState.AddTalkRequest(message, initiator, talkType);
+        }
+
+        // The player's own line never waits behind a background talk.
+        if (AIService.IsBusy())
+            AIService.CancelCurrent();
+
+        ApiLog apiLog = ApiHistory.AddUserHistory(initiator, recipient, message, talkType);
+
         if (initiator.IsPlayer())
         {
             apiLog.SpokenTick = GenTicks.TicksGame;
@@ -77,7 +100,7 @@ public static class CustomDialogueService
         }
         else
         {
-            TalkResponse talkResponse = new(TalkType.User, initiator.LabelShort, message)
+            TalkResponse talkResponse = new(talkType, initiator.LabelShort, message)
             {
                 Id = apiLog.Id
             };
@@ -87,9 +110,10 @@ public static class CustomDialogueService
         TalkLifecycle.PublishPlayerDialogueSubmitted(initiator, recipient, message);
     }
 
-    public class PendingDialogue(Pawn recipient, string message)
+    public class PendingDialogue(Pawn recipient, string message, bool isAnnouncement = false)
     {
         public readonly Pawn Recipient = recipient;
         public readonly string Message = message;
+        public readonly bool IsAnnouncement = isAnnouncement;
     }
 }

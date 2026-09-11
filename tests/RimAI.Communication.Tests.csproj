@@ -18,6 +18,8 @@
     <Compile Include="..\Source\Policy\TalkLifeStagePolicy.cs" Link="TalkLifeStagePolicy.cs" />
     <Compile Include="..\Source\Service\BusyGate.cs" Link="BusyGate.cs" />
     <Compile Include="..\Source\Policy\StoryThreadPolicy.cs" Link="StoryThreadPolicy.cs" />
+    <Compile Include="..\Source\Data\TalkType.cs" Link="TalkType.cs" />
+    <None Include="..\Source\Client\OpenAI\OpenAIClient.cs" Link="OpenAIClient.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Data\PawnState.cs" Link="PawnState.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\TalkService.cs" Link="TalkService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Util\Describer.cs" Link="Describer.cs.src" CopyToOutputDirectory="PreserveNewest" />

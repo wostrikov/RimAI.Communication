@@ -57,10 +57,11 @@ public static class Bubbler_Add
         InteractionDef interactionDef = GetInteractionDef(entry);
         if (interactionDef == null) return true;
         string prompt = entry.ToGameStringFromPOV(initiator).StripTags();
+        bool isFastTrack = settings.IsFastTrackInteraction(interactionDef.defName);
         bool isChitchat = interactionDef == InteractionDefOf.Chitchat ||
                           interactionDef == InteractionDefOf.DeepTalk;
 
-        if (isChitchat
+        if (!isFastTrack && isChitchat
             && (initiator.IsInDanger()
                 || initiator.GetHostilePawnNearBy() != null
                 || !PawnSelector.GetNearByTalkablePawns(initiator).Contains(recipient)))
@@ -71,12 +72,25 @@ public static class Bubbler_Add
         PawnState pawnState = Cache.Get(initiator);
 
         // chitchat is ignored if talkRequest exists
-        if (pawnState == null || (isChitchat && pawnState.TalkRequests.Count > 0))
+        if (pawnState == null || (!isFastTrack && isChitchat && pawnState.TalkRequests.Count > 0))
             return false;
+
+        // A fast-track line waits for nobody, but it does not talk over a pawn already speaking.
+        if (isFastTrack)
+        {
+            pawnState.DrainIncomingTalkResponses();
+            if (pawnState.IsGeneratingTalk || pawnState.TalkResponses.Count > 0)
+                return false;
+
+            PawnState recipientState = Cache.Get(recipient);
+            recipientState?.DrainIncomingTalkResponses();
+            if (recipientState != null && (recipientState.IsGeneratingTalk || recipientState.TalkResponses.Count > 0))
+                return false;
+        }
 
         // Otherwise, block normal bubble and generate talk
         prompt = $"{prompt} ({interactionDef.label})";
-        pawnState.AddTalkRequest(prompt, recipient, TalkType.Chitchat);
+        pawnState.AddTalkRequest(prompt, recipient, isFastTrack ? TalkType.Interaction : TalkType.Chitchat);
         return false;
     }
 

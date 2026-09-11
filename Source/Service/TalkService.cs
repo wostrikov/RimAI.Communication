@@ -48,11 +48,17 @@ public static class TalkService
             talkRequest.Recipient = null;
         }
 
-        List<Pawn> nearbyPawns = PawnSelector.GetAllNearByPawns(talkRequest.Initiator);
+        // An announcement the player makes through a pawn is that pawn's to speak.
+        bool isPlayerAnnouncement = talkRequest.IsAnnouncement && talkRequest.Recipient != null && talkRequest.Recipient.IsPlayer();
+        Pawn mainPawn = isPlayerAnnouncement ? talkRequest.Recipient : talkRequest.Initiator;
+
+        List<Pawn> nearbyPawns = PawnSelector.GetAllNearByPawns(talkRequest.Initiator, isAnnouncement: talkRequest.IsAnnouncement);
         // The recipient may have just been nulled above; a null must not reach nearbyPawns.
-        if (talkRequest.Recipient != null && talkRequest.Recipient.IsPlayer())
+        if (isPlayerAnnouncement)
+            nearbyPawns.Insert(0, talkRequest.Initiator);
+        else if (talkRequest.Recipient != null && talkRequest.Recipient.IsPlayer())
             nearbyPawns.Insert(0, talkRequest.Recipient);
-        var (status, isInDanger) = talkRequest.Initiator.GetPawnStatusFull(nearbyPawns);
+        var (status, isInDanger) = mainPawn.GetPawnStatusFull(nearbyPawns, talkRequest.IsAnnouncement);
         
         // Avoid spamming generations if the pawn's status hasn't changed recently.
         if (!talkRequest.TalkType.IsFromUser() && status == pawn1.LastStatus && pawn1.RejectCount < 2)
@@ -67,17 +73,23 @@ public static class TalkService
         pawn1.LastStatus = status;
 
         // Select the most relevant pawns for the conversation context.
-        List<Pawn> pawns = new List<Pawn> { talkRequest.Initiator, talkRequest.Recipient }
+        List<Pawn> pawns = new List<Pawn> { mainPawn, isPlayerAnnouncement ? null : talkRequest.Recipient }
             .Where(p => p != null)
             .Concat(nearbyPawns.Where(p =>
             {
                 var pawnState = Cache.Get(p);
-                pawnState.DrainIncomingTalkResponses();
-                return pawnState.CanDisplayTalk() && pawnState.TalkResponses.Empty();
+                pawnState?.DrainIncomingTalkResponses();
+                // Everyone in earshot hears an announcement, whatever they were about to say.
+                return pawnState != null && pawnState.CanDisplayTalk() &&
+                       (talkRequest.IsAnnouncement || pawnState.TalkResponses.Empty());
             }))
             .Distinct()
-            .Take(settings.Context.MaxPawnContextCount)
+            .Take(talkRequest.IsAnnouncement ? Math.Max(settings.Context.MaxPawnContextCount, 8) : settings.Context.MaxPawnContextCount)
             .ToList();
+
+        if (talkRequest.IsAnnouncement)
+            foreach (var p in pawns.Where(p => p != null && !p.IsPlayer()))
+                Cache.Get(p)?.IgnoreAllTalkResponses([TalkType.Urgent, TalkType.User, TalkType.Announcement]);
         
         // A sleep line was aimed at whoever is nearby when it was refreshed; that decides it, not the headcount alone.
         if (talkRequest.TalkType == TalkType.Sleep)
@@ -144,13 +156,18 @@ public static class TalkService
             AddResponsesToHistory(receivedResponses, talkRequest.Prompt);
             StoryThreadService.Capture(talkRequest, receivedResponses);
         }
+        catch (OperationCanceledException)
+        {
+            Logger.Debug("Dialogue generation cancelled for a more urgent talk.");
+        }
         catch (Exception ex)
         {
             Logger.Error(ex.StackTrace);
         }
         finally
         {
-            Cache.Get(initiator).IsGeneratingTalk = false;
+            var initiatorState = Cache.Get(initiator);
+            if (initiatorState != null) initiatorState.IsGeneratingTalk = false;
         }
     }
 
@@ -196,7 +213,7 @@ public static class TalkService
             // Danger first: a calm line queued before the raid must not be the next thing said.
             bool inDanger = pawn.IsInDanger();
             if (inDanger)
-                pawnState.IgnoreAllTalkResponses([TalkType.Urgent, TalkType.User]);
+                pawnState.IgnoreAllTalkResponses([TalkType.Urgent, TalkType.User, TalkType.Announcement]);
 
             var talk = pawnState.TalkResponses.FirstOrDefault();
             if (talk == null)
@@ -213,7 +230,8 @@ public static class TalkService
                 continue;
             }
 
-            int replyInterval = inDanger ? 2 : CommunicationSettings.ReplyInterval;
+            // Reactions to an announcement come quickly, as a crowd's do.
+            int replyInterval = inDanger || talk.TalkType == TalkType.Announcement ? 2 : CommunicationSettings.ReplyInterval;
 
             // Enforce a delay for replies to make conversations feel more natural.
             int parentTalkTick = TalkHistory.GetSpokenTick(talk.ParentTalkId);

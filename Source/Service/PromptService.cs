@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Ustas.RimAI.Communication.API;
@@ -24,7 +25,7 @@ public static class PromptService
 {
     public enum InfoLevel { Short, Normal, Full }
 
-    public static string BuildContext(List<Pawn> pawns)
+    public static string BuildContext(List<Pawn> pawns, bool isAnnouncement = false)
     {
         TalkLifecycle.PublishContextBuildStarted(pawns);
         try
@@ -34,7 +35,32 @@ public static class PromptService
         for (int i = 0; i < pawns.Count; i++)
         {
             var pawn = pawns[i];
-            if (pawn.IsPlayer()) continue;
+            if (pawn.IsPlayer())
+            {
+                // When the model speaks for the player it needs to know who that is.
+                var playerPersona = Settings.Get().PlayerPersona;
+                if (Settings.Get().PlayerDialogueMode == Settings.PlayerDialogueMode.AIDriven &&
+                    !string.IsNullOrWhiteSpace(playerPersona))
+                {
+                    string playerContext = $"{pawn.LabelShort} (Player)\nPersonality: {playerPersona.Trim()}";
+                    var playerState = Cache.Get(pawn);
+                    if (playerState != null) playerState.Context = playerContext;
+                    context.AppendLine($"[P{i + 1}]").AppendLine(playerContext);
+                }
+                continue;
+            }
+
+            // Listeners to an announcement only react: a one-line profile each keeps a crowd of
+            // eight inside the budget a full context for each would blow.
+            if (isAnnouncement && i > 0)
+            {
+                var listenerContext = CreateMinimalListenerContext(pawn);
+                var listenerState = Cache.Get(pawn);
+                if (listenerState != null) listenerState.Context = listenerContext;
+                context.AppendLine($"[P{i + 1}]").AppendLine(listenerContext);
+                continue;
+            }
+
             InfoLevel infoLevel = Settings.Get().Context.EnableContextOptimization 
                                   || i != 0 ? InfoLevel.Short : InfoLevel.Normal;
             var pawnContext = CreatePawnContext(pawn, infoLevel);
@@ -59,6 +85,20 @@ public static class PromptService
         {
             TalkLifecycle.PublishContextBuildCompleted();
         }
+    }
+
+    /// <summary>One line for a listener: role, traits and mood.</summary>
+    public static string CreateMinimalListenerContext(Pawn pawn)
+    {
+        var role = pawn.GetRole(false) ?? "Colonist";
+        var traits = pawn.story?.traits?.TraitsSorted?
+            .Select(t => t.LabelCap.ToString())
+            .Where(l => !string.IsNullOrEmpty(l))
+            .ToList();
+        var traitsStr = traits is { Count: > 0 } ? $", Traits: {string.Join(", ", traits)}" : "";
+        var mood = pawn.needs?.mood?.MoodString;
+        var moodStr = !string.IsNullOrEmpty(mood) ? $" | Mood: {mood}" : "";
+        return $"{pawn.LabelShort} ({role}{traitsStr}){moodStr}";
     }
 
     /// <summary>Time, date, season, weather, location, surroundings and wealth of the main pawn's map.</summary>
@@ -190,7 +230,7 @@ public static class PromptService
         ContextBuilder.BuildDialogueType(sb, talkRequest, pawns, shortName, mainPawn);
         sb.Append($"\n{status}");
 
-        if (AIService.IsFirstInstruction() || talkRequest.TalkType == TalkType.User)
+        if (AIService.IsFirstInstruction() || talkRequest.TalkType.IsFromUser())
         {
             if (DialogueLanguage.TryGetDialogueInstruction(out var instruction))
                 sb.Append($"\n{instruction}");
