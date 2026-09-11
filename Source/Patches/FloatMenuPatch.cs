@@ -18,6 +18,10 @@ namespace Ustas.RimAI.Communication.Patches;
 public static class FloatMenuPatch
 {
     private const int ClickRadiusCells = 1;
+    // The 3x3 cell scan finds candidates; only a pawn drawn within this distance of the click
+    // gets the option, so clicking beside someone no longer offers talk to a neighbour.
+    private const float MaxClickDistance = 0.65f;
+    private const float MaxClickDistanceSquared = MaxClickDistance * MaxClickDistance;
 
 #if V1_5
     [HarmonyPostfix]
@@ -69,6 +73,9 @@ public static class FloatMenuPatch
                     if (thingList[i] is Pawn hitPawn)
                     {
                         if (!processedPawns.Add(hitPawn)) continue;
+
+                        Vector3 offset = clickPos - hitPawn.DrawPos;
+                        if (offset.x * offset.x + offset.z * offset.z > MaxClickDistanceSquared) continue;
 
                         if (TryResolveForHitPawn(selectedPawn, hitPawn, out var initiator, out var target))
                         {

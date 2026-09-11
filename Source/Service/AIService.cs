@@ -14,7 +14,10 @@ namespace Ustas.RimAI.Communication.Service;
 // In most cases, you should NOT modify this file.
 public static class AIService
 {
-    private static bool _busy;
+    // volatile: set on the main thread, cleared in a finally on a threadpool thread and read on
+    // the main thread every tick. A cached stale `true` would silence the whole colony for good.
+    private static volatile bool _busy;
+    private static DateTime? _busySince;
     private static bool _firstInstruction = true;
 
     /// <summary>
@@ -95,6 +98,7 @@ public static class AIService
         bool expectTalkObjects = true)
     {
         _busy = true;
+        _busySince = DateTime.Now;
         try
         {
             var requestId = apiLog?.Id.ToString("N");
@@ -158,6 +162,7 @@ public static class AIService
         finally
         {
             _busy = false;
+            _busySince = null;
         }
     }
 
@@ -193,10 +198,21 @@ public static class AIService
     }
 
     public static bool IsFirstInstruction() => _firstInstruction;
-    public static bool IsBusy() => _busy;
+    public static bool IsBusy()
+    {
+        if (!BusyGate.IsStuck(_busy, _busySince, DateTime.Now)) return _busy;
+
+        Logger.Warning($"The AI slot has been held for over {BusyGate.StuckAfterSeconds}s. Releasing it - " +
+                       "no request can legitimately take that long, and while it is held nobody in the colony can speak.");
+        _busy = false;
+        _busySince = null;
+        return false;
+    }
+
     public static void Clear()
     {
         _busy = false;
+        _busySince = null;
         _firstInstruction = true;
     }
 }

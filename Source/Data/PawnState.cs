@@ -18,7 +18,15 @@ public class PawnState(Pawn pawn)
     public int RejectCount { get; set; }
     public readonly List<TalkResponse> TalkResponses = [];
     private readonly ConcurrentQueue<TalkResponse> _incomingTalkResponses = new();
-    public bool IsGeneratingTalk { get; set; }
+    // Same hazard as AIService._busy: set on the main thread, cleared in a finally on a
+    // threadpool thread. An auto-property gives no memory barrier, and a stale `true` here
+    // silences this pawn for good.
+    private volatile bool _isGeneratingTalk;
+    public bool IsGeneratingTalk
+    {
+        get => _isGeneratingTalk;
+        set => _isGeneratingTalk = value;
+    }
     public readonly LinkedList<TalkRequest> TalkRequests = [];
     
     public HashSet<Hediff> Hediffs { get; set; } = pawn.GetHediffs();
@@ -120,8 +128,10 @@ public class PawnState(Pawn pawn)
     {
         if (Pawn.IsPlayer()) return true;
         
-        if (WorldRendererUtility.CurrentWorldRenderMode == WorldRenderMode.Planet || Find.CurrentMap == null ||
-            Pawn.Map != Find.CurrentMap || !Pawn.Spawned)
+        // Where the camera is looking decides whether new talk is generated, not whether talk
+        // already generated may be shown - otherwise glancing at the world map or another map
+        // throws every pending line away.
+        if (Pawn.Map == null || !Pawn.Spawned)
             return false;
         
         CommunicationSettings settings = Settings.Get();
@@ -134,6 +144,9 @@ public class PawnState(Pawn pawn)
     public bool CanGenerateTalk()
     {
         if (Pawn.IsPlayer()) return true;
+        if (WorldRendererUtility.CurrentWorldRenderMode == WorldRenderMode.Planet || Find.CurrentMap == null ||
+            Pawn.Map != Find.CurrentMap)
+            return false;
         DrainIncomingTalkResponses();
         return !IsGeneratingTalk && CanDisplayTalk() && Pawn.Awake() && TalkResponses.Empty()
                && CommonUtil.HasPassed(LastTalkTick, CommunicationSettings.ReplyInterval);

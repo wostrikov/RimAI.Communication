@@ -401,8 +401,11 @@ public class PromptManager : IExposable
         LastContext = context;
 
         talkRequest.Context = PromptService.BuildContext(pawns);
-        context.PawnContext = talkRequest.Context;
         PromptService.DecoratePrompt(talkRequest, pawns, status);
+        // Read both only after decoration: PromptDecorated subscribers append to the context
+        // (Events' ongoing events, Art's book passages), and a copy taken earlier drops them
+        // before the model ever sees them.
+        context.PawnContext = talkRequest.Context;
         context.DialoguePrompt = talkRequest.Prompt;
         AttachTypedMemoryContext(context, talkRequest, pawns);
         LastContext = context;
@@ -429,13 +432,21 @@ public class PromptManager : IExposable
         // 4. Reset session variables and build
         ScribanParser.ResetSessionVariables();
         var segments = new List<PromptMessageSegment>();
-        var messages = BuildMessagesFromPreset(preset, context, segments);
-        
-        if (baseEntry != null && originalBaseContent != null)
+        List<(PromptRole role, string content)> messages;
+        try
         {
-            baseEntry.Content = originalBaseContent;
+            messages = BuildMessagesFromPreset(preset, context, segments);
         }
-        
+        finally
+        {
+            // Simple mode overwrites the saved Base Instruction to render it; restore it even if
+            // rendering throws, or the preset keeps the simple-mode text for good.
+            if (baseEntry != null && originalBaseContent != null)
+            {
+                baseEntry.Content = originalBaseContent;
+            }
+        }
+
         talkRequest.PromptMessageSegments = segments.Count > 0 ? segments : null;
         
         return messages.Select(m => ((Role)m.role, m.content)).ToList();

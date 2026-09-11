@@ -157,11 +157,18 @@ public class PersonaEditorWindow : Window
                 Data.PersonaService.GeneratePersona(_pawn).ContinueWith(task =>
                 {
                     _isGenerating = false;
-                    if (task.IsCompleted)
+
+                    // IsCompleted is also true for a faulted or cancelled task, and a failed
+                    // query returns null, so task.Result.Persona threw in both cases.
+                    var result = task.Status == System.Threading.Tasks.TaskStatus.RanToCompletion ? task.Result : null;
+                    if (result == null)
                     {
-                        _editingPersonality = task.Result.Persona ?? "";
-                        _talkInitiationWeight = task.Result.Chattiness;
+                        Util.Logger.Warning("Persona generation failed - see the API log.");
+                        return;
                     }
+
+                    _editingPersonality = result.Persona ?? "";
+                    _talkInitiationWeight = result.Chattiness;
                 });
             }
         }

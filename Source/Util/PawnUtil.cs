@@ -15,6 +15,7 @@ public static class PawnUtil
 {
     public static bool IsTalkEligible(this Pawn pawn)
     {
+        if (pawn == null) return false;
         if (pawn.IsPlayer()) return true;
         if (pawn.HasVocalLink()) return true;
         if (pawn.DestroyedOrNull() || !pawn.Spawned || pawn.Dead) return false;
@@ -45,7 +46,8 @@ public static class PawnUtil
         if (pawn == null || pawn.IsPlayer()) return false;
         if (pawn.Dead) return true;
         if (pawn.Downed) return true;
-        if (!pawn.health.capacities.CapableOf(PawnCapacityDefOf.Moving)) return true;
+        // Being unable to walk is a condition, not a danger: real danger to an immobile pawn
+        // is already caught by the hostile/bleeding/pain/burning/hediff checks below.
         if (pawn.InMentalState && includeMentalState) return true;
         if (pawn.IsBurning()) return true;
         if (pawn.health.hediffSet.PainTotal >= pawn.GetStatValue(StatDefOf.PainShockThreshold)) return true;
@@ -68,13 +70,24 @@ public static class PawnUtil
     {
         if (pawn == null) return false;
 
-        if (pawn.mindState.enemyTarget != null) return true;
+        // enemyTarget is sticky: RimWorld does not reliably clear it when a fight ends and it
+        // survives save/reload, so a bare null check marks anyone who ever fought as in combat
+        // for good. It only counts while the target is still a live threat.
+        if (IsLiveThreat(pawn, pawn.mindState?.enemyTarget)) return true;
 
         if (pawn.stances?.curStance is Stance_Busy busy && busy.verb != null)
             return true;
 
         Pawn hostilePawn = pawn.GetHostilePawnNearBy();
         return hostilePawn != null && pawn.Position.DistanceTo(hostilePawn.Position) <= 20f;
+    }
+
+    private static bool IsLiveThreat(Pawn pawn, Thing target)
+    {
+        if (target == null || target.Destroyed || !target.Spawned) return false;
+        if (target.Map != pawn.Map) return false;
+        if (target is Pawn targetPawn && (targetPawn.Dead || targetPawn.Downed)) return false;
+        return pawn.Position.DistanceTo(target.Position) <= 30f;
     }
 
     public static string GetRole(this Pawn pawn, bool includeFaction = false)
@@ -98,7 +111,12 @@ public static class PawnUtil
 
     public static bool IsVisitor(this Pawn pawn)
     {
-        return pawn?.Faction != null && Faction.OfPlayer != null && pawn.Faction != Faction.OfPlayer && !pawn.HostileTo(Faction.OfPlayer) && !pawn.IsPrisoner;
+        // A hidden faction has no relation with the player, and asking for one logs RimWorld's
+        // "dummy relation" error - so it is neither a visitor nor an enemy.
+        if (pawn?.Faction == null || Faction.OfPlayer == null || pawn.Faction.IsPlayer || pawn.Faction.def.hidden)
+            return false;
+
+        return !pawn.IsPrisoner && !pawn.HostileTo(Faction.OfPlayer);
     }
 
     public static string GetTitle(this Pawn pawn)
@@ -140,7 +158,10 @@ public static class PawnUtil
 
     public static bool IsEnemy(this Pawn pawn)
     {
-        return pawn != null && Faction.OfPlayer != null && pawn.HostileTo(Faction.OfPlayer) && !pawn.IsPrisoner;
+        if (pawn?.Faction == null || Faction.OfPlayer == null || pawn.Faction.IsPlayer || pawn.Faction.def.hidden)
+            return false;
+
+        return !pawn.IsPrisoner && pawn.HostileTo(Faction.OfPlayer);
     }
 
     public static bool IsBaby(this Pawn pawn)
@@ -458,19 +479,26 @@ public static class PawnUtil
         return MapRole.Visiting;
     }
 
-    public static string GetPrisonerSlaveStatus(this Pawn pawn)
+    public static string GetPrisonerSlaveStatus(this Pawn pawn,
+        Service.PromptService.InfoLevel infoLevel = Service.PromptService.InfoLevel.Normal)
     {
         if (pawn == null) return null;
 
         var lines = new List<string>();
+        // The word carries the meaning; the raw number only earns its tokens at Full detail.
+        bool showRaw = infoLevel == Service.PromptService.InfoLevel.Full;
 
         if (pawn.IsPrisoner)
         {
             float resistance = pawn.guest.resistance;
-            lines.Add($"Resistance: {resistance:0.0} ({Describer.Resistance(resistance)})");
+            lines.Add(showRaw
+                ? $"Resistance: {resistance:0.0} ({Describer.Resistance(resistance)})"
+                : $"Resistance: {Describer.Resistance(resistance)}");
 
             float will = pawn.guest.will;
-            lines.Add($"Will: {will:0.0} ({Describer.Will(will)})");
+            lines.Add(showRaw
+                ? $"Will: {will:0.0} ({Describer.Will(will)})"
+                : $"Will: {Describer.Will(will)}");
         }
         else if (pawn.IsSlave)
         {
@@ -478,7 +506,9 @@ public static class PawnUtil
             if (suppressionNeed != null)
             {
                 float suppression = suppressionNeed.CurLevelPercentage * 100f;
-                lines.Add($"Suppression: {suppression:0.0}% ({Describer.Suppression(suppression)})");
+                lines.Add(showRaw
+                    ? $"Suppression: {suppression:0.0}% ({Describer.Suppression(suppression)})"
+                    : $"Suppression: {Describer.Suppression(suppression)}");
             }
         }
 
@@ -493,12 +523,15 @@ public static class PawnUtil
 
     public static bool IsPlayer(this Pawn pawn)
     {
-        return pawn == Cache.GetPlayer();
+        // Cache.GetPlayer() is null until the invisible player pawn exists, and without the
+        // guard every null pawn would count as "the player".
+        return pawn != null && pawn == Cache.GetPlayer();
     }
 
     public static bool HasVocalLink(this Pawn pawn)
     {
         return Settings.Get().AllowNonHumanToTalk &&
+               pawn?.health?.hediffSet != null &&
                pawn.health.hediffSet.HasHediff(Constant.VocalLinkDef);
     }
 }

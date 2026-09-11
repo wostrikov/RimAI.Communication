@@ -46,7 +46,9 @@ public static class TalkService
         }
 
         List<Pawn> nearbyPawns = PawnSelector.GetAllNearByPawns(talkRequest.Initiator);
-        if (talkRequest.Recipient.IsPlayer()) nearbyPawns.Insert(0, talkRequest.Recipient);
+        // The recipient may have just been nulled above; a null must not reach nearbyPawns.
+        if (talkRequest.Recipient != null && talkRequest.Recipient.IsPlayer())
+            nearbyPawns.Insert(0, talkRequest.Recipient);
         var (status, isInDanger) = talkRequest.Initiator.GetPawnStatusFull(nearbyPawns);
         
         // Avoid spamming generations if the pawn's status hasn't changed recently.
@@ -180,10 +182,16 @@ public static class TalkService
 
             if (pawnState.TalkResponses.Empty()) continue;
 
-            var talk = pawnState.TalkResponses.First();
+            // Danger first: a calm line queued before the raid must not be the next thing said.
+            bool inDanger = pawn.IsInDanger();
+            if (inDanger)
+                pawnState.IgnoreAllTalkResponses([TalkType.Urgent, TalkType.User]);
+
+            var talk = pawnState.TalkResponses.FirstOrDefault();
             if (talk == null)
             {
-                pawnState.TalkResponses.RemoveAt(0);
+                if (!pawnState.TalkResponses.Empty())
+                    pawnState.TalkResponses.RemoveAt(0);
                 continue;
             }
 
@@ -194,12 +202,7 @@ public static class TalkService
                 continue;
             }
 
-            int replyInterval = CommunicationSettings.ReplyInterval;
-            if (pawn.IsInDanger())
-            {
-                replyInterval = 2;
-                pawnState.IgnoreAllTalkResponses([TalkType.Urgent, TalkType.User]);
-            }
+            int replyInterval = inDanger ? 2 : CommunicationSettings.ReplyInterval;
 
             // Enforce a delay for replies to make conversations feel more natural.
             int parentTalkTick = TalkHistory.GetSpokenTick(talk.ParentTalkId);
