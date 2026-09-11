@@ -70,6 +70,9 @@ internal static class ProviderOrchestrationTests
         T(CommunicationFailureClassifier.FromOpenAICategory(OpenAIErrorCategory.Authentication) == CommunicationFailureClass.Authentication, "classify-openai-auth");
         T(CommunicationFailureClassifier.FromException(new TimeoutException("x")) == CommunicationFailureClass.Timeout, "classify-timeout");
         T(CommunicationFailureClassifier.FromException(new OperationCanceledException()) == CommunicationFailureClass.Cancelled, "classify-cancel");
+        T(CommunicationFailureClassifier.FromErrorKind("arbiter_reset") == CommunicationFailureClass.Cancelled, "classify-arbiter-reset");
+        T(CommunicationFailureClassifier.FromErrorKind("arbiter_cancelled") == CommunicationFailureClass.Cancelled, "classify-arbiter-cancelled");
+        T(CommunicationFailureClassifier.FromErrorKind("arbiter_queue_full") != CommunicationFailureClass.Cancelled, "arbiter-queue-full-is-not-cancel");
 
         var invoked = new List<string>();
         var primary = Run(Chain(google, deepseek), slot =>

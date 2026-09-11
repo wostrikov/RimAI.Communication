@@ -62,6 +62,15 @@ public class OpenAIClient(
             throw new QuotaExceededException(shared.Error ?? "Quota exceeded",
                 new Payload(_endpointUrl, model, jsonContent, shared.RawPayload, 0, shared.Error));
         }
+        if (!shared.Succeeded &&
+            Ustas.RimAI.Communication.Client.ProviderPolicy.CommunicationFailureClassifier.FromErrorKind(shared.ErrorKind)
+                == Ustas.RimAI.Communication.Client.ProviderPolicy.CommunicationFailureClass.Cancelled)
+        {
+            // Dropped before it ran - a session reset on load, or its caller cancelled. That
+            // is a cancellation, and callers treat it as one; as an AIRequestException it
+            // surfaced as a failed request whose message was the reset reason ("full").
+            throw new OperationCanceledException(shared.Error ?? "Request was cancelled");
+        }
         if (!shared.Succeeded)
         {
             throw new AIRequestException(shared.Error ?? "Request failed",

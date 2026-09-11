@@ -49,6 +49,10 @@ public static class CommunicationFailureClassifier
                 return CommunicationFailureClass.EmptyResponse;
             case "cancelled":
             case "canceled":
+            // The shared request arbiter dropped the request before it ran: its caller
+            // cancelled, or the game session was reset under it (a save being loaded).
+            case "arbiter_cancelled":
+            case "arbiter_reset":
                 return CommunicationFailureClass.Cancelled;
             case "timeout":
                 return CommunicationFailureClass.Timeout;
