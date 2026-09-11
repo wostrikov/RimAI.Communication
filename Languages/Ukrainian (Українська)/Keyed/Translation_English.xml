@@ -284,6 +284,8 @@
   <RimTalk.Settings.IncludeCleanliness>Чистота</RimTalk.Settings.IncludeCleanliness>
   <RimTalk.Settings.IncludeSurroundings>Предмети поблизу</RimTalk.Settings.IncludeSurroundings>
   <RimTalk.Settings.IncludeWealth>Багатство колонії</RimTalk.Settings.IncludeWealth>
+  <RimTalk.Settings.IncludeTopicKeywords>Ключові слова теми</RimTalk.Settings.IncludeTopicKeywords>
+  <RimTalk.Settings.IncludeTopicKeywords.Tooltip>У половині випадків розмова без власного запиту отримує кут і тему для початку (наприклад, ностальгія і рідне місто), щоб ті самі пішаки не ходили по колу тих самих кількох реплік.</RimTalk.Settings.IncludeTopicKeywords.Tooltip>
   <RimTalk.DebugWindow.ViewByTime>За часом</RimTalk.DebugWindow.ViewByTime>
   <RimTalk.DebugWindow.ViewByPawn>За персонажем</RimTalk.DebugWindow.ViewByPawn>
   <RimTalk.DebugWindow.ViewTalkRequests>Запити на розмову</RimTalk.DebugWindow.ViewTalkRequests>

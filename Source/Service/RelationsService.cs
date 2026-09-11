@@ -46,28 +46,32 @@ public static class RelationsService
                 }
 
                 // --- Step 3: If no other label found, fall back to opinion-based relationship ---
+                bool isOpinionFallback = false;
                 if (string.IsNullOrEmpty(label) && !pawn.IsVisitor() && !pawn.IsEnemy())
                 {
+                    isOpinionFallback = true;
                     if (opinionValue >= FriendOpinionThreshold)
                     {
-                        label = "Friend".Translate();
+                        label = "Friend";
                     }
                     else if (opinionValue <= RivalOpinionThreshold)
                     {
-                        label = "Rival".Translate();
+                        label = "Rival";
                     }
                     else
                     {
-                        label = "Acquaintance".Translate();
+                        label = "Acquaintance";
                     }
                 }
 
                 // If we found any relevant relationship, add it to the string.
                 if (!string.IsNullOrEmpty(label))
                 {
+                    // A label that came from the opinion already says it; "(Friend) friendly" says nothing more.
                     string pawnName = otherPawn.LabelShort;
-                    string opinion = opinionValue.ToStringWithSign();
-                    relationsSb.Append($"{pawnName}({label}) {opinion}, ");
+                    relationsSb.Append(isOpinionFallback
+                        ? $"{pawnName}({label}), "
+                        : $"{pawnName}({label}) {Describer.Opinion(opinionValue)}, ");
                 }
             }
             // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — prompt relation labels must not abort nearby-pawn context
@@ -117,11 +121,12 @@ public static class RelationsService
             if ((!otherPawn.RaceProps.Humanlike && !otherPawn.HasVocalLink()) || otherPawn.Dead ||
                 otherPawn.relations is { hidePawnRelations: true }) continue;
 
-            if (TryGetSocialLabel(pawn, otherPawn, out var label, out var opinionValue))
+            if (TryGetSocialLabel(pawn, otherPawn, out var label, out var opinionValue, out var isOpinionFallback))
             {
                 string pawnName = otherPawn.LabelShort;
-                string opinion = opinionValue.ToStringWithSign();
-                relationsSb.Append($"{pawnName}({label}) {opinion}, ");
+                relationsSb.Append(isOpinionFallback
+                    ? $"{pawnName}({label}), "
+                    : $"{pawnName}({label}) {Describer.Opinion(opinionValue)}, ");
             }
         }
 
@@ -218,27 +223,29 @@ public static class RelationsService
         // Master relationship
         if ((pawn.IsPrisoner || pawn.IsSlave) && otherPawn.IsFreeNonSlaveColonist)
         {
-            return "Master".Translate();
+            return "Master";
         }
 
         // Prisoner or slave labels
-        if (otherPawn.IsPrisoner) return "Prisoner".Translate();
-        if (otherPawn.IsSlave) return "Slave".Translate();
+        if (otherPawn.IsPrisoner) return "Prisoner";
+        if (otherPawn.IsSlave) return "Slave";
 
         // Hostile relationship
         if (pawn.Faction != null && otherPawn.Faction != null && pawn.Faction.HostileTo(otherPawn.Faction))
         {
-            return "Enemy".Translate();
+            return "Enemy";
         }
 
         // No special status found
         return null;
     }
 
-    private static bool TryGetSocialLabel(Pawn pawn, Pawn otherPawn, out string label, out float opinionValue)
+    private static bool TryGetSocialLabel(Pawn pawn, Pawn otherPawn, out string label, out float opinionValue,
+        out bool isOpinionFallback)
     {
         label = null;
         opinionValue = 0f;
+        isOpinionFallback = false;
 
         try
         {
@@ -264,17 +271,18 @@ public static class RelationsService
 
         if (string.IsNullOrEmpty(label) && !pawn.IsVisitor() && !pawn.IsEnemy())
         {
+            isOpinionFallback = true;
             if (opinionValue >= FriendOpinionThreshold)
             {
-                label = "Friend".Translate();
+                label = "Friend";
             }
             else if (opinionValue <= RivalOpinionThreshold)
             {
-                label = "Rival".Translate();
+                label = "Rival";
             }
             else
             {
-                label = "Acquaintance".Translate();
+                label = "Acquaintance";
             }
         }
 

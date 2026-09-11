@@ -16,6 +16,11 @@
     <Compile Include="..\Source\Prompt\PresetDtoJsonCodec.cs" Link="PresetDtoJsonCodec.cs" />
     <Compile Include="..\Source\Data\PersonaGeneratePersistPolicy.cs" Link="PersonaGeneratePersistPolicy.cs" />
     <Compile Include="..\Source\Policy\TalkLifeStagePolicy.cs" Link="TalkLifeStagePolicy.cs" />
+    <Compile Include="..\Source\Service\BusyGate.cs" Link="BusyGate.cs" />
+    <None Include="..\Source\Data\PawnState.cs" Link="PawnState.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\TalkService.cs" Link="TalkService.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Util\Describer.cs" Link="Describer.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\RelationsService.cs" Link="RelationsService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Error\AIErrorHandler.cs" Link="AIErrorHandler.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\PersonaService.cs" Link="PersonaService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\AIService.cs" Link="AIService.cs.src" CopyToOutputDirectory="PreserveNewest" />

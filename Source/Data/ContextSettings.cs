@@ -34,6 +34,9 @@ namespace Ustas.RimAI.Communication.Data
         public bool IncludeSurroundings = false;
         public bool IncludeWealth = false;
 
+        // Dialogue
+        public bool IncludeTopicKeywords = true;
+
         public void ExposeData()
         {
             Scribe_Values.Look(ref EnableContextOptimization, "EnableContextOptimization", false);
@@ -62,6 +65,7 @@ namespace Ustas.RimAI.Communication.Data
             Scribe_Values.Look(ref IncludeCleanliness, "IncludeCleanliness", false);
             Scribe_Values.Look(ref IncludeSurroundings, "IncludeSurroundings", false);
             Scribe_Values.Look(ref IncludeWealth, "IncludeWealth", false);
+            Scribe_Values.Look(ref IncludeTopicKeywords, "IncludeTopicKeywords", true);
         }
     }
 }

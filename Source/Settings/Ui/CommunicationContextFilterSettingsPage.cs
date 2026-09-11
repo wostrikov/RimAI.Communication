@@ -54,7 +54,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 IncludeBeauty = false,
                 IncludeCleanliness = false,
                 IncludeSurroundings = false,
-                IncludeWealth = false
+                IncludeWealth = false,
+                IncludeTopicKeywords = false
             }},
             { ContextPreset.Standard, new ContextSettings {
                 EnableContextOptimization = false,
@@ -83,7 +84,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 IncludeBeauty = false,
                 IncludeCleanliness = false,
                 IncludeSurroundings = false,
-                IncludeWealth = false
+                IncludeWealth = false,
+                IncludeTopicKeywords = true
             }},
             { ContextPreset.Comprehensive, new ContextSettings {
                 EnableContextOptimization = false,
@@ -112,7 +114,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 IncludeBeauty = true,
                 IncludeCleanliness = true,
                 IncludeSurroundings = true,
-                IncludeWealth = true
+                IncludeWealth = true,
+                IncludeTopicKeywords = true
             }}
         };
 
@@ -287,6 +290,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
             rightListing.CheckboxLabeled("RimTalk.Settings.IncludeCleanliness".Translate(), ref context.IncludeCleanliness);
             rightListing.CheckboxLabeled("RimTalk.Settings.IncludeSurroundings".Translate(), ref context.IncludeSurroundings);
             rightListing.CheckboxLabeled("RimTalk.Settings.IncludeWealth".Translate(), ref context.IncludeWealth);
+            rightListing.CheckboxLabeled("RimTalk.Settings.IncludeTopicKeywords".Translate(), ref context.IncludeTopicKeywords,
+                "RimTalk.Settings.IncludeTopicKeywords.Tooltip".Translate());
 
             rightListing.End();
 

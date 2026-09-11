@@ -175,10 +175,29 @@ public static class ContextBuilder
         if (!contextSettings.IncludeSkills)
             return null;
 
-        var skills = pawn.skills?.skills?.Select(s => $"{s.def.label}: {s.Level}");
-        if (skills?.Any() == true)
-            return $"Skills: {string.Join(", ", skills)}";
-        return null;
+        var records = pawn.skills?.skills;
+        if (records == null || records.Count == 0)
+            return null;
+
+        // Grouped by proficiency tier, so a small model reads who is good at what at a glance
+        // instead of parsing a dozen "skill: level" pairs. Passion comes from vanilla's own
+        // label, which picks up a mod's custom passion tier too.
+        bool showPassion = infoLevel != PromptService.InfoLevel.Short;
+        var groups = records
+            .GroupBy(s => s.LevelDescriptor)
+            .OrderByDescending(g => g.Max(s => s.Level))
+            .Select(g =>
+            {
+                var names = g.Select(s =>
+                {
+                    string passion = showPassion && s.passion != Passion.None ? s.passion.GetLabel() : null;
+                    return string.IsNullOrEmpty(passion) ? s.def.label : $"{s.def.label} ({passion})";
+                });
+                return $"{g.Key}: {string.Join(", ", names)}";
+            });
+
+        // One line, tiers separated by semicolons, so a tier like "Beginner:" is not read as a field.
+        return $"Skills: {string.Join("; ", groups)}";
     }
 
     public static string GetHealthContext(Pawn pawn, PromptService.InfoLevel infoLevel)
@@ -221,7 +240,9 @@ public static class ContextBuilder
                 ? "Critical: Downed (in pain/distress)"
                 : pawn.InMentalState
                     ? $"Mood: {pawn.MentalState?.InspectLine} (in mental break)"
-                    : $"Mood: {m.MoodString} ({(int)(m.CurLevelPercentage * 100)}%)";
+                    : infoLevel == PromptService.InfoLevel.Full
+                        ? $"Mood: {m.MoodString} ({(int)(m.CurLevelPercentage * 100)}%)"
+                        : $"Mood: {m.MoodString}";
             return mood;
         }
 
@@ -269,7 +290,7 @@ public static class ContextBuilder
         if (!contextSettings.IncludePrisonerSlaveStatus || (!pawn.IsSlave && !pawn.IsPrisoner))
             return null;
 
-        return pawn.GetPrisonerSlaveStatus();
+        return pawn.GetPrisonerSlaveStatus(infoLevel);
     }
 
     public static string GetRelationsContext(Pawn pawn, PromptService.InfoLevel infoLevel)
@@ -289,15 +310,34 @@ public static class ContextBuilder
 
         var equipment = new List<string>();
         if (pawn.equipment?.Primary != null)
-            equipment.Add($"Weapon: {pawn.equipment.Primary.LabelCap}");
+            equipment.Add($"Weapon: {DescribeThingLabel(pawn.equipment.Primary)}");
 
-        var apparelLabels = pawn.apparel?.WornApparel?.Select(a => a.LabelCap);
+        var apparelLabels = pawn.apparel?.WornApparel?.Select(DescribeThingLabel).ToList();
         if (apparelLabels?.Any() == true)
             equipment.Add($"Apparel: {string.Join(", ", apparelLabels)}");
 
         if (equipment.Any())
             return $"Equipment: {string.Join(", ", equipment)}";
         return null;
+    }
+
+    /// <summary>
+    /// The thing's label with its wear as a word ("damaged") instead of vanilla's "(84%)". Quality
+    /// and comp label overrides stay; the condition folds into an existing parenthetical.
+    /// </summary>
+    private static string DescribeThingLabel(Thing thing)
+    {
+        string label = thing.GetCustomLabelNoCount(includeHp: false).CapitalizeFirst(thing.def);
+
+        if (thing.def.useHitPoints && thing.def.stackLimit == 1 && thing.HitPoints < thing.MaxHitPoints)
+        {
+            string condition = Describer.Condition((float)thing.HitPoints / thing.MaxHitPoints * 100f);
+            label = label.EndsWith(")")
+                ? $"{label.Substring(0, label.Length - 1)}, {condition})"
+                : $"{label} ({condition})";
+        }
+
+        return label;
     }
 
     public static void BuildDialogueType(StringBuilder sb, TalkRequest talkRequest, List<Pawn> pawns, string shortName, Pawn mainPawn)
@@ -326,11 +366,8 @@ public static class ContextBuilder
         }
         else
         {
-            if (pawns.Count == 1)
-            {
-                intentSb.Append($"{shortName} short monologue");
-            }
-            else if (mainPawn.IsInCombat() || mainPawn.GetMapRole() == MapRole.Invading)
+            // Combat first: a pawn fighting alone is in combat, not musing to itself.
+            if (mainPawn.IsInCombat() || mainPawn.GetMapRole() == MapRole.Invading)
             {
                 if (talkRequest.TalkType != TalkType.Urgent && !mainPawn.InMentalState)
                     talkRequest.Prompt = null;
@@ -339,6 +376,10 @@ public static class ContextBuilder
                 intentSb.Append(mainPawn.IsSlave || mainPawn.IsPrisoner
                     ? $"{shortName} dialogue short (worry)"
                     : $"{shortName} dialogue short, urgent tone ({mainPawn.GetMapRole().ToString().ToLower()}/command)");
+            }
+            else if (pawns.Count == 1)
+            {
+                intentSb.Append($"{shortName} short monologue");
             }
             else
             {
@@ -351,6 +392,14 @@ public static class ContextBuilder
                 topicSb.Append("(downed in pain. Short, strained dialogue)");
             else if (talkRequest.Prompt != null)
                 topicSb.Append(talkRequest.Prompt);
+            else if (talkRequest.TalkType != TalkType.Urgent && Settings.Get().Context.IncludeTopicKeywords)
+            {
+                // Without a prompt of its own, a talk gets a fresh angle and subject half the time,
+                // which is what keeps the same pair from circling the same few remarks.
+                string topicKeywords = TopicService.TryGetTopic(mainPawn);
+                if (topicKeywords != null)
+                    topicSb.Append($"Topic keywords: {topicKeywords}.");
+            }
 
             sb.Append(intentSb);
             if (topicSb.Length > 0)
@@ -397,13 +446,12 @@ public static class ContextBuilder
 
         if (contextSettings.IncludeBeauty)
         {
-            var nearbyCells = ContextHelper.GetNearbyCells(mainPawn);
-            if (nearbyCells.Count > 0)
+            var beautyLabel = Describer.Beauty(mainPawn);
+            if (!string.IsNullOrEmpty(beautyLabel))
             {
-                var beautySum = nearbyCells.Sum(c => BeautyUtility.CellBeauty(c, mainPawn.Map));
                 var value = ContextHookRegistry.ApplyPawnHooks(
-                    ContextCategories.Pawn.Beauty, mainPawn, Describer.Beauty(beautySum / nearbyCells.Count));
-                sb.Append($"\nCellBeauty: {value}");
+                    ContextCategories.Pawn.Beauty, mainPawn, beautyLabel);
+                sb.Append($"\nSurroundings beauty: {value}");
             }
         }
 
