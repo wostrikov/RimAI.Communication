@@ -169,6 +169,8 @@
   <RimTalk.Settings.AllowCustomConversationTooltip>Дозволяє починати власні діалоги між персонажами або безпосередньо розмовляти з персонажем, написавши власні репліки. Клацніть правою кнопкою миші персонажа, щоб почати розмову.</RimTalk.Settings.AllowCustomConversationTooltip>
   <RimTalk.Settings.ContinueDialogueWhileSleeping>Продовжувати діалог під час сну</RimTalk.Settings.ContinueDialogueWhileSleeping>
   <RimTalk.Settings.ContinueDialogueWhileSleepingTooltip>Якщо ввімкнено, персонажі продовжуватимуть промовляти всі згенеровані репліки, навіть якщо заснуть.</RimTalk.Settings.ContinueDialogueWhileSleepingTooltip>
+  <RimTalk.Settings.EnableSleepDialogue>Репліки перед сном і після пробудження</RimTalk.Settings.EnableSleepDialogue>
+  <RimTalk.Settings.EnableSleepDialogueTooltip>Раз за ніч пішак, лягаючи спати, кидає коротке сонне слово, а прокинувшись — ранкове: тому, хто поруч, або самому собі.</RimTalk.Settings.EnableSleepDialogueTooltip>
   <RimTalk.Settings.AllowMonologue>Дозволити монологи</RimTalk.Settings.AllowMonologue>
   <RimTalk.Settings.AllowMonologueTooltip>Коли ввімкнено, персонажі можуть генерувати монологи за допомогою ШІ, навіть якщо поблизу немає інших персонажів.</RimTalk.Settings.AllowMonologueTooltip>
   <RimTalk.Settings.AllowSlavesToTalk>Дозволити рабам розмовляти</RimTalk.Settings.AllowSlavesToTalk>
@@ -286,6 +288,8 @@
   <RimTalk.Settings.IncludeWealth>Багатство колонії</RimTalk.Settings.IncludeWealth>
   <RimTalk.Settings.IncludeTopicKeywords>Ключові слова теми</RimTalk.Settings.IncludeTopicKeywords>
   <RimTalk.Settings.IncludeTopicKeywords.Tooltip>У половині випадків розмова без власного запиту отримує кут і тему для початку (наприклад, ностальгія і рідне місто), щоб ті самі пішаки не ходили по колу тих самих кількох реплік.</RimTalk.Settings.IncludeTopicKeywords.Tooltip>
+  <RimTalk.Settings.IncludeStoryThreads>Сюжетні нитки</RimTalk.Settings.IncludeStoryThreads>
+  <RimTalk.Settings.IncludeStoryThreads.Tooltip>Історія, чутка чи зізнання, які розповів пішак, можуть лишитися відкритими: згодом хтось, хто це чув, продовжує — що було далі, несподіваний поворот, нова чутка, — а за кілька переказів хтось розповідає, чим усе скінчилося. Не більше п'яти одночасно; нитку, про яку десять днів мовчать, забувають.</RimTalk.Settings.IncludeStoryThreads.Tooltip>
   <RimTalk.DebugWindow.ViewByTime>За часом</RimTalk.DebugWindow.ViewByTime>
   <RimTalk.DebugWindow.ViewByPawn>За персонажем</RimTalk.DebugWindow.ViewByPawn>
   <RimTalk.DebugWindow.ViewTalkRequests>Запити на розмову</RimTalk.DebugWindow.ViewTalkRequests>

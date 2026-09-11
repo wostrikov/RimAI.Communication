@@ -87,7 +87,8 @@ internal static class TickManagerPatch
                     continue;
                 }
 
-                if (!request.TalkType.IsFromUser()) break;
+                // Bedtime and waking lines ride this pool too: they have a moment, and a normal slot would miss it.
+                if (!request.TalkType.IsFromUser() && request.TalkType != TalkType.Sleep) break;
 
                 if (TalkService.GenerateTalk(request))
                     UserRequestPool.Remove(pawn);
@@ -160,5 +161,6 @@ internal static class TickManagerPatch
         _initialCacheRefresh = false;
         _lastTalkEndTick = GenTicks.TicksGame;
         TopicService.Reset();
+        SleepDialogueTracker.Reset();
     }
 }

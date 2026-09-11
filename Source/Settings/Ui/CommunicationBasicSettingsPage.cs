@@ -93,6 +93,10 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
             ref settings.ContinueDialogueWhileSleeping,
             "RimTalk.Settings.ContinueDialogueWhileSleepingTooltip".Translate().ToString());
         leftListing.Gap(6f);
+        leftListing.CheckboxLabeled("RimTalk.Settings.EnableSleepDialogue".Translate().ToString(),
+            ref settings.EnableSleepDialogue,
+            "RimTalk.Settings.EnableSleepDialogueTooltip".Translate().ToString());
+        leftListing.Gap(6f);
         leftListing.CheckboxLabeled("RimTalk.Settings.ApplyMoodAndSocialEffects".Translate().ToString(),
             ref settings.ApplyMoodAndSocialEffects,
             "RimTalk.Settings.ApplyMoodAndSocialEffectsTooltip".Translate().ToString());
@@ -240,6 +244,7 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
             settings.PlayerDialogueMode = Settings.PlayerDialogueMode.Manual;
             settings.PlayerName = "Player";
             settings.ContinueDialogueWhileSleeping = false;
+            settings.EnableSleepDialogue = true;
             settings.ApplyMoodAndSocialEffects = false;
             settings.UseSimpleConfig = true;
             settings.DisableAiAtSpeed = 0;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Policy;
 using Verse;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
 
@@ -19,22 +20,50 @@ public static class TopicService
     private static Queue<string> _subjectDeck = new();
 
     /// <summary>
+    /// What a talk without its own prompt is given to start from: a story thread this pawn
+    /// heard, to carry on, or else a topic - and a storytelling topic asks for a story that
+    /// can be picked up later. Null when it gets nothing this time.
+    /// </summary>
+    public static string DrawHint(TalkRequest talkRequest, Pawn mainPawn)
+    {
+        var context = Settings.Get().Context;
+        if (context.IncludeStoryThreads && StoryThreadService.TryPickContinuation(mainPawn, out var thread))
+        {
+            talkRequest.StoryThreadId = thread.Id;
+            return StoryThreadPolicy.ContinuationInstruction(thread.Steps, thread.Teller, thread.Subject, thread.Summary);
+        }
+
+        if (!context.IncludeTopicKeywords || !TryGetTopic(mainPawn, out var approach, out var subject))
+            return null;
+
+        string hint = $"Topic keywords: [{approach}, {subject}].";
+        if (context.IncludeStoryThreads && StoryThreadPolicy.OpensThread(approach, subject))
+        {
+            talkRequest.StoryOpening = subject;
+            hint += " " + StoryThreadPolicy.OpeningInstruction(approach, subject);
+        }
+        return hint;
+    }
+
+    /// <summary>
     /// A topic half the time, and always for a pawn's first talk. Animals, mechanoids, entities
     /// and mutants never get a human narrative topic.
     /// </summary>
-    public static string TryGetTopic(Pawn pawn = null)
+    public static bool TryGetTopic(Pawn pawn, out string approach, out string subject)
     {
+        approach = null;
+        subject = null;
         if (pawn != null && (!pawn.RaceProps.Humanlike || pawn.IsMutant))
-            return null;
+            return false;
 
         lock (Lock)
         {
             bool isFirstTalk = pawn != null && Cache.Get(pawn)?.LastTalkTick == 0;
-            if (!isFirstTalk && Rng.NextDouble() >= 0.50) return null;
+            if (!isFirstTalk && Rng.NextDouble() >= 0.50) return false;
             EnsureDecks();
-            string approach = Draw(_approachDeck) ?? "casual remark";
-            string subject = Draw(_subjectDeck) ?? "daily life";
-            return $"[{approach}, {subject}]";
+            approach = Draw(_approachDeck) ?? "casual remark";
+            subject = Draw(_subjectDeck) ?? "daily life";
+            return true;
         }
     }
 

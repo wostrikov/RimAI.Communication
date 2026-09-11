@@ -14,8 +14,29 @@ public enum RequestStatus
     Expired
 }
 
+public enum SleepDialogueKind
+{
+    None,
+    Bedtime,
+    WakeUp
+}
+
 public class TalkRequest(string prompt, Pawn initiator, Pawn recipient = null, TalkType talkType = TalkType.Other)
 {
+    public SleepDialogueKind SleepDialogueKind { get; set; }
+
+    /// <summary>
+    /// The topic, story opening or story continuation this talk was given - drawn once, since the
+    /// dialogue type is built twice per talk and a second draw would hand each a different one.
+    /// </summary>
+    public string TopicHint { get; set; }
+    public bool TopicHintDrawn { get; set; }
+
+    /// <summary>The story thread this talk continues, if any.</summary>
+    public string StoryThreadId { get; set; }
+
+    /// <summary>The subject of a story this talk was asked to open, if any.</summary>
+    public string StoryOpening { get; set; }
     public TalkType TalkType { get; set; } = talkType;
     public string Context { get; set; }
     public string Prompt { get; set; } = prompt;
@@ -46,8 +67,10 @@ public class TalkRequest(string prompt, Pawn initiator, Pawn recipient = null, T
 
     public bool IsExpired()
     {
-        int duration = 20;
         if (TalkType.IsFromUser()) return false;
+        if (TalkType == TalkType.Sleep)
+            return GenTicks.TicksGame - CreatedTick > 5000;
+        int duration = 20;
         if (TalkType == TalkType.Urgent)
         {
             duration = 5;

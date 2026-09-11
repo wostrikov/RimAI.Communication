@@ -11,6 +11,7 @@ public enum TalkType
     QuestEnd,
     Thought,
     User,
+    Sleep,
     Other
 }
 

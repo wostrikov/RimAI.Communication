@@ -55,7 +55,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 IncludeCleanliness = false,
                 IncludeSurroundings = false,
                 IncludeWealth = false,
-                IncludeTopicKeywords = false
+                IncludeTopicKeywords = false,
+                IncludeStoryThreads = false
             }},
             { ContextPreset.Standard, new ContextSettings {
                 EnableContextOptimization = false,
@@ -85,7 +86,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 IncludeCleanliness = false,
                 IncludeSurroundings = false,
                 IncludeWealth = false,
-                IncludeTopicKeywords = true
+                IncludeTopicKeywords = true,
+                IncludeStoryThreads = true
             }},
             { ContextPreset.Comprehensive, new ContextSettings {
                 EnableContextOptimization = false,
@@ -115,7 +117,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 IncludeCleanliness = true,
                 IncludeSurroundings = true,
                 IncludeWealth = true,
-                IncludeTopicKeywords = true
+                IncludeTopicKeywords = true,
+                IncludeStoryThreads = true
             }}
         };
 
@@ -292,6 +295,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
             rightListing.CheckboxLabeled("RimTalk.Settings.IncludeWealth".Translate(), ref context.IncludeWealth);
             rightListing.CheckboxLabeled("RimTalk.Settings.IncludeTopicKeywords".Translate(), ref context.IncludeTopicKeywords,
                 "RimTalk.Settings.IncludeTopicKeywords.Tooltip".Translate());
+            rightListing.CheckboxLabeled("RimTalk.Settings.IncludeStoryThreads".Translate(), ref context.IncludeStoryThreads,
+                "RimTalk.Settings.IncludeStoryThreads.Tooltip".Translate());
 
             rightListing.End();
 

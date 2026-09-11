@@ -188,6 +188,8 @@ Crucial Tips:
     <RimTalk.Settings.AllowCustomConversationTooltip>Allows you to start custom dialogues between characters or talk directly to a character by writing your own lines. Right-click a pawn to begin a conversation.</RimTalk.Settings.AllowCustomConversationTooltip>
     <RimTalk.Settings.ContinueDialogueWhileSleeping>Continue Dialogue While Sleeping</RimTalk.Settings.ContinueDialogueWhileSleeping>
     <RimTalk.Settings.ContinueDialogueWhileSleepingTooltip>If enabled, pawns will continue speaking all generated lines even if they fall asleep.</RimTalk.Settings.ContinueDialogueWhileSleepingTooltip>
+    <RimTalk.Settings.EnableSleepDialogue>Bedtime and Waking Remarks</RimTalk.Settings.EnableSleepDialogue>
+    <RimTalk.Settings.EnableSleepDialogueTooltip>Once a night, a pawn going to bed says a brief sleepy word, and one getting up says a waking one - to whoever is nearby, or to nobody.</RimTalk.Settings.EnableSleepDialogueTooltip>
 
     <RimTalk.Settings.AllowMonologue>Allow Monologues</RimTalk.Settings.AllowMonologue>
     <RimTalk.Settings.AllowMonologueTooltip>When enabled, pawns may generate AI-driven monologues even when no other pawn is nearby.</RimTalk.Settings.AllowMonologueTooltip>
@@ -319,6 +321,8 @@ Crucial Tips:
     <RimTalk.Settings.IncludeWealth>Colony Wealth</RimTalk.Settings.IncludeWealth>
     <RimTalk.Settings.IncludeTopicKeywords>Topic keywords</RimTalk.Settings.IncludeTopicKeywords>
     <RimTalk.Settings.IncludeTopicKeywords.Tooltip>Half the time, a talk without a prompt of its own gets an angle and a subject to start from (for example nostalgia and hometown), so the same pawns do not keep circling the same few remarks.</RimTalk.Settings.IncludeTopicKeywords.Tooltip>
+    <RimTalk.Settings.IncludeStoryThreads>Story threads</RimTalk.Settings.IncludeStoryThreads>
+    <RimTalk.Settings.IncludeStoryThreads.Tooltip>A story, rumor or confession a pawn tells can stay open: later someone who heard it carries it on - what happened next, a twist, a new rumor - and after a few tellings someone says how it ended. Up to five at a time; one left untold for ten days is forgotten.</RimTalk.Settings.IncludeStoryThreads.Tooltip>
     
     <!-- DebugWindow.cs -->
     <RimTalk.DebugWindow.ViewByTime>By Time</RimTalk.DebugWindow.ViewByTime>

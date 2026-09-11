@@ -14,9 +14,16 @@ public class RimTalkWorldComponent(World world) : WorldComponent(world)
     public Dictionary<string, string> RimTalkInteractionTexts = new();
     private Queue<string> _keyInsertionOrder = new();
 
+    /// <summary>Stories the colony is still telling; see StoryThreadService.</summary>
+    public List<StoryThread> StoryThreads = new();
+
     public override void ExposeData()
     {
         base.ExposeData();
+
+        Scribe_Collections.Look(ref StoryThreads, "storyThreads", LookMode.Deep);
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            StoryThreads ??= new List<StoryThread>();
 
         try 
         {

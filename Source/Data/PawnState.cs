@@ -34,7 +34,8 @@ public class PawnState(Pawn pawn)
     public string Personality => PersonaService.GetPersonality(Pawn);
     public double TalkInitiationWeight => PersonaService.GetTalkInitiationWeight(Pawn);
 
-    public void AddTalkRequest(string prompt, Pawn recipient = null, TalkType talkType = TalkType.Other)
+    public void AddTalkRequest(string prompt, Pawn recipient = null, TalkType talkType = TalkType.Other,
+        SleepDialogueKind sleepDialogueKind = SleepDialogueKind.None)
     {
         // 1. If Urgent, clear out less important active requests
         if (talkType == TalkType.Urgent)
@@ -56,13 +57,26 @@ public class PawnState(Pawn pawn)
         }
 
         // 2. Create and Enqueue
-        var newRequest = new TalkRequest(prompt, Pawn, recipient, talkType) { Status = RequestStatus.Pending };
+        var newRequest = new TalkRequest(prompt, Pawn, recipient, talkType)
+        {
+            Status = RequestStatus.Pending,
+            SleepDialogueKind = sleepDialogueKind
+        };
 
         if (talkType.IsFromUser())
         {
             TalkRequests.AddFirst(newRequest);
             IgnoreAllTalkResponses();
             Cache.Get(recipient)?.IgnoreAllTalkResponses();
+            UserRequestPool.Add(Pawn);
+        }
+        else if (talkType == TalkType.Sleep)
+        {
+            // A bedtime or waking line belongs to that moment: first in line, and taken
+            // through the request pool rather than waiting for the pawn's next turn to talk.
+            newRequest.IsMonologue = recipient == null;
+            TalkRequests.AddFirst(newRequest);
+            LastTalkTick = 0;
             UserRequestPool.Add(Pawn);
         }
         else if (talkType is TalkType.Event or TalkType.QuestOffer)

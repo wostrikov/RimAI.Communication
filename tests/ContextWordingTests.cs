@@ -34,7 +34,8 @@ internal static class ContextWordingTests
 
         T(builder.Contains("GroupBy(s => s.LevelDescriptor)"), "skills-grouped-by-tier");
         T(builder.Contains("DescribeThingLabel"), "equipment-condition-as-a-word");
-        T(builder.Contains("TopicService.TryGetTopic(mainPawn)"), "topic-keywords-offered");
+        T(builder.Contains("TopicService.DrawHint(talkRequest, mainPawn)"), "topic-keywords-offered");
+        T(builder.Contains("if (!talkRequest.TopicHintDrawn)"), "topic-drawn-once-per-talk");
         int combat = builder.IndexOf("mainPawn.IsInCombat() || mainPawn.GetMapRole() == MapRole.Invading", StringComparison.Ordinal);
         int monologue = builder.IndexOf("short monologue", StringComparison.Ordinal);
         T(combat >= 0 && monologue > combat, "combat-outranks-monologue");

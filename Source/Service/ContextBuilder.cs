@@ -392,13 +392,18 @@ public static class ContextBuilder
                 topicSb.Append("(downed in pain. Short, strained dialogue)");
             else if (talkRequest.Prompt != null)
                 topicSb.Append(talkRequest.Prompt);
-            else if (talkRequest.TalkType != TalkType.Urgent && Settings.Get().Context.IncludeTopicKeywords)
+            else if (talkRequest.TalkType != TalkType.Urgent)
             {
-                // Without a prompt of its own, a talk gets a fresh angle and subject half the time,
-                // which is what keeps the same pair from circling the same few remarks.
-                string topicKeywords = TopicService.TryGetTopic(mainPawn);
-                if (topicKeywords != null)
-                    topicSb.Append($"Topic keywords: {topicKeywords}.");
+                // Without a prompt of its own, a talk gets a fresh angle, or a story to carry on,
+                // which is what keeps the same pair from circling the same few remarks. Drawn once
+                // per request: this method runs twice per talk.
+                if (!talkRequest.TopicHintDrawn)
+                {
+                    talkRequest.TopicHintDrawn = true;
+                    talkRequest.TopicHint = TopicService.DrawHint(talkRequest, mainPawn);
+                }
+                if (talkRequest.TopicHint != null)
+                    topicSb.Append(talkRequest.TopicHint);
             }
 
             sb.Append(intentSb);

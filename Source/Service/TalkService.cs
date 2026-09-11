@@ -33,6 +33,9 @@ public static class TalkService
         if (settings.GetActiveConfig() == null) return false;
         if (AIService.IsBusy()) return false;
 
+        // A bedtime or waking line whose moment has passed is dropped; a live one is re-aimed at whoever is near now.
+        if (!SleepDialogueTracker.TryRefreshRequest(talkRequest)) return false;
+
         PawnState pawn1 = Cache.Get(talkRequest.Initiator);
         if (!talkRequest.TalkType.IsFromUser() && (pawn1 == null || !pawn1.CanGenerateTalk())) return false;
         
@@ -76,7 +79,11 @@ public static class TalkService
             .Take(settings.Context.MaxPawnContextCount)
             .ToList();
         
-        if (pawns.Count == 1) talkRequest.IsMonologue = true;
+        // A sleep line was aimed at whoever is nearby when it was refreshed; that decides it, not the headcount alone.
+        if (talkRequest.TalkType == TalkType.Sleep)
+            talkRequest.IsMonologue = pawns.Count == 1;
+        else if (pawns.Count == 1)
+            talkRequest.IsMonologue = true;
 
         if (!settings.AllowMonologue && talkRequest.IsMonologue && !talkRequest.TalkType.IsFromUser())
             return false;
@@ -135,6 +142,7 @@ public static class TalkService
 
             // Once the stream is complete, save the full conversation to history.
             AddResponsesToHistory(receivedResponses, talkRequest.Prompt);
+            StoryThreadService.Capture(talkRequest, receivedResponses);
         }
         catch (Exception ex)
         {
@@ -169,6 +177,9 @@ public static class TalkService
     /// </summary>
     public static void DisplayTalk(bool ignoreReplyInterval = false)
     {
+        // Story threads finished on the background thread are recorded here, on the main thread.
+        StoryThreadService.DrainCaptures();
+
         // Drain all pawns upfront so every pawn has a consistent view of TalkResponses for this tick cycle.
         foreach (Pawn pawn in Cache.Keys)
         {
