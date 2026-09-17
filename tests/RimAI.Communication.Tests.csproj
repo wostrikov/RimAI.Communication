@@ -35,6 +35,11 @@
     <None Include="..\Source\Patches\BubblePatch.cs" Link="BubblePatch.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Prompt\PromptManager.cs" Link="PromptManager.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Prompt\PresetSerializer.cs" Link="PresetSerializer.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Data\TalkRequest.cs" Link="TalkRequest.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Data\TalkRequestPool.cs" Link="TalkRequestPool.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Patches\ArchivePatch.cs" Link="ArchivePatch.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Patches\TickManagerPatch.cs" Link="TickManagerPatch.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Client\OpenAI\OpenAIStreamHandler.cs" Link="OpenAIStreamHandler.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj" />
   </ItemGroup>
 </Project>

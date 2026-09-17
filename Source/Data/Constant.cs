@@ -49,8 +49,10 @@ public static class Constant
                                                           "act": Insult, Slight, Chat, Kind
                                                           "target": targetName
                                                           """;
-    public const string DefaultCloudModel = "gemma-4-31b-it";
-    public const string FallbackCloudModel = "gemma-4-26b-a4b-it";
+    // The smaller model first: gemma-4-31b is often overloaded and answers slowly, so it is
+    // the fallback rather than the default.
+    public const string DefaultCloudModel = "gemma-4-26b-a4b-it";
+    public const string FallbackCloudModel = "gemma-4-31b-it";
     public const string ChooseModel = Ustas.RimAI.Communication.CommunicationCloudSettingsPersistence.SelectedModelDefault;
 
     public static string Lang =>

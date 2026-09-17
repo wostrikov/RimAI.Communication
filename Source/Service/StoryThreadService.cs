@@ -66,7 +66,7 @@ public static class StoryThreadService
         foreach (var pawn in (request.Participants ?? []).Append(request.Initiator).Append(request.Recipient))
             if (pawn != null) heard.Add(pawn.ThingID);
         foreach (var response in responses)
-            if (Cache.GetByName(response.Name)?.Pawn is { } speaker) heard.Add(speaker.ThingID);
+            if ((response.SpeakerPawn ?? Cache.GetByName(response.Name)?.Pawn) is { } speaker) heard.Add(speaker.ThingID);
 
         int now = GenTicks.TicksGame;
         string tellerId = request.Initiator?.ThingID;

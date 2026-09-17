@@ -25,6 +25,53 @@ public static class PromptService
 {
     public enum InfoLevel { Short, Normal, Full }
 
+    /// <summary>
+    /// The name a pawn goes by in a prompt: its short name, unless another talk-eligible pawn on the
+    /// map shares it - then with the surname, or failing that a number. Two colonists called Bob were
+    /// one person to the model, and a line meant for one went to whichever the cache found first.
+    /// Main thread only, since it walks the map's pawns; TalkRequest keeps what it returned for the
+    /// streaming thread.
+    /// </summary>
+    public static string GetUniqueName(Pawn pawn, List<Pawn> pawns = null)
+    {
+        if (pawn == null) return string.Empty;
+        var pool = pawn.Map?.mapPawns?.AllPawnsSpawned ?? pawns ?? Find.CurrentMap?.mapPawns?.AllPawnsSpawned;
+        if (pool == null) return pawn.LabelShort;
+
+        int dupIndex = 0, dupCount = 0;
+        for (int i = 0; i < pool.Count; i++)
+        {
+            var p = pool[i];
+            if (p == null || p.LabelShort != pawn.LabelShort || !p.IsTalkEligible()) continue;
+            dupCount++;
+            if (p.thingIDNumber <= pawn.thingIDNumber) dupIndex++;
+        }
+
+        if (dupCount <= 1) return pawn.LabelShort;
+        if (pawn.Name is NameTriple triple && !string.IsNullOrEmpty(triple.Last))
+        {
+            var fullName = $"{pawn.LabelShort} {triple.Last}";
+            int fullNameCount = 0;
+            for (int i = 0; i < pool.Count; i++)
+            {
+                var p = pool[i];
+                if (p != null && p.IsTalkEligible() && p.Name is NameTriple other && $"{p.LabelShort} {other.Last}" == fullName)
+                    fullNameCount++;
+            }
+            if (fullNameCount <= 1) return fullName;
+        }
+        return $"{pawn.LabelShort} {dupIndex}";
+    }
+
+    /// <summary>Puts a pawn's unique name where a context line starts with its short name.</summary>
+    private static string WithUniqueName(string text, Pawn pawn, List<Pawn> pawns)
+    {
+        var unique = GetUniqueName(pawn, pawns);
+        if (unique == pawn.LabelShort || string.IsNullOrEmpty(pawn.LabelShort) || text == null || !text.StartsWith(pawn.LabelShort))
+            return text;
+        return unique + text.Substring(pawn.LabelShort.Length);
+    }
+
     public static string BuildContext(List<Pawn> pawns, bool isAnnouncement = false)
     {
         TalkLifecycle.PublishContextBuildStarted(pawns);
@@ -42,7 +89,7 @@ public static class PromptService
                 if (Settings.Get().PlayerDialogueMode == Settings.PlayerDialogueMode.AIDriven &&
                     !string.IsNullOrWhiteSpace(playerPersona))
                 {
-                    string playerContext = $"{pawn.LabelShort} (Player)\nPersonality: {playerPersona.Trim()}";
+                    string playerContext = $"{GetUniqueName(pawn, pawns)} (Player)\nPersonality: {playerPersona.Trim()}";
                     var playerState = Cache.Get(pawn);
                     if (playerState != null) playerState.Context = playerContext;
                     context.AppendLine($"[P{i + 1}]").AppendLine(playerContext);
@@ -54,7 +101,7 @@ public static class PromptService
             // eight inside the budget a full context for each would blow.
             if (isAnnouncement && i > 0)
             {
-                var listenerContext = CreateMinimalListenerContext(pawn);
+                var listenerContext = WithUniqueName(CreateMinimalListenerContext(pawn), pawn, pawns);
                 var listenerState = Cache.Get(pawn);
                 if (listenerState != null) listenerState.Context = listenerContext;
                 context.AppendLine($"[P{i + 1}]").AppendLine(listenerContext);
@@ -63,7 +110,8 @@ public static class PromptService
 
             InfoLevel infoLevel = Settings.Get().Context.EnableContextOptimization 
                                   || i != 0 ? InfoLevel.Short : InfoLevel.Normal;
-            var pawnContext = CreatePawnContext(pawn, infoLevel);
+            // Replaced on the result rather than inside, so Harmony patches on CreatePawnContext still apply.
+            var pawnContext = WithUniqueName(CreatePawnContext(pawn, infoLevel), pawn, pawns);
             pawnContext = CommonUtil.StripFormattingTags(pawnContext);
 
             Cache.Get(pawn).Context = pawnContext;
@@ -224,7 +272,7 @@ public static class PromptService
         TalkLifecycle.PublishPromptDecorateStarted(pawns);
         var sb = new StringBuilder();
         var mainPawn = pawns[0];
-        var shortName = $"{mainPawn.LabelShort}";
+        var shortName = GetUniqueName(mainPawn, pawns);
 
         // Dialogue type
         ContextBuilder.BuildDialogueType(sb, talkRequest, pawns, shortName, mainPawn);

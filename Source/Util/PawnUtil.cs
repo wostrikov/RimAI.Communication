@@ -111,12 +111,25 @@ public static class PawnUtil
 
     public static bool IsVisitor(this Pawn pawn)
     {
-        // A hidden faction has no relation with the player, and asking for one logs RimWorld's
-        // "dummy relation" error - so it is neither a visitor nor an enemy.
-        if (pawn?.Faction == null || Faction.OfPlayer == null || pawn.Faction.IsPlayer || pawn.Faction.def.hidden)
+        if (pawn?.Faction == null || Faction.OfPlayer == null || pawn.Faction.IsPlayer)
             return false;
 
-        return !pawn.IsPrisoner && !pawn.HostileTo(Faction.OfPlayer);
+        return !pawn.IsPrisoner && !IsHostileToPlayer(pawn);
+    }
+
+    /// <summary>
+    /// Whether the pawn is hostile to the player, without RimWorld's "dummy relation" error.
+    /// A hidden faction may have no relation with the player at all, and HostileTo asks for one
+    /// and logs that error when it is missing. Leaving hidden factions out altogether, which
+    /// is what this did first, also left out beggars and pilgrims - they belong to hidden
+    /// factions, and nobody could talk to them.
+    /// </summary>
+    private static bool IsHostileToPlayer(Pawn pawn)
+    {
+        if (pawn.Faction.def.hidden && pawn.Faction.RelationWith(Faction.OfPlayer, allowNull: true) == null)
+            return pawn.Faction.def.permanentEnemy || pawn.InAggroMentalState;
+
+        return pawn.HostileTo(Faction.OfPlayer);
     }
 
     public static string GetTitle(this Pawn pawn)
@@ -158,10 +171,10 @@ public static class PawnUtil
 
     public static bool IsEnemy(this Pawn pawn)
     {
-        if (pawn?.Faction == null || Faction.OfPlayer == null || pawn.Faction.IsPlayer || pawn.Faction.def.hidden)
+        if (pawn?.Faction == null || Faction.OfPlayer == null || pawn.Faction.IsPlayer)
             return false;
 
-        return !pawn.IsPrisoner && pawn.HostileTo(Faction.OfPlayer);
+        return !pawn.IsPrisoner && IsHostileToPlayer(pawn);
     }
 
     public static bool IsBaby(this Pawn pawn)

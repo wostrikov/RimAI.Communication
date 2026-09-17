@@ -42,7 +42,7 @@ public static class AIService
                 response =>
                 {
                     if (IsCancellationRequested()) return;
-                    if (Cache.GetByName(response.Name) == null) return;
+                    if (request.ResolvePawnState(response.Name) == null) return;
                     delivered++;
                     response.TalkType = request.TalkType;
 
@@ -194,7 +194,11 @@ public static class AIService
         // If response is empty but no explicit error yet, mark as deserialization failure (or empty response)
         if (string.IsNullOrEmpty(apiLog.Response) && !apiLog.IsError && string.IsNullOrEmpty(payload.ErrorMessage))
         {
-            ReportError(apiLog, payload, "Json Deserialization Failed");
+            // Nothing at all and something unreadable are different faults with different fixes -
+            // a model that answered nothing is not helped by a hint about the JSON format.
+            ReportError(apiLog, payload, string.IsNullOrWhiteSpace(payload?.Response)
+                ? "Empty Response (AI returned no content)"
+                : "Json Deserialization Failed");
             return;
         }
         
@@ -210,6 +214,9 @@ public static class AIService
     }
 
     public static bool IsCancellationRequested() => _currentCts?.IsCancellationRequested ?? false;
+
+    /// <summary>The request in flight, or null.</summary>
+    public static TalkRequest CurrentRequest => _currentRequest;
 
     public static bool CanCancelFor(TalkRequest incomingRequest)
     {

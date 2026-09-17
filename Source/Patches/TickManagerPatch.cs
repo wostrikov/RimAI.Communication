@@ -113,10 +113,16 @@ internal static class TickManagerPatch
             }
         }
 
-        // The ambient cooldown counts from the last ambient talk, not from whatever else kept
-        // the AI busy - a fast-track line must not push the colony's next chat further away.
+        // The ambient cooldown counts from the end of the last ambient talk, not from whatever else
+        // kept the AI busy - a fast-track line must not push the colony's next chat further away.
+        // Counting from when an ambient talk was asked for let a slow model start the next one the
+        // moment the last finished, with no pause between them.
         if (AIService.IsBusy())
+        {
+            if (AIService.CurrentRequest == null || !AIService.CurrentRequest.TalkType.IsFastTrack())
+                _lastTalkEndTick = GenTicks.TicksGame;
             return;
+        }
 
         int intervalTicks = CommonUtil.GetTicksForDuration(TalkInterval);
         if (intervalTicks > 0 && GenTicks.TicksGame - _lastTalkEndTick >= intervalTicks)

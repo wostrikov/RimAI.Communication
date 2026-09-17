@@ -356,9 +356,9 @@ public static class ContextBuilder
                 ? talkRequest.Recipient
                 : talkRequest.Initiator;
             var listeners = pawns.Where(p => p != speaker && !p.IsPlayer()).ToList();
-            var listenerNames = string.Join(", ", listeners.Select(p => p.LabelShort));
+            var listenerNames = string.Join(", ", listeners.Select(p => PromptService.GetUniqueName(p, pawns)));
 
-            topicSb.Append($"{speaker.LabelShort} announced to everyone nearby: '{talkRequest.Prompt}'. ");
+            topicSb.Append($"{PromptService.GetUniqueName(speaker, pawns)} announced to everyone nearby: '{talkRequest.Prompt}'. ");
             intentSb.Append(listeners.Count > 0
                 ? $"Generate brief reactions from listeners ({listenerNames}). Each person who heard should speak at least once. Do not repeat the initial announcement."
                 : "Generate brief reactions from nearby listeners. Do not repeat the initial announcement.");
@@ -368,11 +368,12 @@ public static class ContextBuilder
         else if (talkRequest.TalkType.IsFromUser())
         {
             var speaker = pawns.Count > 1 ? pawns[1] : talkRequest.Initiator ?? mainPawn;
-            topicSb.Append($"{speaker.LabelShort}({speaker.GetRole()}) said to {shortName}: '{talkRequest.Prompt}'. ");
+            var speakerName = PromptService.GetUniqueName(speaker, pawns);
+            topicSb.Append($"{speakerName}({speaker.GetRole()}) said to {shortName}: '{talkRequest.Prompt}'. ");
 
             var mode = Settings.Get().PlayerDialogueMode;
             const string multiTurnIntent = "Generate multi turn dialogues starting after this (do not repeat initial dialogue), beginning with ";
-            string singleTurnIntent = $"Generate dialogue starting after this. Do not generate any further lines for {speaker.LabelShort}";
+            string singleTurnIntent = $"Generate dialogue starting after this. Do not generate any further lines for {speakerName}";
 
             if (!speaker.IsPlayer())
                 intentSb.Append(mode != Settings.PlayerDialogueMode.Manual ? multiTurnIntent + shortName : singleTurnIntent);
@@ -380,7 +381,7 @@ public static class ContextBuilder
                 intentSb.Append(multiTurnIntent + shortName);
             else if (mode == Settings.PlayerDialogueMode.AIDrivenPawnOnly && pawns.Count > 2)
                 // The pawns carry it on among themselves; the player's lines stay the player's.
-                intentSb.Append($"{multiTurnIntent}{shortName}. Do not generate any further lines for {speaker.LabelShort}");
+                intentSb.Append($"{multiTurnIntent}{shortName}. Do not generate any further lines for {speakerName}");
             else
                 intentSb.Append(singleTurnIntent);
 
@@ -401,7 +402,8 @@ public static class ContextBuilder
             }
             else if (pawns.Count == 1)
             {
-                intentSb.Append($"{shortName} short monologue");
+                // Named as one speaker: "monologue" alone let the model write lines for pawns nearby.
+                intentSb.Append($"{shortName} short monologue (only {shortName} speaks)");
             }
             else
             {

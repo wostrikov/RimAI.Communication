@@ -288,6 +288,7 @@ public class OpenAIClient(
 
         if (streamHandler != null)
         {
+            streamHandler.Flush();
             if (!string.IsNullOrEmpty(streamHandler.DetectedError))
             {
                 string errorMsg = streamHandler.DetectedError;

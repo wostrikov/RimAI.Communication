@@ -12,7 +12,7 @@ public static class TalkRequestPool
     private const int MaxHistorySize = 500;
   
     
-    public static void Add(string prompt, Pawn initiator = null, Pawn recipient = null, int mapId = 0, TalkType talkType = TalkType.Event)
+    public static void Add(string prompt, Pawn initiator = null, Pawn recipient = null, int mapId = -1, TalkType talkType = TalkType.Event)
     {
         var request = new TalkRequest(prompt, initiator, recipient, talkType)
         {
@@ -24,10 +24,15 @@ public static class TalkRequestPool
 
     public static TalkRequest GetRequestFromPool(Pawn pawn)
     {
+        if (pawn?.Map == null) return null;
+
         for (int i = Requests.Count - 1; i >= 0; i--)
         {
             var request = Requests[i];
-            if (request.MapId != pawn.Map.uniqueID) continue;
+            // -1 is an event with no map of its own - a world event, a quest - which any map may
+            // talk about. It used to be 0, which is also the first map's id, so such an event was
+            // only ever spoken about on that one map.
+            if (request.MapId != -1 && request.MapId != pawn.Map.uniqueID) continue;
 
             if (request.IsExpired())
             {

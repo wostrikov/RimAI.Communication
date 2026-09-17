@@ -15,7 +15,7 @@ public static class ApiHistory
 
     public static ApiLog AddRequest(TalkRequest request, Channel channel)
     {
-        var log = new ApiLog(request.Initiator.LabelShort, request, null, null, DateTime.Now, channel)
+        var log = new ApiLog(request.PromptNameOf(request.Initiator) ?? request.Initiator.LabelShort, request, null, null, DateTime.Now, channel)
             {
                 IsFirstDialogue = true,
                 ConversationId = request.IsMonologue ? -1 : _conversationIdIndex++

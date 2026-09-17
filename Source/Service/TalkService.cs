@@ -100,6 +100,10 @@ public static class TalkService
         if (!settings.AllowMonologue && talkRequest.IsMonologue && !talkRequest.TalkType.IsFromUser())
             return false;
 
+        // The streaming thread resolves the model's names against these.
+        talkRequest.Participants = pawns;
+        talkRequest.RememberPromptNames();
+
         // Delegate prompt assembly to PromptManager (Handles Simple/Advanced modes and fallbacks)
         talkRequest.PromptMessages = PromptManager.Instance.BuildMessages(talkRequest, pawns, status);
         
@@ -136,8 +140,18 @@ public static class TalkService
                 {
                     Logger.Debug($"Streamed: {talkResponse}");
 
-                    PawnState pawnState = Cache.GetByName(talkResponse.Name);
+                    // Resolved by the name the prompt gave the pawn, then shown by its own short name.
+                    PawnState pawnState = talkRequest.ResolvePawnState(talkResponse.Name);
+                    if (pawnState?.Pawn == null) return;
+                    talkResponse.SpeakerPawn = pawnState.Pawn;
                     talkResponse.Name = pawnState.Pawn.LabelShort;
+
+                    if (!string.IsNullOrEmpty(talkResponse.TargetName))
+                    {
+                        talkResponse.TargetPawn = talkRequest.ResolvePawnState(talkResponse.TargetName)?.Pawn;
+                        if (talkResponse.TargetPawn != null)
+                            talkResponse.TargetName = talkResponse.TargetPawn.LabelShort;
+                    }
 
                     // Link replies to the previous message in the conversation.
                     if (receivedResponses.Any())
@@ -153,7 +167,7 @@ public static class TalkService
             );
 
             // Once the stream is complete, save the full conversation to history.
-            AddResponsesToHistory(receivedResponses, talkRequest.Prompt);
+            AddResponsesToHistory(receivedResponses, talkRequest.Prompt, talkRequest);
             StoryThreadService.Capture(talkRequest, receivedResponses);
         }
         catch (OperationCanceledException)
@@ -174,12 +188,13 @@ public static class TalkService
     /// <summary>
     /// Serializes the generated responses and adds them to the message history for all involved pawns.
     /// </summary>
-    private static void AddResponsesToHistory(List<TalkResponse> responses, string prompt)
+    private static void AddResponsesToHistory(List<TalkResponse> responses, string prompt, TalkRequest talkRequest)
     {
         if (!responses.Any()) return;
         string serializedResponses = JsonUtil.SerializeToJson(responses);
+        // The speakers as resolved while streaming - by name alone, two Bobs shared one history.
         var uniquePawns = responses
-            .Select(r => Cache.GetByName(r.Name)?.Pawn)
+            .Select(r => r.SpeakerPawn ?? talkRequest.ResolvePawnState(r.Name)?.Pawn)
             .Where(p => p != null)
             .Distinct();
 

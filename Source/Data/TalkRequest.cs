@@ -43,7 +43,8 @@ public class TalkRequest(string prompt, Pawn initiator, Pawn recipient = null, T
     public string RawPrompt { get; set; } = prompt;
     public Pawn Initiator { get; set; } = initiator;
     public Pawn Recipient { get; set; } = recipient;
-    public int MapId { get; set; }
+    /// <summary>The map the request belongs to, or -1 for one that may be spoken on any map.</summary>
+    public int MapId { get; set; } = -1;
     public int CreatedTick { get; set; } = GenTicks.TicksGame;
     public DateTime CreatedTime { get; set; } = DateTime.Now; 
     public int FinishedTick { get; set; } = -1; 
@@ -55,6 +56,49 @@ public class TalkRequest(string prompt, Pawn initiator, Pawn recipient = null, T
     /// All pawns participating in the dialogue (filled in sync layer)
     /// </summary>
     public List<Pawn> Participants { get; set; }
+
+    /// <summary>
+    /// The name each participant went by in the prompt. Taken on the main thread when the prompt is
+    /// built, because working it out walks the map's pawns, and read on the streaming thread.
+    /// </summary>
+    private volatile Dictionary<string, Pawn> _promptNames;
+
+    public void RememberPromptNames()
+    {
+        var names = new Dictionary<string, Pawn>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pawn in Participants ?? [])
+            if (pawn != null)
+                names[Service.PromptService.GetUniqueName(pawn, Participants)] = pawn;
+        _promptNames = names;
+    }
+
+    /// <summary>The name <paramref name="pawn"/> went by in the prompt, or its short name.</summary>
+    public string PromptNameOf(Pawn pawn)
+    {
+        if (pawn == null) return null;
+        var names = _promptNames;
+        if (names != null)
+            foreach (var entry in names)
+                if (entry.Value == pawn) return entry.Key;
+        return pawn.LabelShort;
+    }
+
+    /// <summary>
+    /// The pawn a name the model wrote belongs to: by the name the prompt gave it, then by short
+    /// name among this talk's participants, then anywhere. Safe off the main thread.
+    /// </summary>
+    public PawnState ResolvePawnState(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return null;
+        name = name.Trim();
+        var names = _promptNames;
+        if (names != null && names.TryGetValue(name, out var named))
+            return Cache.Get(named);
+        foreach (var pawn in Participants ?? [])
+            if (pawn != null && name.Equals(pawn.LabelShort, StringComparison.OrdinalIgnoreCase))
+                return Cache.Get(pawn);
+        return Cache.GetByName(name);
+    }
     
     /// <summary>
     /// Pre-built message list (built by PromptManager in sync layer)

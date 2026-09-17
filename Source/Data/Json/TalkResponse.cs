@@ -44,9 +44,15 @@ public class TalkResponse(TalkType talkType, string name, string text) : IJsonDa
 
         return Enum.TryParse(InteractionRaw, true, out InteractionType result) ? result : InteractionType.None;
     }
+    /// <summary>The speaker, resolved through the request's names while streaming. Not serialized.</summary>
+    public Pawn? SpeakerPawn { get; set; }
+
+    /// <summary>The target, resolved the same way. Not serialized.</summary>
+    public Pawn? TargetPawn { get; set; }
+
     public Pawn? GetTarget()
     {
-        return TargetName != null ? Cache.GetByName(TargetName)?.Pawn : null;
+        return TargetPawn ?? (TargetName != null ? Cache.GetByName(TargetName)?.Pawn : null);
     }
 
     public override string ToString()

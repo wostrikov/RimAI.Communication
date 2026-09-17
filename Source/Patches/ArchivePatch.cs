@@ -23,16 +23,11 @@ public static class ArchivePatch
         // Generate the prompt text first, as it's needed in all cases.
         // Decide quest category & generate prompt (kept compatible with original text)
         var (prompt, talkType) = GeneratePrompt(archivable);
-        var (eventMap, nearbyColonists) = FindLocationAndColonists(archivable);
+        var eventMap = FindLocation(archivable);
 
-        // If specific colonists are nearby, create a request for each one.
-        if (nearbyColonists.Any())
-        {
-            foreach (var pawn in nearbyColonists)
-                Cache.Get(pawn)?.AddTalkRequest(prompt, talkType: talkType);
-        }
-        else
-            TalkRequestPool.Add(prompt, mapId: eventMap?.uniqueID ?? 0);
+        // One request for the colony, taken by whichever colonist speaks next. A request for every
+        // colonist on the map had each of them bring up the same letter in turn.
+        TalkRequestPool.Add(prompt, mapId: eventMap?.uniqueID ?? -1, talkType: talkType);
     }
 
     private static bool ShouldProcessArchivable(IArchivable archivable)
@@ -40,34 +35,28 @@ public static class ArchivePatch
         var settings = Settings.Get();
         var enabledTypes = settings.EnabledArchivableTypes;
 
-        // 1. Check against the C# type (e.g., "Verse.Letter_Standard")
+        // Messages - "research finished", "a colonist is hungry" - are off unless switched on. The
+        // event filter page wrote that default only once it had been opened, so on a game where
+        // nobody had opened it every message reached the talk pool.
+        if (archivable is Message message)
+        {
+            if (!enabledTypes.TryGetValue("Verse.Message", out var messagesEnabled) || !messagesEnabled)
+                return false;
+
+            return message.def == null
+                || !enabledTypes.TryGetValue(message.def.defName, out var isMessageDefEnabled)
+                || isMessageDefEnabled;
+        }
+
+        // Letters and everything else are on unless switched off, by C# type and then by def.
         string typeName = archivable.GetType().FullName;
         if (enabledTypes.TryGetValue(typeName, out var isTypeEnabled) && !isTypeEnabled)
-        {
-            return false; // The C# type itself is disabled, so we stop here.
-        }
+            return false;
 
-        // 2. If it's a Letter or Message, also check against its defName
-        string defName = null;
-        if (archivable is Letter letter)
-        {
-            defName = letter.def.defName;
-        }
-        else if (archivable is Message message)
-        {
-            defName = message.def.defName;
-        }
+        if (archivable is Letter letter && letter.def != null
+            && enabledTypes.TryGetValue(letter.def.defName, out var isDefEnabled) && !isDefEnabled)
+            return false;
 
-        if (defName != null)
-        {
-            if (enabledTypes.TryGetValue(defName, out var isDefEnabled) && !isDefEnabled)
-            {
-                return false; // The specific defName is disabled.
-            }
-        }
-        
-        // If reached this point, it means neither the C# type nor the defName (if applicable) was explicitly disabled.
-        // The archivable should be processed.
         return true;
     }
 
@@ -75,6 +64,7 @@ public static class ArchivePatch
     {
         var talkType = TalkType.Event;
         string prompt;
+        string targetSuffix = GetTargetSuffix(archivable);
 
         if (archivable is ChoiceLetter { quest: not null } choiceLetter)
         {
@@ -101,16 +91,28 @@ public static class ArchivePatch
             }
             else
             {
-                prompt = $"(Talk about incident)\n[{tip.StripTags()}]";
+                prompt = $"(Talk about incident)\n[{tip.StripTags()}{targetSuffix}]";
             }
         }
         else
         {
             // Other events
-            prompt = $"(Talk about incident)\n[{archivable.ArchivedTooltip.StripTags()}]";
+            prompt = $"(Talk about incident)\n[{archivable.ArchivedTooltip.StripTags()}{targetSuffix}]";
         }
 
         return (prompt, talkType);
+    }
+
+    /// <summary>
+    /// Who a letter is about, when it is about a pawn. The tooltip often says "a colonist" or a
+    /// name the model cannot tie to anyone in the talk.
+    /// </summary>
+    private static string GetTargetSuffix(IArchivable archivable)
+    {
+        var pawn = archivable?.LookTargets?.PrimaryTarget.Thing as Pawn
+            ?? archivable?.LookTargets?.targets?.Select(t => t.Thing as Pawn).FirstOrDefault(p => p != null);
+
+        return pawn != null ? $" (Target: {pawn.LabelShort})" : string.Empty;
     }
 
     private static bool ContainsQuestReference(string label, string tip)
@@ -119,27 +121,12 @@ public static class ArchivePatch
             || tip.IndexOf("Quest", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
-    private static (Map eventMap, List<Pawn> nearbyColonists) FindLocationAndColonists(IArchivable archivable)
+    private static Map FindLocation(IArchivable archivable)
     {
-        Map eventMap = null;
-        var nearbyColonists = new List<Pawn>();
-
-        // --- Safely check for location and nearby pawns ---
         if (archivable.LookTargets is not { Any: true })
-            return (null, nearbyColonists);
+            return null;
 
-        // Try to determine the map from the look targets
-        eventMap = archivable.LookTargets.PrimaryTarget.Map 
+        return archivable.LookTargets.PrimaryTarget.Map
             ?? archivable.LookTargets.targets.Select(t => t.Map).FirstOrDefault(m => m != null);
-
-        // If we successfully found a map, look for the nearest colonists
-        if (eventMap != null)
-        {
-            nearbyColonists = eventMap.mapPawns.AllPawnsSpawned
-                .Where(pawn => pawn.IsFreeNonSlaveColonist && !pawn.IsQuestLodger() && Cache.Get(pawn)?.CanDisplayTalk() == true)
-                .ToList();
-        }
-
-        return (eventMap, nearbyColonists);
     }
 }
