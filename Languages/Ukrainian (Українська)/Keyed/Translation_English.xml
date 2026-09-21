@@ -175,7 +175,7 @@
   <RimTalk.Settings.ContinueDialogueWhileSleeping>Продовжувати діалог під час сну</RimTalk.Settings.ContinueDialogueWhileSleeping>
   <RimTalk.Settings.ContinueDialogueWhileSleepingTooltip>Якщо ввімкнено, персонажі продовжуватимуть промовляти всі згенеровані репліки, навіть якщо заснуть.</RimTalk.Settings.ContinueDialogueWhileSleepingTooltip>
   <RimTalk.Settings.EnableSleepDialogue>Репліки перед сном і після пробудження</RimTalk.Settings.EnableSleepDialogue>
-  <RimTalk.Settings.EnableSleepDialogueTooltip>Раз за ніч пішак, лягаючи спати, кидає коротке сонне слово, а прокинувшись — ранкове: тому, хто поруч, або самому собі.</RimTalk.Settings.EnableSleepDialogueTooltip>
+  <RimTalk.Settings.EnableSleepDialogueTooltip>Раз за ніч персонаж, лягаючи спати, кидає коротке сонне слово, а прокинувшись — ранкове: тому, хто поруч, або самому собі.</RimTalk.Settings.EnableSleepDialogueTooltip>
   <RimTalk.Settings.AllowMonologue>Дозволити монологи</RimTalk.Settings.AllowMonologue>
   <RimTalk.Settings.AllowMonologueTooltip>Коли ввімкнено, персонажі можуть генерувати монологи за допомогою ШІ, навіть якщо поблизу немає інших персонажів.</RimTalk.Settings.AllowMonologueTooltip>
   <RimTalk.Settings.AllowSlavesToTalk>Дозволити рабам розмовляти</RimTalk.Settings.AllowSlavesToTalk>
@@ -294,9 +294,9 @@
   <RimTalk.Settings.IncludeSurroundings>Предмети поблизу</RimTalk.Settings.IncludeSurroundings>
   <RimTalk.Settings.IncludeWealth>Багатство колонії</RimTalk.Settings.IncludeWealth>
   <RimTalk.Settings.IncludeTopicKeywords>Ключові слова теми</RimTalk.Settings.IncludeTopicKeywords>
-  <RimTalk.Settings.IncludeTopicKeywords.Tooltip>У половині випадків розмова без власного запиту отримує кут і тему для початку (наприклад, ностальгія і рідне місто), щоб ті самі пішаки не ходили по колу тих самих кількох реплік.</RimTalk.Settings.IncludeTopicKeywords.Tooltip>
+  <RimTalk.Settings.IncludeTopicKeywords.Tooltip>У половині випадків розмова без власного запиту отримує кут і тему для початку (наприклад, ностальгія і рідне місто), щоб ті самі персонажі не ходили по колу тих самих кількох реплік.</RimTalk.Settings.IncludeTopicKeywords.Tooltip>
   <RimTalk.Settings.IncludeStoryThreads>Сюжетні нитки</RimTalk.Settings.IncludeStoryThreads>
-  <RimTalk.Settings.IncludeStoryThreads.Tooltip>Історія, чутка чи зізнання, які розповів пішак, можуть лишитися відкритими: згодом хтось, хто це чув, продовжує — що було далі, несподіваний поворот, нова чутка, — а за кілька переказів хтось розповідає, чим усе скінчилося. Не більше п'яти одночасно; нитку, про яку десять днів мовчать, забувають.</RimTalk.Settings.IncludeStoryThreads.Tooltip>
+  <RimTalk.Settings.IncludeStoryThreads.Tooltip>Історія, чутка чи зізнання, які розповів персонаж, можуть лишитися відкритими: згодом хтось, хто це чув, продовжує — що було далі, несподіваний поворот, нова чутка, — а за кілька переказів хтось розповідає, чим усе скінчилося. Не більше п'яти одночасно; нитку, про яку десять днів мовчать, забувають.</RimTalk.Settings.IncludeStoryThreads.Tooltip>
   <RimTalk.DebugWindow.ViewByTime>За часом</RimTalk.DebugWindow.ViewByTime>
   <RimTalk.DebugWindow.ViewByPawn>За персонажем</RimTalk.DebugWindow.ViewByPawn>
   <RimTalk.DebugWindow.ViewTalkRequests>Запити на розмову</RimTalk.DebugWindow.ViewTalkRequests>
@@ -384,12 +384,12 @@
   <RimTalk.FloatMenu.WhatToSayToOther>Що ви хочете, щоб {0} сказав {1}?</RimTalk.FloatMenu.WhatToSayToOther>
   <RimTalk.FloatMenu.WhatToAnnounceToSelf>Що ви хочете оголосити {0} і всім, хто поруч?</RimTalk.FloatMenu.WhatToAnnounceToSelf>
   <RimTalk.FloatMenu.WhatToAnnounceToOther>Що {0} має оголосити всім, хто поруч?</RimTalk.FloatMenu.WhatToAnnounceToOther>
-  <RimTalk.FloatMenu.DirectModeTooltip>Сказати одному пішакові (Tab — перемкнути)</RimTalk.FloatMenu.DirectModeTooltip>
+  <RimTalk.FloatMenu.DirectModeTooltip>Сказати одному персонажеві (Tab — перемкнути)</RimTalk.FloatMenu.DirectModeTooltip>
   <RimTalk.FloatMenu.AnnounceModeTooltip>Оголосити всім, хто чує (Tab — перемкнути)</RimTalk.FloatMenu.AnnounceModeTooltip>
   <RimTalk.Gizmo.Announce>Оголосити</RimTalk.Gizmo.Announce>
   <RimTalk.Gizmo.AnnounceDesc>{0} оголошує щось усім поруч — і чути, як вони відгукуються.</RimTalk.Gizmo.AnnounceDesc>
   <RimTalk.Settings.AllowAnnouncement>Дозволити оголошення</RimTalk.Settings.AllowAnnouncement>
-  <RimTalk.Settings.AllowAnnouncementTooltip>Пішак може оголосити щось усім, хто чує, — кнопкою на ньому або через Tab у вікні розмови. Потрібні власні розмови.</RimTalk.Settings.AllowAnnouncementTooltip>
+  <RimTalk.Settings.AllowAnnouncementTooltip>Персонаж може оголосити щось усім, хто чує, — кнопкою на ньому або через Tab у вікні розмови. Потрібні власні розмови.</RimTalk.Settings.AllowAnnouncementTooltip>
   <RimTalk.FloatMenu.Send>Надіслати</RimTalk.FloatMenu.Send>
   <RimTalk.FloatMenu.Cancel>Скасувати</RimTalk.FloatMenu.Cancel>
   <RimTalk.ScribanVar.Category.PawnShorthands>Скорочення для персонажів</RimTalk.ScribanVar.Category.PawnShorthands>
