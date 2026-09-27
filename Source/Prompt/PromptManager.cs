@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -552,7 +552,7 @@ public class PromptManager : IExposable
 
         context.UsedTypedMemoryContext = true;
         context.TypedMemorySource = lastSource;
-        if (Prefs.DevMode)
+        if (RimAiLog.Detailed)
             RimAiLog.Info(
                 RimAiLogCategory.Communication,
                 $"[RIMAI_MEMORY] typed_context pawns={ids.Count} per_pawn_budget={perPawnTokenBudget} knowledge_once=true");
