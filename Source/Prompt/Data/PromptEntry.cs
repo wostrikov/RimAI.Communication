@@ -161,7 +161,8 @@ public class PromptEntry : IExposable
     {
         return new PromptEntry
         {
-            Id = Guid.NewGuid().ToString(), // New ID for cloned entry
+            // A copy gets an id of its own, except a built-in entry, which is known by its id.
+            Id = BuiltInPromptEntries.IsBuiltInId(Id) ? Id : Guid.NewGuid().ToString(),
             Name = Name,
             Content = Content,
             Role = Role,

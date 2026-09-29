@@ -134,6 +134,7 @@ public static class TalkService
             TalkLifecycle.PublishTalkRequestEnrichment(talkRequest);
 
             var receivedResponses = new List<TalkResponse>();
+            var orderRecipient = PlayerOrderService.RecipientOf(talkRequest);
 
             // Call the streaming chat service. The callback is executed as each piece of dialogue is parsed.
             await AIService.ChatStreaming(talkRequest, talkResponse =>
@@ -160,6 +161,13 @@ public static class TalkService
                     }
 
                     receivedResponses.Add(talkResponse);
+
+                    // The first report of the addressed pawn's orders is the one kept.
+                    if (orderRecipient != null && talkResponse.Orders != null)
+                    {
+                        PlayerOrderService.Capture(orderRecipient, talkResponse.Orders);
+                        orderRecipient = null;
+                    }
 
                     // Hand off to the main thread for display later; PawnState.TalkResponses itself must only ever be touched from the main thread.
                     pawnState.QueueIncomingResponse(talkResponse);
@@ -211,6 +219,7 @@ public static class TalkService
     {
         // Story threads finished on the background thread are recorded here, on the main thread.
         StoryThreadService.DrainCaptures();
+        PlayerOrderService.DrainCaptures();
 
         // Drain all pawns upfront so every pawn has a consistent view of TalkResponses for this tick cycle.
         foreach (Pawn pawn in Cache.Keys)
@@ -238,11 +247,23 @@ public static class TalkService
                 continue;
             }
 
-            // Skip this talk if its parent was ignored or the pawn is currently unable to speak.
-            if (TalkHistory.IsTalkIgnored(talk.ParentTalkId) || !pawnState.CanDisplayTalk())
+            if (!pawnState.CanDisplayTalk())
             {
                 pawnState.IgnoreTalkResponse();
                 continue;
+            }
+
+            // A reply whose parent was dropped goes with it - except a reply to the player or an
+            // announcement: that answers the player, not the listener before it, so one listener
+            // who could not speak must not silence everyone after.
+            if (TalkHistory.IsTalkIgnored(talk.ParentTalkId))
+            {
+                if (!talk.TalkType.IsFromUser())
+                {
+                    pawnState.IgnoreTalkResponse();
+                    continue;
+                }
+                talk.ParentTalkId = Guid.Empty;
             }
 
             // Reactions to an announcement come quickly, as a crowd's do.

@@ -259,21 +259,24 @@ public class PromptManager : IExposable
                 // 1. System Section
                 new()
                 {
-                    Name = "Base Instruction",
+                    Id = BuiltInPromptEntries.BaseInstructionId,
+                    Name = BuiltInPromptEntries.BaseInstructionName,
                     Role = PromptRole.System,
                     Position = PromptPosition.Relative,
                     Content = Constant.DefaultInstruction
                 },
                 new()
                 {
-                    Name = "JSON Format",
+                    Id = BuiltInPromptEntries.JsonFormatId,
+                    Name = BuiltInPromptEntries.JsonFormatName,
                     Role = PromptRole.System,
                     Position = PromptPosition.Relative,
                     Content = Constant.JsonInstruction + "\n{{ if settings.ApplyMoodAndSocialEffects }}\n" + Constant.SocialInstruction + "\n{{ end }}"
                 },
                 new()
                 {
-                    Name = "Pawn Profiles",
+                    Id = BuiltInPromptEntries.PawnProfilesId,
+                    Name = BuiltInPromptEntries.PawnProfilesName,
                     Role = PromptRole.System,
                     Position = PromptPosition.Relative,
                     Content = "{{context}}"
@@ -281,7 +284,8 @@ public class PromptManager : IExposable
                 // 2. History Section
                 new()
                 {
-                    Name = "Chat History",
+                    Id = BuiltInPromptEntries.ChatHistoryId,
+                    Name = BuiltInPromptEntries.ChatHistoryName,
                     Role = PromptRole.User, // Visual placeholder
                     Position = PromptPosition.Relative,
                     IsMainChatHistory = true,
@@ -290,7 +294,8 @@ public class PromptManager : IExposable
                 // 3. Prompt Section
                 new()
                 {
-                    Name = "Dialogue Prompt",
+                    Id = BuiltInPromptEntries.DialoguePromptId,
+                    Name = BuiltInPromptEntries.DialoguePromptName,
                     Role = PromptRole.User,
                     Position = PromptPosition.Relative,
                     Content = "{{prompt}}"
@@ -352,15 +357,13 @@ public class PromptManager : IExposable
     {
         static string Normalize(string value) => (value ?? string.Empty).Replace("\r\n", "\n").Trim();
 
-        var baseEntry = preset.Entries.FirstOrDefault(e =>
-            string.Equals(e.Name, "Base Instruction", StringComparison.OrdinalIgnoreCase));
+        var baseEntry = BuiltInPromptEntries.FindBaseInstruction(preset);
         if (baseEntry != null && Constant.IsLegacyDefaultInstruction(baseEntry.Content))
         {
             baseEntry.Content = Constant.DefaultInstruction;
         }
 
-        var jsonEntry = preset.Entries.FirstOrDefault(e =>
-            string.Equals(e.Name, "JSON Format", StringComparison.OrdinalIgnoreCase));
+        var jsonEntry = BuiltInPromptEntries.FindJsonFormat(preset);
         string oldJson = Constant.LegacyEnglishJsonInstruction + "\n{{ if settings.ApplyMoodAndSocialEffects }}\n" +
                          Constant.LegacyEnglishSocialInstruction + "\n{{ end }}";
         if (jsonEntry != null && Normalize(jsonEntry.Content) == Normalize(oldJson))
@@ -417,8 +420,7 @@ public class PromptManager : IExposable
         string originalBaseContent = null;
         PromptEntry baseEntry = null;
 
-        baseEntry = preset.Entries.FirstOrDefault(e =>
-            string.Equals(e.Name, "Base Instruction", StringComparison.OrdinalIgnoreCase));
+        baseEntry = BuiltInPromptEntries.FindBaseInstruction(preset);
         if (baseEntry != null)
         {
             originalBaseContent = baseEntry.Content;

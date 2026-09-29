@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Error;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.AI;
 using Ustas.RimAI.Core.Net;
 using Ustas.RimAI.Core.Player2;
 using RimWorld;
@@ -62,8 +63,10 @@ public class Player2Client : IAIClient
 
     public async Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
         List<(Role role, string message)> messages,
-        Action<Payload> onRequestPrepared = null)
+        Action<Payload> onRequestPrepared = null,
+        AiRequestPriority? priority = null)
     {
+        // Player2 is a local app with its own queue; the shared arbiter's priority does not reach it.
         string jsonContent = BuildRequestJson(prefixMessages, messages, stream: false);
         onRequestPrepared?.Invoke(new Payload(CurrentApiUrl, null, jsonContent, null, 0));
         string responseText = await SendRequestAsync($"{CurrentApiUrl}/v1/chat/completions", jsonContent);

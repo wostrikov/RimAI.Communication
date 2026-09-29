@@ -32,7 +32,11 @@ internal static class CommunicationHostWiringGuardTests
             "entry.ToGameStringFromPOV(initiator)",
             StringComparison.Ordinal);
         T(settingsGuard >= 0 && renderCall > settingsGuard, "bubble-render-after-settings-guard");
-        T(bubblePatch.Contains("pawns.Length < 2"), "bubble-requires-two-pawns");
+        T(bubblePatch.Contains("pawns.Length < (isSinglePawn ? 1 : 2)"), "bubble-requires-two-pawns-unless-single-pawn");
+        T(bubblePatch.Contains("entry is PlayLogEntry_InteractionSinglePawn"), "bubble-voices-single-pawn-interactions");
+        int cacheCheck = bubblePatch.IndexOf("PawnState pawnState = Cache.Get(initiator);", StringComparison.Ordinal);
+        int nearbyScan = bubblePatch.IndexOf("PawnSelector.GetNearByTalkablePawns(initiator)", StringComparison.Ordinal);
+        T(cacheCheck >= 0 && nearbyScan > cacheCheck, "bubble-cache-check-before-nearby-scan");
         T(bubblePatch.Contains("pawns[0].RaceProps?.Humanlike != true")
             && bubblePatch.Contains("pawns[1].RaceProps?.Humanlike != true"),
             "bubble-skips-animal-grammar-render");

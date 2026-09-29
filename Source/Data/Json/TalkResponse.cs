@@ -24,6 +24,10 @@ public class TalkResponse(TalkType talkType, string name, string text) : IJsonDa
 
     [DataMember(Name = "target", EmitDefaultValue = false)]
     public string? TargetName { get; set; }
+
+    /// <summary>The addressed pawn's full set of orders, sent when the player changed them.</summary>
+    [DataMember(Name = "orders", EmitDefaultValue = false)]
+    public string? Orders { get; set; }
     
     public Guid ParentTalkId { get; set; }
     
@@ -58,6 +62,7 @@ public class TalkResponse(TalkType talkType, string name, string text) : IJsonDa
     public override string ToString()
     {
         return $"Type: {TalkType} | Name: {Name} | Text: \"{Text}\" | " +
-               $"Int: {InteractionRaw} | Target: {TargetName}";
+               $"Int: {InteractionRaw} | Target: {TargetName}" +
+               (Orders != null ? $" | Orders: {Orders}" : "");
     }
 }

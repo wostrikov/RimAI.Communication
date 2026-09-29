@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Client;
 using Ustas.RimAI.Communication.Client.ProviderPolicy;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Threading;
 using RimWorld;
 using Verse;
 
@@ -12,6 +13,8 @@ namespace Ustas.RimAI.Communication.Error;
 public static class AIErrorHandler
 {
     private static bool _quotaWarningShown;
+    // A provider that is down fails every request in turn; one notice per half minute is enough.
+    private static readonly FailureNoticeGate GenerationFailures = new(TimeSpan.FromSeconds(30));
 
     public static async Task<CommunicationProviderOutcome> ExecuteLogicalRequest(
         Func<CommunicationProviderSlot, Task<CommunicationProviderAttempt>> attempt,
@@ -117,16 +120,27 @@ public static class AIErrorHandler
         if (!_quotaWarningShown)
         {
             _quotaWarningShown = true;
-            string message = "RimTalk.TalkService.QuotaExceeded".Translate();
-            Messages.Message(message, MessageTypeDefOf.NeutralEvent, false);
             Logger.Warning(ex.Message);
+            MainThreadSchedulerAccess.RunInlineOrEnqueue(() =>
+                Messages.Message("RimTalk.TalkService.QuotaExceeded".Translate(), MessageTypeDefOf.NeutralEvent, false));
         }
     }
 
     static void ShowGenerationWarning(Exception ex)
     {
         Logger.Warning(ex.Message);
-        string message = $"{"RimTalk.TalkService.GenerationFailed".Translate()}: {ex.Message}";
-        Messages.Message(message, MessageTypeDefOf.NeutralEvent, false);
+        if (!GenerationFailures.Record(DateTime.UtcNow))
+            return;
+
+        string reason = ex.Message;
+        // Messages belong to the main thread; a failure is reported from the request's own.
+        MainThreadSchedulerAccess.RunInlineOrEnqueue(() =>
+        {
+            int failures = GenerationFailures.TakeForNotice(DateTime.UtcNow);
+            string message = $"{"RimTalk.TalkService.GenerationFailed".Translate()}: {reason}";
+            if (failures > 1)
+                message += " " + "RimTalk.TalkService.GenerationFailedCount".Translate(failures);
+            Messages.Message(message, MessageTypeDefOf.NeutralEvent, false);
+        });
     }
 }

@@ -19,6 +19,9 @@
     <Compile Include="..\Source\Service\BusyGate.cs" Link="BusyGate.cs" />
     <Compile Include="..\Source\Policy\StoryThreadPolicy.cs" Link="StoryThreadPolicy.cs" />
     <Compile Include="..\Source\Data\TalkType.cs" Link="TalkType.cs" />
+    <Compile Include="..\Source\Policy\EventPromptPolicy.cs" Link="EventPromptPolicy.cs" />
+    <Compile Include="..\Source\Policy\PlayerOrderPolicy.cs" Link="PlayerOrderPolicy.cs" />
+    <Compile Include="..\Source\Error\FailureNoticeGate.cs" Link="FailureNoticeGate.cs" />
     <None Include="..\Source\Client\OpenAI\OpenAIClient.cs" Link="OpenAIClient.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Data\PawnState.cs" Link="PawnState.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\TalkService.cs" Link="TalkService.cs.src" CopyToOutputDirectory="PreserveNewest" />
@@ -29,6 +32,12 @@
     <None Include="..\Source\Service\AIService.cs" Link="AIService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\PromptService.cs" Link="PromptService.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\ContextBuilder.cs" Link="ContextBuilder.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\SpontaneousDialogueType.cs" Link="SpontaneousDialogueType.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\DialogueTone.cs" Link="DialogueTone.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\PlayerOrderService.cs" Link="PlayerOrderService.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Data\Hediff_Persona.cs" Link="Hediff_Persona.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Util\PawnUtilStatusOps.cs" Link="PawnUtilStatusOps.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Prompt\Data\BuiltInPromptEntries.cs" Link="BuiltInPromptEntries.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Util\PawnUtil.cs" Link="PawnUtil.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Settings\CommunicationSettings.cs" Link="CommunicationSettings.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Settings\Ui\CommunicationBasicSettingsPage.cs" Link="CommunicationBasicSettingsPage.cs.src" CopyToOutputDirectory="PreserveNewest" />

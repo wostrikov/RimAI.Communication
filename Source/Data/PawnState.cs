@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Communication.Util;
 using Ustas.RimAI.Core.Communication;
 using RimWorld;
@@ -178,25 +179,41 @@ public class PawnState(Pawn pawn)
     {
         if (TalkResponses.Count == 0) return;
         var talkResponse = TalkResponses[0];
-        TalkHistory.AddIgnored(talkResponse.Id);
         TalkResponses.Remove(talkResponse);
+        MarkIgnored(talkResponse);
+    }
 
+    /// <summary>
+    /// Drops this pawn's pending lines, except those of <paramref name="keepTypes"/>, and stops a
+    /// generation still streaming lines for this pawn - otherwise the lines just dropped are
+    /// replaced a moment later by the rest of the same conversation.
+    /// </summary>
+    public void IgnoreAllTalkResponses(List<TalkType> keepTypes = null)
+    {
+        DrainIncomingTalkResponses();
+        TalkResponses.RemoveAll(response =>
+        {
+            if (keepTypes != null && keepTypes.Contains(response.TalkType)) return false;
+            MarkIgnored(response);
+            return true;
+        });
+
+        CancelGenerationInvolvingPawn(keepTypes);
+    }
+
+    private static void MarkIgnored(TalkResponse talkResponse)
+    {
+        TalkHistory.AddIgnored(talkResponse.Id);
         var log = ApiHistory.GetApiLog(talkResponse.Id);
         if (log != null) log.SpokenTick = -1;
     }
 
-    public void IgnoreAllTalkResponses(List<TalkType> keepTypes = null)
+    private void CancelGenerationInvolvingPawn(List<TalkType> keepTypes)
     {
-        DrainIncomingTalkResponses();
-        if (keepTypes == null)
-            while (TalkResponses.Count > 0)
-                IgnoreTalkResponse();
-        else
-            TalkResponses.RemoveAll(response =>
-            {
-                if (keepTypes.Contains(response.TalkType)) return false;
-                TalkHistory.AddIgnored(response.Id);
-                return true;
-            });
+        var current = AIService.CurrentTalk;
+        if (current == null || current.TalkType.IsFromUser()) return;
+        if (keepTypes != null && keepTypes.Contains(current.TalkType)) return;
+        if (current.Initiator == Pawn || current.Recipient == Pawn || current.Participants?.Contains(Pawn) == true)
+            AIService.CancelCurrent();
     }
 }

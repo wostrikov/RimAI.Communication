@@ -46,10 +46,21 @@ public static class TopicService
     }
 
     /// <summary>
+    /// What a pawn in a mental break keeps coming back to: always a topic, when topics are on,
+    /// so that one break does not produce the same outburst over and over. Null during a fight.
+    /// </summary>
+    public static string DrawFixation(TalkRequest talkRequest, Pawn mainPawn)
+    {
+        if (!Settings.Get().Context.IncludeTopicKeywords || talkRequest.TalkType == TalkType.Urgent)
+            return null;
+        return TryGetTopic(mainPawn, out var approach, out var subject, always: true) ? $"{approach}, {subject}" : null;
+    }
+
+    /// <summary>
     /// A topic half the time, and always for a pawn's first talk. Animals, mechanoids, entities
     /// and mutants never get a human narrative topic.
     /// </summary>
-    public static bool TryGetTopic(Pawn pawn, out string approach, out string subject)
+    public static bool TryGetTopic(Pawn pawn, out string approach, out string subject, bool always = false)
     {
         approach = null;
         subject = null;
@@ -59,7 +70,7 @@ public static class TopicService
         lock (Lock)
         {
             bool isFirstTalk = pawn != null && Cache.Get(pawn)?.LastTalkTick == 0;
-            if (!isFirstTalk && Rng.NextDouble() >= 0.50) return false;
+            if (!always && !isFirstTalk && Rng.NextDouble() >= 0.50) return false;
             EnsureDecks();
             approach = Draw(_approachDeck) ?? "casual remark";
             subject = Draw(_subjectDeck) ?? "daily life";

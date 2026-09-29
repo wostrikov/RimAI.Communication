@@ -113,6 +113,9 @@ public static class PromptService
             // Replaced on the result rather than inside, so Harmony patches on CreatePawnContext still apply.
             var pawnContext = WithUniqueName(CreatePawnContext(pawn, infoLevel), pawn, pawns);
             pawnContext = CommonUtil.StripFormattingTags(pawnContext);
+            var orders = PlayerOrderService.ContextLine(pawn);
+            if (orders != null)
+                pawnContext = pawnContext.TrimEnd() + "\n" + orders;
 
             Cache.Get(pawn).Context = pawnContext;
             context.AppendLine($"[P{i + 1}]").AppendLine(pawnContext);

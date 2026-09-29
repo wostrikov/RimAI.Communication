@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Policy;
 using RimWorld;
 using Verse;
 using Cache = Ustas.RimAI.Communication.Data.Cache;
@@ -62,45 +62,21 @@ public static class ArchivePatch
 
     private static (string prompt, TalkType talkType) GeneratePrompt(IArchivable archivable)
     {
-        var talkType = TalkType.Event;
-        string prompt;
-        string targetSuffix = GetTargetSuffix(archivable);
+        string label = archivable.ArchivedLabel?.StripTags();
+        string tip = archivable.ArchivedTooltip?.StripTags() ?? string.Empty;
 
         if (archivable is ChoiceLetter { quest: not null } choiceLetter)
         {
-            if (choiceLetter.quest.State == QuestState.NotYetAccepted)
-            {
-                talkType = TalkType.QuestOffer;
-                prompt = $"(Talk if you want to accept quest)\n[{choiceLetter.quest.description.ToString().StripTags()}]";
-            }
-            else
-            {
-                talkType = TalkType.QuestEnd;
-                prompt = $"(Talk about quest result)\n[{archivable.ArchivedTooltip.StripTags()}]";
-            }
-        }
-        else if (archivable is Letter and not ChoiceLetter)
-        {
-            var label = archivable.ArchivedLabel ?? string.Empty;
-            var tip = archivable.ArchivedTooltip ?? string.Empty;
-            
-            if (ContainsQuestReference(label, tip))
-            {
-                talkType = TalkType.QuestEnd;
-                prompt = $"(Talk about quest result)\n[{tip.StripTags()}]";
-            }
-            else
-            {
-                prompt = $"(Talk about incident)\n[{tip.StripTags()}{targetSuffix}]";
-            }
-        }
-        else
-        {
-            // Other events
-            prompt = $"(Talk about incident)\n[{archivable.ArchivedTooltip.StripTags()}{targetSuffix}]";
+            return choiceLetter.quest.State == QuestState.NotYetAccepted
+                ? (EventPromptPolicy.Compose("Talk if you want to accept quest", label,
+                    choiceLetter.quest.description.ToString().StripTags()), TalkType.QuestOffer)
+                : (EventPromptPolicy.Compose("Talk about quest result", label, tip), TalkType.QuestEnd);
         }
 
-        return (prompt, talkType);
+        if (archivable is Letter and not ChoiceLetter && ContainsQuestReference(label ?? string.Empty, tip))
+            return (EventPromptPolicy.Compose("Talk about quest result", label, tip), TalkType.QuestEnd);
+
+        return (EventPromptPolicy.Compose("Talk about incident", label, tip, GetTargetSuffix(archivable)), TalkType.Event);
     }
 
     /// <summary>

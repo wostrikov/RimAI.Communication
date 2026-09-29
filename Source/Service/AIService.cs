@@ -23,6 +23,8 @@ public static class AIService
     // cancelled from the main thread when something more urgent arrives.
     private static volatile System.Threading.CancellationTokenSource _currentCts;
     private static volatile TalkRequest _currentRequest;
+    // Whether the request in flight is a streamed talk rather than a one-off query (a persona).
+    private static volatile bool _currentIsTalk;
 
     /// <summary>
     /// Streaming chat that invokes callback as each player's dialogue is parsed
@@ -30,6 +32,7 @@ public static class AIService
     public static async Task ChatStreaming(TalkRequest request, Action<TalkResponse> onPlayerResponseReceived)
     {
         _currentRequest = request;
+        _currentIsTalk = true;
         var prefixMessages = request.PromptMessages ?? [];
         var apiLog = ApiHistory.AddRequest(request, Channel.Stream);
         var lastApiLog = apiLog;
@@ -69,6 +72,7 @@ public static class AIService
     public static async Task<T> Query<T>(TalkRequest request) where T : class, IJsonData
     {
         _currentRequest = request;
+        _currentIsTalk = false;
         var messages = new List<(Role role, string message)> { (Role.User, request.Prompt) };
         var prefixMessages = new List<(Role role, string message)> { (Role.System, request.Context) };
         var apiLog = ApiHistory.AddRequest(request, Channel.Query);
@@ -76,7 +80,7 @@ public static class AIService
         var payload = await ExecuteWithRetry(
             apiLog,
             async client =>
-                await client.GetChatCompletionAsync(prefixMessages, messages, prep => ApiHistory.UpdatePayload(apiLog.Id, prep)),
+                await client.GetChatCompletionAsync(prefixMessages, messages, prep => ApiHistory.UpdatePayload(apiLog.Id, prep), request.Priority),
             expectTalkObjects: false);
 
         if (string.IsNullOrEmpty(payload.Response) || !string.IsNullOrEmpty(payload.ErrorMessage))
@@ -217,6 +221,9 @@ public static class AIService
 
     /// <summary>The request in flight, or null.</summary>
     public static TalkRequest CurrentRequest => _currentRequest;
+
+    /// <summary>The talk being streamed, or null - a persona query in flight is not one.</summary>
+    public static TalkRequest CurrentTalk => _currentIsTalk && _busy ? _currentRequest : null;
 
     public static bool CanCancelFor(TalkRequest incomingRequest)
     {

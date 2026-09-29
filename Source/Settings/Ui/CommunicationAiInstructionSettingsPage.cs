@@ -200,26 +200,6 @@ internal sealed class CommunicationAiInstructionSettingsPage : CommunicationSett
     }
 
     internal static PromptEntry GetOrCreateBaseInstructionEntry(PromptPreset preset)
-    {
-        if (preset == null) return null;
-
-        var entry = preset.Entries.FirstOrDefault(e =>
-            string.Equals(e.Name, "Base Instruction", StringComparison.OrdinalIgnoreCase));
-        if (entry != null) return entry;
-
-        entry = preset.Entries.FirstOrDefault(e =>
-            e.Role == PromptRole.System && e.Position == PromptPosition.Relative);
-        if (entry != null) return entry;
-
-        entry = new PromptEntry
-        {
-            Name = "Base Instruction",
-            Role = PromptRole.System,
-            Position = PromptPosition.Relative,
-            Content = Constant.DefaultInstruction
-        };
-        preset.Entries.Insert(0, entry);
-        return entry;
-    }
+        => BuiltInPromptEntries.GetOrCreateBaseInstruction(preset, Constant.DefaultInstruction);
 
 }

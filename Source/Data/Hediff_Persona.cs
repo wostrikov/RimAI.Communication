@@ -44,10 +44,7 @@ public class Hediff_Persona : Hediff
             PersonalityData randomPersonalityData;
             if (pawn.RaceProps.Humanlike)
             {
-                var selector = SelectPersonality;
-                randomPersonalityData = selector != null
-                    ? selector(Constant.Personalities, pawn)
-                    : Constant.Personalities.RandomElement();
+                randomPersonalityData = pawn.IsBaby() ? Constant.PersonaBaby : PickHumanlikePersona(pawn);
             }
             else if (pawn.RaceProps.Animal)
             {
@@ -61,18 +58,14 @@ public class Hediff_Persona : Hediff
             {
                 randomPersonalityData = Constant.PersonaNonHuman;
             }
-            hediff.Personality = randomPersonalityData.Persona;
-        
-            if (pawn.IsSlave || pawn.IsPrisoner || pawn.IsVisitor() || pawn.IsEnemy())
-            {
-                hediff.TalkInitiationWeight = 0.2f;
-            }
-            else
-            {
-                hediff.TalkInitiationWeight = randomPersonalityData.Chattiness;
-            }
-        
+
+            hediff.Assign(pawn, randomPersonalityData);
             pawn.health.AddHediff(hediff);
+        }
+        else if (pawn.RaceProps.Humanlike && hediff.Personality == Constant.PersonaBaby.Persona && !pawn.IsBaby())
+        {
+            // The baby has grown into a child: it gets a persona of its own now.
+            hediff.Assign(pawn, PickHumanlikePersona(pawn));
         }
     
         // Ensure dictionary is initialized (for both new and existing hediffs)
@@ -81,6 +74,21 @@ public class Hediff_Persona : Hediff
         return hediff;
     }
     
+    private static PersonalityData PickHumanlikePersona(Pawn pawn)
+    {
+        var selector = SelectPersonality;
+        return selector != null ? selector(Constant.Personalities, pawn) : Constant.Personalities.RandomElement();
+    }
+
+    private void Assign(Pawn pawn, PersonalityData data)
+    {
+        Personality = data.Persona;
+        // Someone who is not free, or not one of ours, rarely starts a conversation.
+        TalkInitiationWeight = pawn.IsSlave || pawn.IsPrisoner || pawn.IsVisitor() || pawn.IsEnemy()
+            ? 0.2f
+            : data.Chattiness;
+    }
+
     // Check if thought was spoken recently, if not mark it as spoken
     // Returns true if successfully marked (was not spoken recently)
     // Returns false if already spoken recently (within intervalTicks)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Core.AI;
 
 namespace Ustas.RimAI.Communication.Client
 {
@@ -13,10 +14,12 @@ namespace Ustas.RimAI.Communication.Client
         /// <param name="prefixMessages">Initial messages to prepend (can include system, user, assistant roles)</param>
         /// <param name="messages">List of conversation messages with roles</param>
         /// <param name="onRequestPrepared">Callback invoked as soon as the request JSON is built</param>
+        /// <param name="priority">Scheduling priority, or null for the module's own</param>
         /// <returns>AI response text and token usage</returns>
         Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages, 
             List<(Role role, string message)> messages, 
-            Action<Payload> onRequestPrepared = null);
+            Action<Payload> onRequestPrepared = null,
+            AiRequestPriority? priority = null);
 
         /// <summary>
         /// Streams chat completion and invokes a callback for each response chunk.

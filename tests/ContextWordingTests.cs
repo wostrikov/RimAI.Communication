@@ -20,6 +20,8 @@ internal static class ContextWordingTests
 
         string describer = Read("Describer.cs.src");
         string builder = Read("ContextBuilder.cs.src");
+        // The dialogue type of a talk the pawns start themselves moved out of ContextBuilder.
+        string spontaneous = Read("SpontaneousDialogueType.cs.src");
         string prompt = Read("PromptService.cs.src");
         string relations = Read("RelationsService.cs.src");
 
@@ -34,10 +36,11 @@ internal static class ContextWordingTests
 
         T(builder.Contains("GroupBy(s => s.LevelDescriptor)"), "skills-grouped-by-tier");
         T(builder.Contains("DescribeThingLabel"), "equipment-condition-as-a-word");
-        T(builder.Contains("TopicService.DrawHint(talkRequest, mainPawn)"), "topic-keywords-offered");
-        T(builder.Contains("if (!talkRequest.TopicHintDrawn)"), "topic-drawn-once-per-talk");
-        int combat = builder.IndexOf("mainPawn.IsInCombat() || mainPawn.GetMapRole() == MapRole.Invading", StringComparison.Ordinal);
-        int monologue = builder.IndexOf("short monologue", StringComparison.Ordinal);
+        T(builder.Contains("SpontaneousDialogueType.Build("), "builder-delegates-spontaneous-talk");
+        T(spontaneous.Contains("TopicService.DrawHint(talkRequest, mainPawn)"), "topic-keywords-offered");
+        T(spontaneous.Contains("if (!talkRequest.TopicHintDrawn)"), "topic-drawn-once-per-talk");
+        int combat = spontaneous.IndexOf("mainPawn.IsInCombat() || mainPawn.GetMapRole() == MapRole.Invading", StringComparison.Ordinal);
+        int monologue = spontaneous.IndexOf("short monologue", StringComparison.Ordinal);
         T(combat >= 0 && monologue > combat, "combat-outranks-monologue");
 
         int decorate = prompt.IndexOf("public static void DecoratePrompt", StringComparison.Ordinal);

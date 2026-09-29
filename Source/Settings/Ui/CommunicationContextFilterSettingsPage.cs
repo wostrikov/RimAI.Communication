@@ -56,7 +56,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 IncludeSurroundings = false,
                 IncludeWealth = false,
                 IncludeTopicKeywords = false,
-                IncludeStoryThreads = false
+                IncludeStoryThreads = false,
+                IncludePlayerOrders = true
             }},
             { ContextPreset.Standard, new ContextSettings {
                 EnableContextOptimization = false,
@@ -87,7 +88,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 IncludeSurroundings = false,
                 IncludeWealth = false,
                 IncludeTopicKeywords = true,
-                IncludeStoryThreads = true
+                IncludeStoryThreads = true,
+                IncludePlayerOrders = true
             }},
             { ContextPreset.Comprehensive, new ContextSettings {
                 EnableContextOptimization = false,
@@ -118,7 +120,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 IncludeSurroundings = true,
                 IncludeWealth = true,
                 IncludeTopicKeywords = true,
-                IncludeStoryThreads = true
+                IncludeStoryThreads = true,
+                IncludePlayerOrders = true
             }}
         };
 
@@ -297,6 +300,8 @@ internal sealed class CommunicationContextFilterSettingsPage : CommunicationSett
                 "RimTalk.Settings.IncludeTopicKeywords.Tooltip".Translate());
             rightListing.CheckboxLabeled("RimTalk.Settings.IncludeStoryThreads".Translate(), ref context.IncludeStoryThreads,
                 "RimTalk.Settings.IncludeStoryThreads.Tooltip".Translate());
+            rightListing.CheckboxLabeled("RimTalk.Settings.IncludePlayerOrders".Translate(), ref context.IncludePlayerOrders,
+                "RimTalk.Settings.IncludePlayerOrders.Tooltip".Translate());
 
             rightListing.End();
 

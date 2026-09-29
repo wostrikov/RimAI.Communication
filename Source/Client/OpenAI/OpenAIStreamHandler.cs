@@ -104,7 +104,8 @@ public class OpenAIStreamHandler(Action<string> onContentReceived)
                     onContentReceived?.Invoke(content);
                 }
 
-                if (!string.IsNullOrEmpty(choice.FinishReason))
+                // A provider may close a stream with "choices":[null]; the element itself can be null.
+                if (!string.IsNullOrEmpty(choice?.FinishReason))
                 {
                     _finishReason = choice.FinishReason;
                 }

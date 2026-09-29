@@ -37,6 +37,7 @@ namespace Ustas.RimAI.Communication.Data
         // Dialogue
         public bool IncludeTopicKeywords = true;
         public bool IncludeStoryThreads = true;
+        public bool IncludePlayerOrders = true;
 
         public void ExposeData()
         {
@@ -68,6 +69,7 @@ namespace Ustas.RimAI.Communication.Data
             Scribe_Values.Look(ref IncludeWealth, "IncludeWealth", false);
             Scribe_Values.Look(ref IncludeTopicKeywords, "IncludeTopicKeywords", true);
             Scribe_Values.Look(ref IncludeStoryThreads, "IncludeStoryThreads", true);
+            Scribe_Values.Look(ref IncludePlayerOrders, "IncludePlayerOrders", true);
         }
     }
 }

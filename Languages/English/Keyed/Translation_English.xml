@@ -11,6 +11,7 @@
     <RimTalk.TalkService.APIError>API error occurred</RimTalk.TalkService.APIError>
     <RimTalk.TalkService.TryingNextAPI>Trying next API ({0})</RimTalk.TalkService.TryingNextAPI>
     <RimTalk.TalkService.GenerationFailed>RimTalk generation failed</RimTalk.TalkService.GenerationFailed>
+    <RimTalk.TalkService.GenerationFailedCount>({0} times)</RimTalk.TalkService.GenerationFailedCount>
 
     <!-- Persona -->
     <RimTalk.Persona.CheerfulHelper>Cheerful Helper - Warm, upbeat, and encouraging. Always trying to lift spirits.</RimTalk.Persona.CheerfulHelper>
@@ -65,6 +66,7 @@
     <RimTalk.Persona.Animal>Animal: simple, emotional, instinct-first - short, sensory sentences about smell, hunger, danger.</RimTalk.Persona.Animal>
     <RimTalk.Persona.Mech>Robot: cold, logical, data-driven - terse diagnostics, probabilities, and efficiency-focused responses.</RimTalk.Persona.Mech>
     <RimTalk.Persona.NonHuman>Non-human: cryptic, metaphorical, reality-bending - speaks in visions, echoes, and uncanny images.</RimTalk.Persona.NonHuman>
+    <RimTalk.Persona.Baby>Baby: all feeling and no words yet - babbles, coos, giggles and cries; reacts to hunger, comfort and familiar faces.</RimTalk.Persona.Baby>
 
     <!-- RimTalk_Toggle.cs -->
     <RimTalk.Toggle.Tooltip>Toggle overlay window\nShift+click for mod settings\nCtrl+click for debug window</RimTalk.Toggle.Tooltip>
@@ -253,6 +255,10 @@ Crucial Tips:
     <RimTalk.PersonaEditor.SmartGen>Smart Gen</RimTalk.PersonaEditor.SmartGen>
     <RimTalk.PersonaEditor.RollGen>Roll Gen</RimTalk.PersonaEditor.RollGen>
     <RimTalk.PersonaEditor.Clear>Clear</RimTalk.PersonaEditor.Clear>
+    <RimTalk.PersonaEditor.Orders>Standing orders: {0}</RimTalk.PersonaEditor.Orders>
+    <RimTalk.PersonaEditor.NoOrders>No standing orders</RimTalk.PersonaEditor.NoOrders>
+    <RimTalk.PersonaEditor.Orders.Tooltip>Orders you gave this pawn while talking to it. The pawn keeps to them in every conversation until you withdraw them in a talk, or make it forget them here.</RimTalk.PersonaEditor.Orders.Tooltip>
+    <RimTalk.PersonaEditor.ForgetOrders>Forget orders</RimTalk.PersonaEditor.ForgetOrders>
 
     <!-- Settings_Api.cs -->
     <RimTalk.Settings.GoogleApiKeyLabel>Google AI API Key:</RimTalk.Settings.GoogleApiKeyLabel>
@@ -329,6 +335,8 @@ Crucial Tips:
     <RimTalk.Settings.IncludeTopicKeywords.Tooltip>Half the time, a talk without a prompt of its own gets an angle and a subject to start from (for example nostalgia and hometown), so the same pawns do not keep circling the same few remarks.</RimTalk.Settings.IncludeTopicKeywords.Tooltip>
     <RimTalk.Settings.IncludeStoryThreads>Story threads</RimTalk.Settings.IncludeStoryThreads>
     <RimTalk.Settings.IncludeStoryThreads.Tooltip>A story, rumor or confession a pawn tells can stay open: later someone who heard it carries it on - what happened next, a twist, a new rumor - and after a few tellings someone says how it ended. Up to five at a time; one left untold for ten days is forgotten.</RimTalk.Settings.IncludeStoryThreads.Tooltip>
+    <RimTalk.Settings.IncludePlayerOrders>Player's orders</RimTalk.Settings.IncludePlayerOrders>
+    <RimTalk.Settings.IncludePlayerOrders.Tooltip>When you give a pawn an order, a rule or a role while talking to it, the pawn remembers it with the save and keeps to it in later conversations. A pawn's orders are shown, and can be forgotten, in its conversation style window.</RimTalk.Settings.IncludePlayerOrders.Tooltip>
     
     <!-- DebugWindow.cs -->
     <RimTalk.DebugWindow.ViewByTime>By Time</RimTalk.DebugWindow.ViewByTime>

@@ -37,7 +37,7 @@ public class PersonaEditorWindow : Window
         preventCameraMotion = false;
     }
 
-    public override Vector2 InitialSize => new Vector2(520f, 440f);
+    public override Vector2 InitialSize => new Vector2(520f, 470f);
 
     public override void DoWindowContents(Rect inRect)
     {
@@ -123,11 +123,14 @@ public class PersonaEditorWindow : Window
         Widgets.Label(valueLabelRect, _talkInitiationWeight.ToString("0.00"));
         Text.Anchor = TextAnchor.UpperLeft;
 
+        Rect ordersRect = new Rect(inRect.x, sliderRowRect.yMax + 10f, inRect.width, 24f);
+        PlayerOrdersRow.Draw(ordersRect, _pawn);
+
         // Buttons
         float buttonWidth = 90f;
         float buttonHeight = 28f;
         float spacing = 10f;
-        float buttonY = sliderRowRect.yMax + 15f;
+        float buttonY = ordersRect.yMax + 12f;
 
         // Center the button group (4 buttons total)
         float totalWidth = (buttonWidth * 4f) + (spacing * 3f);

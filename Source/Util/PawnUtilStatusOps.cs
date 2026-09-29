@@ -90,8 +90,11 @@ namespace Ustas.RimAI.Communication.Util
         if (nearestHostile != null)
         {
             float distance = pawn.Position.DistanceTo(nearestHostile.Position);
+            string breakdown = DescribeOwnSideBreakdown(pawn, nearestHostile);
 
-            if (distance <= 10f)
+            if (breakdown != null)
+                lines.Add(distance <= 20f ? $"Threat: {breakdown}, and close!" : $"Alert: {breakdown}");
+            else if (distance <= 10f)
                 lines.Add("Threat: Engaging in battle!");
             else if (distance <= 20f)
                 lines.Add("Threat: Hostiles are dangerously close!");
@@ -100,6 +103,18 @@ namespace Ustas.RimAI.Communication.Util
 
             isInDanger = true;
         }
+    }
+
+    /// <summary>
+    /// When the threat is one of the pawn's own side gone berserk, who it is: "hostiles" had the
+    /// colony shouting at raiders who were not there while a friend attacked them.
+    /// </summary>
+    private static string DescribeOwnSideBreakdown(Pawn pawn, Pawn threat)
+    {
+        if (!threat.InMentalState || threat.Faction == null || threat.Faction != PawnUtil.GetReferenceFaction(pawn))
+            return null;
+        string state = threat.MentalStateDef?.label ?? "mental break";
+        return $"{threat.LabelShort} ({state}) is attacking their own";
     }
 
     /// <summary>

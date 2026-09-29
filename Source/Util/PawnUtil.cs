@@ -45,9 +45,9 @@ public static class PawnUtil
     {
         if (pawn == null || pawn.IsPlayer()) return false;
         if (pawn.Dead) return true;
-        if (pawn.Downed) return true;
-        // Being unable to walk is a condition, not a danger: real danger to an immobile pawn
-        // is already caught by the hostile/bleeding/pain/burning/hediff checks below.
+        // Being downed or unable to walk is a condition, not a danger - a baby is downed all its
+        // life. Real danger to such a pawn is caught by the hostile/bleeding/pain/burning/hediff
+        // checks below.
         if (pawn.InMentalState && includeMentalState) return true;
         if (pawn.IsBurning()) return true;
         if (pawn.health.hediffSet.PainTotal >= pawn.GetStatValue(StatDefOf.PainShockThreshold)) return true;
@@ -311,7 +311,7 @@ public static class PawnUtil
         return FindClosestValidThreat(pawn, referenceFaction, hostileTargets);
     }
 
-    private static Faction GetReferenceFaction(Pawn pawn)
+    internal static Faction GetReferenceFaction(Pawn pawn)
     {
         if (pawn.IsPrisoner || pawn.IsSlave || pawn.IsFreeColonist ||
             pawn.IsVisitor() || pawn.IsQuestLodger())

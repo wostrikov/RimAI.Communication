@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Ustas.RimAI.Communication.Patches;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.AI;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Data;
@@ -30,6 +31,13 @@ public class TalkRequest(string prompt, Pawn initiator, Pawn recipient = null, T
     /// dialogue type is built twice per talk and a second draw would hand each a different one.
     /// </summary>
     public string TopicHint { get; set; }
+
+    /// <summary>
+    /// Scheduling priority for a one-time query, or null for the module's own. Work nobody is
+    /// waiting on - a persona written in the background - asks for Background here, so it
+    /// queues behind every line a colonist is about to say.
+    /// </summary>
+    public AiRequestPriority? Priority { get; set; }
     public bool TopicHintDrawn { get; set; }
 
     /// <summary>The story thread this talk continues, if any.</summary>

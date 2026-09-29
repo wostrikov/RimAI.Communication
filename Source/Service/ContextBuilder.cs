@@ -236,7 +236,7 @@ public static class ContextBuilder
         var m = pawn.needs?.mood;
         if (m?.MoodString != null)
         {
-            string mood = pawn.Downed && !pawn.IsBaby()
+            string mood = pawn.IsDownedInPain()
                 ? "Critical: Downed (in pain/distress)"
                 : pawn.InMentalState
                     ? $"Mood: {pawn.MentalState?.InspectLine} (in mental break)"
@@ -385,50 +385,14 @@ public static class ContextBuilder
             else
                 intentSb.Append(singleTurnIntent);
 
+            if (PlayerOrderService.RecipientOf(talkRequest) != null)
+                intentSb.Append(PlayerOrderService.Instruction(shortName, speakerName));
+
             sb.Append(topicSb).Append(intentSb);
         }
         else
         {
-            // Combat first: a pawn fighting alone is in combat, not musing to itself.
-            if (mainPawn.IsInCombat() || mainPawn.GetMapRole() == MapRole.Invading)
-            {
-                if (talkRequest.TalkType != TalkType.Urgent && !mainPawn.InMentalState)
-                    talkRequest.Prompt = null;
-
-                talkRequest.TalkType = TalkType.Urgent;
-                intentSb.Append(mainPawn.IsSlave || mainPawn.IsPrisoner
-                    ? $"{shortName} dialogue short (worry)"
-                    : $"{shortName} dialogue short, urgent tone ({mainPawn.GetMapRole().ToString().ToLower()}/command)");
-            }
-            else if (pawns.Count == 1)
-            {
-                // Named as one speaker: "monologue" alone let the model write lines for pawns nearby.
-                intentSb.Append($"{shortName} short monologue (only {shortName} speaks)");
-            }
-            else
-            {
-                intentSb.Append($"{shortName} starts conversation, taking turns");
-            }
-
-            if (mainPawn.InMentalState)
-                topicSb.Append("be dramatic (mental break)");
-            else if (mainPawn.Downed && !mainPawn.IsBaby())
-                topicSb.Append("(downed in pain. Short, strained dialogue)");
-            else if (talkRequest.Prompt != null)
-                topicSb.Append(talkRequest.Prompt);
-            else if (talkRequest.TalkType != TalkType.Urgent)
-            {
-                // Without a prompt of its own, a talk gets a fresh angle, or a story to carry on,
-                // which is what keeps the same pair from circling the same few remarks. Drawn once
-                // per request: this method runs twice per talk.
-                if (!talkRequest.TopicHintDrawn)
-                {
-                    talkRequest.TopicHintDrawn = true;
-                    talkRequest.TopicHint = TopicService.DrawHint(talkRequest, mainPawn);
-                }
-                if (talkRequest.TopicHint != null)
-                    topicSb.Append(talkRequest.TopicHint);
-            }
+            SpontaneousDialogueType.Build(intentSb, topicSb, talkRequest, pawns, shortName, mainPawn);
 
             sb.Append(intentSb);
             if (topicSb.Length > 0)

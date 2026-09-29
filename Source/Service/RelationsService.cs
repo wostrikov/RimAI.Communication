@@ -14,6 +14,8 @@ public static class RelationsService
 {
     private const float FriendOpinionThreshold = 20f;
     private const float RivalOpinionThreshold = -20f;
+    // Where dislike turns into a grudge; the same step Describer.Opinion calls "hostile".
+    private const float GrudgeOpinionThreshold = -40f;
 
     public static string GetRelationsString(Pawn pawn)
     {
@@ -60,7 +62,7 @@ public static class RelationsService
                     }
                     else
                     {
-                        label = "Acquaintance";
+                        label = IsOutsiderOrStranger(pawn, otherPawn) ? "Stranger" : "Acquaintance";
                     }
                 }
 
@@ -218,6 +220,42 @@ public static class RelationsService
         return "";
     }
 
+    /// <summary>
+    /// Whether the two are not both members of the colony. A colony member is a colonist, or
+    /// anything else of the player's faction that is not a prisoner - a colony's own animal or
+    /// mechanoid with a voice is family, not a stranger.
+    /// </summary>
+    public static bool IsOutsiderOrStranger(Pawn pawn, Pawn otherPawn)
+    {
+        if (pawn == null || otherPawn == null) return false;
+        if (pawn.IsVisitor() || otherPawn.IsVisitor()) return true;
+        if (pawn.Faction == null || otherPawn.Faction == null || pawn.Faction != otherPawn.Faction) return true;
+        return !IsColonyMember(pawn) || !IsColonyMember(otherPawn);
+    }
+
+    private static bool IsColonyMember(Pawn pawn) => pawn.IsColonist || (pawn.Faction.IsPlayer && !pawn.IsPrisoner);
+
+    /// <summary>
+    /// Whether <paramref name="pawn"/> dislikes <paramref name="target"/> enough for it to show:
+    /// an opinion at or below the rival line, and a grudge when it is severe. Someone on the other
+    /// side of a war with the player is always a grudge; two raiders are not each other's enemy.
+    /// </summary>
+    public static bool HasFriction(Pawn pawn, Pawn target, out bool isSevere)
+    {
+        isSevere = false;
+        if (pawn == null || target == null || pawn == target || target.IsPlayer()) return false;
+
+        if (target.IsEnemy() != pawn.IsEnemy())
+        {
+            isSevere = true;
+            return true;
+        }
+
+        float opinion = pawn.relations?.OpinionOf(target) ?? 0f;
+        isSevere = opinion <= GrudgeOpinionThreshold;
+        return opinion <= RivalOpinionThreshold;
+    }
+
     private static string GetStatusLabel(Pawn pawn, Pawn otherPawn)
     {
         // Master relationship
@@ -282,7 +320,7 @@ public static class RelationsService
             }
             else
             {
-                label = "Acquaintance";
+                label = IsOutsiderOrStranger(pawn, otherPawn) ? "Stranger" : "Acquaintance";
             }
         }
 

@@ -107,8 +107,7 @@ public static class Constant
         var preset = PromptManager.Instance?.GetActivePreset();
         if (preset == null) return DefaultInstruction;
 
-        var entry = preset.Entries.FirstOrDefault(e =>
-            string.Equals(e.Name, "Base Instruction", StringComparison.OrdinalIgnoreCase))
+        var entry = BuiltInPromptEntries.FindBaseInstruction(preset)
                     ?? preset.Entries.FirstOrDefault(e =>
                         e.Role == PromptRole.System && e.Position == PromptPosition.Relative);
 
@@ -198,4 +197,7 @@ public static class Constant
 
     private static PersonalityData _personaNonHuman;
     public static PersonalityData PersonaNonHuman => _personaNonHuman ??= new("RimTalk.Persona.NonHuman".Translate(), 0.2f);
+
+    private static PersonalityData _personaBaby;
+    public static PersonalityData PersonaBaby => _personaBaby ??= new("RimTalk.Persona.Baby".Translate(), 0.15f);
 }

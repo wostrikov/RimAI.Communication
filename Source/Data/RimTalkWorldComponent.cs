@@ -17,13 +17,20 @@ public class RimTalkWorldComponent(World world) : WorldComponent(world)
     /// <summary>Stories the colony is still telling; see StoryThreadService.</summary>
     public List<StoryThread> StoryThreads = new();
 
+    /// <summary>Orders the player gave pawns in conversation; see PlayerOrderService.</summary>
+    public List<PawnOrders> PlayerOrders = new();
+
     public override void ExposeData()
     {
         base.ExposeData();
 
         Scribe_Collections.Look(ref StoryThreads, "storyThreads", LookMode.Deep);
+        Scribe_Collections.Look(ref PlayerOrders, "playerOrders", LookMode.Deep);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
             StoryThreads ??= new List<StoryThread>();
+            PlayerOrders ??= new List<PawnOrders>();
+        }
 
         try 
         {

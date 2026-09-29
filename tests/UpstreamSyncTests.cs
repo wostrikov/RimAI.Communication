@@ -46,7 +46,7 @@ internal static class UpstreamSyncTests
         T(pool.Contains("if (pawn?.Map == null) return null;") && pool.Contains("request.MapId != -1 && request.MapId != pawn.Map.uniqueID"), "pool-serves-any-map-event");
 
         // Monologue, empty responses, beggars and pilgrims, the cooldown.
-        T(builder.Contains("short monologue (only {shortName} speaks)"), "monologue-is-one-speaker");
+        T(Read("SpontaneousDialogueType.cs.src").Contains("short monologue (only {shortName} speaks)"), "monologue-is-one-speaker");
         T(ai.Contains("Empty Response (AI returned no content)"), "empty-response-told-apart");
         T(pawnUtil.Contains("private static bool IsHostileToPlayer(Pawn pawn)") && pawnUtil.Contains("RelationWith(Faction.OfPlayer, allowNull: true)"), "hidden-faction-hostility-without-dummy-relation");
         T(!pawnUtil.Contains("pawn.Faction.IsPlayer || pawn.Faction.def.hidden)"), "hidden-factions-not-excluded");

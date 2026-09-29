@@ -6,6 +6,7 @@
   <RimTalk.TalkService.APIError>Сталася помилка API</RimTalk.TalkService.APIError>
   <RimTalk.TalkService.TryingNextAPI>Спроба використати наступний API ({0})</RimTalk.TalkService.TryingNextAPI>
   <RimTalk.TalkService.GenerationFailed>Не вдалося згенерувати RimTalk</RimTalk.TalkService.GenerationFailed>
+  <RimTalk.TalkService.GenerationFailedCount>(разів: {0})</RimTalk.TalkService.GenerationFailedCount>
   <RimTalk.Persona.CheerfulHelper>Життєрадісний помічник — теплий, бадьорий і підбадьорливий. Завжди намагається підняти настрій.</RimTalk.Persona.CheerfulHelper>
   <RimTalk.Persona.CynicalRealist>Цинічний реаліст — сухий, саркастичний і скептичний. Говорить прямо про сувору правду.</RimTalk.Persona.CynicalRealist>
   <RimTalk.Persona.ShyThinker>Сором'язливий мислитель — тихий і нерішучий. Використовує мало слів, але висловлюється вдумливо.</RimTalk.Persona.ShyThinker>
@@ -57,6 +58,7 @@
   <RimTalk.Persona.Animal>Тварина: проста, емоційна, керується інстинктами — короткі чуттєві речення про запахи, голод і небезпеку.</RimTalk.Persona.Animal>
   <RimTalk.Persona.Mech>Робот: холодний, логічний, керується даними — стислі діагностичні повідомлення, імовірності та відповіді, зосереджені на ефективності.</RimTalk.Persona.Mech>
   <RimTalk.Persona.NonHuman>Нелюдь: загадковий, метафоричний, викривляє реальність — говорить видіннями, відлуннями та моторошними образами.</RimTalk.Persona.NonHuman>
+  <RimTalk.Persona.Baby>Немовля: самі почуття, слів ще немає — белькоче, гулить, сміється й плаче; відгукується на голод, затишок і знайомі обличчя.</RimTalk.Persona.Baby>
   <RimTalk.Toggle.Tooltip>Перемкнути вікно накладання\nShift+клацання — налаштування моду\nCtrl+клацання — вікно налагодження</RimTalk.Toggle.Tooltip>
   <RimTalk.Settings.BasicSettings>Основні налаштування</RimTalk.Settings.BasicSettings>
   <RimTalk.Settings.PromptSetting>Налаштування промптів</RimTalk.Settings.PromptSetting>
@@ -228,6 +230,10 @@
   <RimTalk.PersonaEditor.SmartGen>Розумна генерація</RimTalk.PersonaEditor.SmartGen>
   <RimTalk.PersonaEditor.RollGen>Випадкова генерація</RimTalk.PersonaEditor.RollGen>
   <RimTalk.PersonaEditor.Clear>Очистити</RimTalk.PersonaEditor.Clear>
+  <RimTalk.PersonaEditor.Orders>Чинні накази: {0}</RimTalk.PersonaEditor.Orders>
+  <RimTalk.PersonaEditor.NoOrders>Чинних наказів немає</RimTalk.PersonaEditor.NoOrders>
+  <RimTalk.PersonaEditor.Orders.Tooltip>Накази, які ви дали цьому персонажу в розмові. Він дотримується їх у кожній розмові, доки ви не скасуєте їх у розмові або не змусите його забути їх тут.</RimTalk.PersonaEditor.Orders.Tooltip>
+  <RimTalk.PersonaEditor.ForgetOrders>Забути накази</RimTalk.PersonaEditor.ForgetOrders>
   <RimTalk.Settings.GoogleApiKeyLabel>Ключ API Google AI:</RimTalk.Settings.GoogleApiKeyLabel>
   <RimTalk.Settings.GoogleApiKeyDesc>Використовує безплатну модель Gemma-4-26b-a4b. Для інших моделей або провайдерів скористайтеся розширеними налаштуваннями.</RimTalk.Settings.GoogleApiKeyDesc>
   <RimTalk.Settings.GetFreeApiKeyButton>Отримати безплатний ключ API</RimTalk.Settings.GetFreeApiKeyButton>
@@ -297,6 +303,8 @@
   <RimTalk.Settings.IncludeTopicKeywords.Tooltip>У половині випадків розмова без власного запиту отримує кут і тему для початку (наприклад, ностальгія і рідне місто), щоб ті самі персонажі не ходили по колу тих самих кількох реплік.</RimTalk.Settings.IncludeTopicKeywords.Tooltip>
   <RimTalk.Settings.IncludeStoryThreads>Сюжетні нитки</RimTalk.Settings.IncludeStoryThreads>
   <RimTalk.Settings.IncludeStoryThreads.Tooltip>Історія, чутка чи зізнання, які розповів персонаж, можуть лишитися відкритими: згодом хтось, хто це чув, продовжує — що було далі, несподіваний поворот, нова чутка, — а за кілька переказів хтось розповідає, чим усе скінчилося. Не більше п'яти одночасно; нитку, про яку десять днів мовчать, забувають.</RimTalk.Settings.IncludeStoryThreads.Tooltip>
+  <RimTalk.Settings.IncludePlayerOrders>Накази гравця</RimTalk.Settings.IncludePlayerOrders>
+  <RimTalk.Settings.IncludePlayerOrders.Tooltip>Коли в розмові ви даєте персонажу наказ, правило чи роль, він запам'ятовує це разом зі збереженням і дотримується цього в наступних розмовах. Накази персонажа видно у вікні його стилю розмови — там же можна змусити його їх забути.</RimTalk.Settings.IncludePlayerOrders.Tooltip>
   <RimTalk.DebugWindow.ViewByTime>За часом</RimTalk.DebugWindow.ViewByTime>
   <RimTalk.DebugWindow.ViewByPawn>За персонажем</RimTalk.DebugWindow.ViewByPawn>
   <RimTalk.DebugWindow.ViewTalkRequests>Запити на розмову</RimTalk.DebugWindow.ViewTalkRequests>

@@ -40,7 +40,8 @@ public class OpenAIClient(
 
     public async Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
         List<(Role role, string message)> messages,
-        Action<Payload> onRequestPrepared = null)
+        Action<Payload> onRequestPrepared = null,
+        AiRequestPriority? priority = null)
     {
         string jsonContent = officialOpenAI ? BuildResponsesJson(prefixMessages, messages) : BuildRequestJson(prefixMessages, messages, stream: false);
         onRequestPrepared?.Invoke(new Payload(_endpointUrl, model, jsonContent, null, 0));
@@ -55,7 +56,9 @@ public class OpenAIClient(
             ExtraHeaders = extraHeaders,
             PrebuiltJson = jsonContent,
             Caller = "communication",
-            Arbitration = AiRequestMetadata.FromCaller("communication")
+            Arbitration = priority is AiRequestPriority requested
+                ? new AiRequestMetadata("communication", "dialogue", requested, caller: "communication")
+                : AiRequestMetadata.FromCaller("communication")
         }));
         if (shared.StatusCode == 429)
         {
