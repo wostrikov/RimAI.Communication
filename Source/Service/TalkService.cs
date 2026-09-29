@@ -308,7 +308,10 @@ public static class TalkService
 
         // Create the interaction log entry, which triggers the display of the talk bubble in-game.
         InteractionDef intDef = DefDatabase<InteractionDef>.GetNamed("RimTalkInteraction");
-        var recipient = talk.GetTarget() ?? pawn;
+        // The invisible player pawn lives in no map and no save, so a log entry or a social
+        // memory naming him would be written as a reference the save cannot resolve.
+        var target = talk.GetTarget();
+        var recipient = target == null || target.IsPlayer() ? pawn : target;
         var playLogEntryInteraction = new PlayLogEntry_RimTalkInteraction(intDef, pawn, recipient, null);
 
         if (playLogEntryInteraction.CachedString.NullOrEmpty())

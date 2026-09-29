@@ -216,7 +216,14 @@ public static class Cache
     {
         if (Current.Game == null || Settings.Get().PlayerName == _playerPawn?.Name.ToStringShort) return;
         
-        _playerPawn = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist);
+        // A new pawn, always. Left to itself the generator may redress a free world pawn
+        // instead - somebody with relations and a history - take him out of the world and
+        // hand him over to be renamed, after which everything that named him points at a
+        // pawn no save can contain. And no relations, so nobody else names this one.
+        _playerPawn = PawnGenerator.GeneratePawn(new PawnGenerationRequest(
+            PawnKindDefOf.Colonist,
+            forceGenerateNewPawn: true,
+            canGeneratePawnRelations: false));
         _playerPawn.Name = new NameSingle(Settings.Get().PlayerName);
         PawnCache[_playerPawn] = new PawnState(_playerPawn);
         NameCache[_playerPawn.LabelShort] = _playerPawn;
