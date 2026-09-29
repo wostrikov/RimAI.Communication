@@ -38,10 +38,17 @@ public class OpenAIClient(
             : trimmed;
     }
 
+    public Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
+        List<(Role role, string message)> messages,
+        Action<Payload> onRequestPrepared = null)
+    {
+        return GetChatCompletionAsync(prefixMessages, messages, onRequestPrepared, null);
+    }
+
     public async Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
         List<(Role role, string message)> messages,
-        Action<Payload> onRequestPrepared = null,
-        AiRequestPriority? priority = null)
+        Action<Payload> onRequestPrepared,
+        AiRequestPriority? priority)
     {
         string jsonContent = officialOpenAI ? BuildResponsesJson(prefixMessages, messages) : BuildRequestJson(prefixMessages, messages, stream: false);
         onRequestPrepared?.Invoke(new Payload(_endpointUrl, model, jsonContent, null, 0));

@@ -14,12 +14,22 @@ namespace Ustas.RimAI.Communication.Client
         /// <param name="prefixMessages">Initial messages to prepend (can include system, user, assistant roles)</param>
         /// <param name="messages">List of conversation messages with roles</param>
         /// <param name="onRequestPrepared">Callback invoked as soon as the request JSON is built</param>
-        /// <param name="priority">Scheduling priority, or null for the module's own</param>
         /// <returns>AI response text and token usage</returns>
         Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages, 
             List<(Role role, string message)> messages, 
-            Action<Payload> onRequestPrepared = null,
-            AiRequestPriority? priority = null);
+            Action<Payload> onRequestPrepared = null);
+
+        /// <summary>
+        /// The same, at a chosen scheduling priority. An overload rather than an optional
+        /// parameter on the method above: Art, Memory, Voices and Quests call that one from
+        /// assemblies deployed on their own, and a changed signature is a
+        /// MissingMethodException in every one of them until each is rebuilt.
+        /// </summary>
+        /// <param name="priority">Scheduling priority, or null for the module's own</param>
+        Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
+            List<(Role role, string message)> messages,
+            Action<Payload> onRequestPrepared,
+            AiRequestPriority? priority);
 
         /// <summary>
         /// Streams chat completion and invokes a callback for each response chunk.

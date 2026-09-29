@@ -61,12 +61,19 @@ public class Player2Client : IAIClient
         }
     }
 
+    // Player2 is a local app with its own queue; the shared arbiter's priority does not reach it.
+    public Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
+        List<(Role role, string message)> messages,
+        Action<Payload> onRequestPrepared,
+        AiRequestPriority? priority)
+    {
+        return GetChatCompletionAsync(prefixMessages, messages, onRequestPrepared);
+    }
+
     public async Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
         List<(Role role, string message)> messages,
-        Action<Payload> onRequestPrepared = null,
-        AiRequestPriority? priority = null)
+        Action<Payload> onRequestPrepared = null)
     {
-        // Player2 is a local app with its own queue; the shared arbiter's priority does not reach it.
         string jsonContent = BuildRequestJson(prefixMessages, messages, stream: false);
         onRequestPrepared?.Invoke(new Payload(CurrentApiUrl, null, jsonContent, null, 0));
         string responseText = await SendRequestAsync($"{CurrentApiUrl}/v1/chat/completions", jsonContent);
