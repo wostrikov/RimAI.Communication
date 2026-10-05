@@ -6,7 +6,6 @@ using System.Text;
 using HarmonyLib;
 using Ustas.RimAI.Communication.API;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using UnityEngine;

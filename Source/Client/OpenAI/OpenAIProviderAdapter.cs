@@ -18,17 +18,27 @@ public static class OpenAIProviderAdapter
     public static bool CredentialPresent => AiCredentialResolver.Resolve().Present;
     public static string CredentialDisplay => AiCredentialResolver.Resolve().Display;
 
-    public static string BuildRequest(string model, IList<(Role role, string message)> messages, int maxOutputTokens = 2048)
+    /// <param name="imageJpegBase64">A picture for the last user message, or null.</param>
+    public static string BuildRequest(string model, IList<(Role role, string message)> messages, int maxOutputTokens = 2048, string imageJpegBase64 = null)
     {
         if (string.IsNullOrWhiteSpace(model)) throw new ArgumentException("OpenAI model is required.");
         if (messages == null || messages.Count == 0) throw new ArgumentException("OpenAI input is required.");
+        int imageIndex = -1;
+        if (!string.IsNullOrEmpty(imageJpegBase64))
+        {
+            for (int i = messages.Count - 1; i >= 0 && imageIndex < 0; i--)
+                if (messages[i].role == Role.User) imageIndex = i;
+        }
         var json = new StringBuilder("{\"model\":\"").Append(Escape(model)).Append("\",\"input\":[");
         for (int i = 0; i < messages.Count; i++)
         {
             if (i > 0) json.Append(',');
             string role = messages[i].role == Role.System ? "developer" : messages[i].role == Role.AI ? "assistant" : "user";
             json.Append("{\"role\":\"").Append(role).Append("\",\"content\":[{\"type\":\"input_text\",\"text\":\"")
-                .Append(Escape(messages[i].message)).Append("\"}]}");
+                .Append(Escape(messages[i].message)).Append("\"}");
+            if (i == imageIndex)
+                json.Append(',').Append(Ustas.RimAI.Core.AI.TextAiImageParts.ResponsesPart(imageJpegBase64));
+            json.Append("]}");
         }
         return json.Append("],\"max_output_tokens\":").Append(maxOutputTokens).Append(",\"store\":false}").ToString();
     }

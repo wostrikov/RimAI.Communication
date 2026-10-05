@@ -1,6 +1,5 @@
 using HarmonyLib;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using Verse;
 

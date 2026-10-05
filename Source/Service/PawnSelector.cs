@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using Verse;
 

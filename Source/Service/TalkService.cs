@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Prompt;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.UI;
 using Ustas.RimAI.Communication.Util;
 using Ustas.RimAI.Core.Communication;

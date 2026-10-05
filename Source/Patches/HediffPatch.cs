@@ -1,7 +1,6 @@
 using System;
 using HarmonyLib;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Util;
 using Verse;
 

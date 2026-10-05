@@ -77,11 +77,25 @@ public static class AIService
         var prefixMessages = new List<(Role role, string message)> { (Role.System, request.Context) };
         var apiLog = ApiHistory.AddRequest(request, Channel.Query);
 
+        string image = request.ImageJpegBase64;
         var payload = await ExecuteWithRetry(
             apiLog,
             async client =>
-                await client.GetChatCompletionAsync(prefixMessages, messages, prep => ApiHistory.UpdatePayload(apiLog.Id, prep), request.Priority),
+                await client.GetChatCompletionAsync(prefixMessages, messages, prep => ApiHistory.UpdatePayload(apiLog.Id, prep), request.Priority, image),
             expectTalkObjects: false);
+
+        // A model that takes no pictures refuses the whole request; the text alone
+        // is still worth asking once more. A cancellation is not a refusal.
+        if (image != null && payload != null && !string.IsNullOrEmpty(payload.ErrorMessage))
+        {
+            Logger.Warning("Query with a picture failed (" + payload.ErrorMessage + "); asking once more without it.");
+            image = null;
+            payload = await ExecuteWithRetry(
+                apiLog,
+                async client =>
+                    await client.GetChatCompletionAsync(prefixMessages, messages, prep => ApiHistory.UpdatePayload(apiLog.Id, prep), request.Priority, null),
+                expectTalkObjects: false);
+        }
 
         if (string.IsNullOrEmpty(payload.Response) || !string.IsNullOrEmpty(payload.ErrorMessage))
         {

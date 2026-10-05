@@ -45,16 +45,28 @@ public class OpenAIClient(
         return GetChatCompletionAsync(prefixMessages, messages, onRequestPrepared, null);
     }
 
-    public async Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
+    public Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
         List<(Role role, string message)> messages,
         Action<Payload> onRequestPrepared,
         AiRequestPriority? priority)
     {
-        string jsonContent = officialOpenAI ? BuildResponsesJson(prefixMessages, messages) : BuildRequestJson(prefixMessages, messages, stream: false);
+        return GetChatCompletionAsync(prefixMessages, messages, onRequestPrepared, priority, null);
+    }
+
+    public async Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
+        List<(Role role, string message)> messages,
+        Action<Payload> onRequestPrepared,
+        AiRequestPriority? priority,
+        string imageJpegBase64)
+    {
+        string image = string.IsNullOrEmpty(imageJpegBase64) ? null : imageJpegBase64;
+        string jsonContent = officialOpenAI
+            ? BuildResponsesJson(prefixMessages, messages, image)
+            : BuildRequestJson(prefixMessages, messages, stream: false, image);
         onRequestPrepared?.Invoke(new Payload(_endpointUrl, model, jsonContent, null, 0));
         var shared = await RimAiBackground.Run(() => SharedTextAiOrchestrator.Complete(new TextAiRequest
         {
-            Messages = ToSharedMessages(prefixMessages, messages),
+            Messages = ToSharedMessages(prefixMessages, messages, image),
             Model = model,
             BaseUrl = _endpointUrl,
             ApiShape = officialOpenAI ? TextAiApiShape.Responses : TextAiApiShape.ChatCompletions,
@@ -122,12 +134,12 @@ public class OpenAIClient(
             streamHandler.GetTotalTokens());
     }
 
-    private string BuildResponsesJson(List<(Role role, string message)> prefixMessages, List<(Role role, string message)> messages)
+    private string BuildResponsesJson(List<(Role role, string message)> prefixMessages, List<(Role role, string message)> messages, string image = null)
     {
         var all = new List<(Role role, string message)>();
         if (prefixMessages != null) all.AddRange(prefixMessages);
         if (messages != null) all.AddRange(messages);
-        return OpenAIProviderAdapter.BuildRequest(model, all);
+        return OpenAIProviderAdapter.BuildRequest(model, all, imageJpegBase64: image);
     }
 
     private static int ParseResponsesTotalTokens(string json)
@@ -137,7 +149,7 @@ public class OpenAIClient(
     }
 
     private string BuildRequestJson(List<(Role role, string message)> prefixMessages,
-        List<(Role role, string message)> messages, bool stream)
+        List<(Role role, string message)> messages, bool stream, string image = null)
     {
         var rawMessages = new List<(Role role, string message)>();
         if (prefixMessages != null) rawMessages.AddRange(prefixMessages);
@@ -179,7 +191,7 @@ public class OpenAIClient(
             }
         }
         
-        string? reasoningEffort = DefaultReasoningEffort(model);
+        string reasoningEffort = DefaultReasoningEffort(model);
 
         var request = new OpenAIRequest
         {
@@ -190,14 +202,25 @@ public class OpenAIClient(
             ReasoningEffort = reasoningEffort
         };
 
-        return JsonUtil.SerializeToJson(request);
+        // The DTO's content is a string; the message carrying the picture is
+        // serialized with a marker and the marker swapped for a content array.
+        int imageIndex = image == null ? -1 : mergedMessages.FindLastIndex(m => m.Role == "user");
+        if (imageIndex < 0)
+            return JsonUtil.SerializeToJson(request);
+
+        string text = mergedMessages[imageIndex].Content;
+        mergedMessages[imageIndex].Content = ImageContentMarker;
+        string json = JsonUtil.SerializeToJson(request);
+        return json.Replace("\"" + ImageContentMarker + "\"", TextAiImageParts.ChatContent(text, image));
     }
+
+    private const string ImageContentMarker = "__rimai_image_content_7d1f2c__";
 
     /// <summary>
     /// Talk lines want an answer, not deliberation. Every current Gemini takes "low" - the
     /// newer Flash models reject "minimal" - and Gemma thinks least with "minimal".
     /// </summary>
-    internal static string? DefaultReasoningEffort(string? model)
+    internal static string DefaultReasoningEffort(string model)
     {
         if (string.IsNullOrEmpty(model)) return null;
         string m = model.ToLowerInvariant();
@@ -208,7 +231,8 @@ public class OpenAIClient(
 
     static List<TextAiMessage> ToSharedMessages(
         List<(Role role, string message)> prefixMessages,
-        List<(Role role, string message)> messages)
+        List<(Role role, string message)> messages,
+        string image = null)
     {
         var result = new List<TextAiMessage>();
         if (prefixMessages != null)
@@ -220,6 +244,12 @@ public class OpenAIClient(
         {
             foreach (var item in messages)
                 result.Add(new TextAiMessage(RoleToString(item.role), item.message));
+        }
+        // Same message the request body carries the picture on: the last user one.
+        if (image != null)
+        {
+            int last = result.FindLastIndex(m => m.Role == "user");
+            if (last >= 0) result[last] = new TextAiMessage(result[last].Role, result[last].Text, image);
         }
         return result;
     }

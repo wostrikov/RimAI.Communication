@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Ustas.RimAI.Communication.API;
 using Ustas.RimAI.Communication.Data;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Prompt;
 using Ustas.RimAI.Communication.Util;
 using Ustas.RimAI.Core.Communication;

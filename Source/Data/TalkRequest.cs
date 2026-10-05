@@ -38,6 +38,13 @@ public class TalkRequest(string prompt, Pawn initiator, Pawn recipient = null, T
     /// queues behind every line a colonist is about to say.
     /// </summary>
     public AiRequestPriority? Priority { get; set; }
+
+    /// <summary>
+    /// A picture sent with a one-time query's prompt, or null: a JPEG, base64-encoded.
+    /// Only <see cref="Service.AIService.Query{T}"/> sends it, and a request that
+    /// fails with it is tried once more without it, for models that take no images.
+    /// </summary>
+    public string ImageJpegBase64 { get; set; }
     public bool TopicHintDrawn { get; set; }
 
     /// <summary>The story thread this talk continues, if any.</summary>

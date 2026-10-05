@@ -16,7 +16,7 @@ public sealed class CommunicationComposition : IRimAiModuleComposition
 {
     public static CommunicationComposition Current { get; } = new();
 
-    Settings? _mod;
+    Settings _mod;
 
     public string ModuleId => RimAiModuleIds.Communication;
 

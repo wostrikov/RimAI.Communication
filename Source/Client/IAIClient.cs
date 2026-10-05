@@ -32,6 +32,17 @@ namespace Ustas.RimAI.Communication.Client
             AiRequestPriority? priority);
 
         /// <summary>
+        /// The same, with a picture attached to the last user message. Another overload
+        /// for the reason above. A client whose provider takes no images sends the text.
+        /// </summary>
+        /// <param name="imageJpegBase64">A JPEG, base64-encoded, or null for none</param>
+        Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
+            List<(Role role, string message)> messages,
+            Action<Payload> onRequestPrepared,
+            AiRequestPriority? priority,
+            string imageJpegBase64);
+
+        /// <summary>
         /// Streams chat completion and invokes a callback for each response chunk.
         /// </summary>
         /// <param name="prefixMessages">Initial messages</param>

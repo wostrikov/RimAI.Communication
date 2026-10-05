@@ -28,7 +28,7 @@ sealed class CommunicationPromptVariableHost : IPromptVariableHost
         return list;
     }
 
-    public void RegisterContextVariable(string modId, string name, Func<object?, string> provider, string? description, int priority)
+    public void RegisterContextVariable(string modId, string name, Func<object, string> provider, string description, int priority)
     {
         if (string.IsNullOrEmpty(modId) || string.IsNullOrEmpty(name) || provider == null)
             return;
@@ -46,19 +46,19 @@ sealed class CommunicationPromptVariableHost : IPromptVariableHost
             ContextHookRegistry.UnregisterMod(modId);
     }
 
-    public bool TryGetPawnVariable(string name, object? pawn, out string value)
+    public bool TryGetPawnVariable(string name, object pawn, out string value)
     {
         value = string.Empty;
         return pawn is Pawn typed && ContextHookRegistry.TryGetPawnVariable(name, typed, out value);
     }
 
-    public bool TryGetEnvironmentVariable(string name, object? map, out string value)
+    public bool TryGetEnvironmentVariable(string name, object map, out string value)
     {
         value = string.Empty;
         return map is Map typed && ContextHookRegistry.TryGetEnvironmentVariable(name, typed, out value);
     }
 
-    public bool TryGetContextVariable(string name, PromptVariableResolveRequest? request, out string value)
+    public bool TryGetContextVariable(string name, PromptVariableResolveRequest request, out string value)
     {
         value = string.Empty;
         var context = new PromptContext

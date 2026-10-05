@@ -70,6 +70,16 @@ public class Player2Client : IAIClient
         return GetChatCompletionAsync(prefixMessages, messages, onRequestPrepared);
     }
 
+    // Player2's local endpoint takes text only; the picture is left out.
+    public Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
+        List<(Role role, string message)> messages,
+        Action<Payload> onRequestPrepared,
+        AiRequestPriority? priority,
+        string imageJpegBase64)
+    {
+        return GetChatCompletionAsync(prefixMessages, messages, onRequestPrepared);
+    }
+
     public async Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
         List<(Role role, string message)> messages,
         Action<Payload> onRequestPrepared = null)
