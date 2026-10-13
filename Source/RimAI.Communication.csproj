@@ -1,10 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <GameVersion Condition=" '$(GameVersion)' == '' ">1.6</GameVersion>
+        <!--
+            RimWorld 1.7 and nothing older. 1.7 is not a Unity player: it runs on
+            .NET 10, its assemblies sit in the game folder itself, and one
+            assembly - UnityStubs - stands in for everything that was
+            UnityEngine.*Module.dll. So this is net10.0 and compiles against that
+            stand-in, which turns a Unity member 1.7 does not have into a compile
+            error here instead of a type that fails to load there. The 1.6 build
+            is the tag rimworld-1.6-final.
+        -->
+        <GameVersion Condition=" '$(GameVersion)' == '' ">1.7</GameVersion>
         <OutputType>Library</OutputType>
-        <TargetFramework>net48</TargetFramework>
-        <PlatformTarget>x64</PlatformTarget>
+        <TargetFramework>net10.0</TargetFramework>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <!-- The game loads a mod assembly from the mod's own folder: no deps
+             file and no runtime config beside it. -->
+        <GenerateDependencyFile>false</GenerateDependencyFile>
+        <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
+        <HarmonyLibVersion Condition=" '$(HarmonyLibVersion)' == '' ">3.0.0-rc.2</HarmonyLibVersion>
         <RootNamespace>Ustas.RimAI.Communication</RootNamespace>
         <AssemblyName>RimAI.Communication</AssemblyName>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -33,7 +47,9 @@
         only lacked a way to notice.
     -->
     <PropertyGroup>
-        <BubblesForkPath>$(RimWorldDir)\Mods\Interaction Bubbles\1.6\Assemblies\Bubbles.dll</BubblesForkPath>
+        <BubblesForkPath>$(RimWorldDir)\Mods\Interaction Bubbles\1.7\Assemblies\Bubbles.dll</BubblesForkPath>
+        <!-- Until the Bubbles fork itself has moved to its 1.7 folder. -->
+        <BubblesForkPath Condition=" !Exists('$(BubblesForkPath)') ">$(RimWorldDir)\Mods\Interaction Bubbles\1.6\Assemblies\Bubbles.dll</BubblesForkPath>
         <BubblesWorkshopPath>$(RimWorldWorkshopDir)\1516158345\Assemblies\Bubbles.dll</BubblesWorkshopPath>
         <BubblesPath Condition=" '$(BubblesPath)' == '' And Exists('$(BubblesForkPath)') ">$(BubblesForkPath)</BubblesPath>
         <BubblesPath Condition=" '$(BubblesPath)' == '' And Exists('$(BubblesWorkshopPath)') ">$(BubblesWorkshopPath)</BubblesPath>
@@ -53,10 +69,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Lib.Harmony.Ref" Version="2.*" PrivateAssets="All"/>
-        <!-- Consumers compile against the polyfill but must not copy it; this
-             mod is the one that ships it. -->
-        <PackageReference Include="IndexRange" Version="1.0.3" PrivateAssets="runtime" />
+        <!-- Compiled against, never shipped: the Harmony mod is where the one
+             library everybody is patched through comes from. Harmony 3 is the
+             first with an asset for .NET 10, and the version is the one that
+             mod deploys. -->
+        <PackageReference Include="Lib.Harmony" Version="$(HarmonyLibVersion)" ExcludeAssets="runtime" PrivateAssets="All" />
         <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj">
             <Private>false</Private>
         </ProjectReference>
@@ -71,15 +88,15 @@
     <!-- Reference actual game assemblies when UseLocalDlls is enabled -->
     <ItemGroup Condition=" '$(UseLocalDlls)' == 'true' AND '$(RimWorldDir)' != '' ">
         <Reference Include="Assembly-CSharp">
-            <HintPath Condition=" '$(OS)' == 'Windows_NT' ">$(RimWorldDir)\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
-            <HintPath Condition=" '$(OS)' != 'Windows_NT' ">$(RimWorldDir)/RimWorldMac.app/Contents/Resources/Data/Managed/Assembly-CSharp.dll</HintPath>
+            <HintPath>$(RimWorldDir)\Assembly-CSharp.dll</HintPath>
             <Private>false</Private>
         </Reference>
-
-        <_UnityAssemblies Include="$(RimWorldDir)\RimWorldWin64_Data\Managed\UnityEngine*.dll" Condition=" '$(OS)' == 'Windows_NT' " />
-        <_UnityAssemblies Include="$(RimWorldDir)/RimWorldMac.app/Contents/Resources/Data/Managed/UnityEngine*.dll" Condition=" '$(OS)' != 'Windows_NT' " />
-
-        <Reference Include="@(_UnityAssemblies)">
+        <Reference Include="UnityStubs">
+            <HintPath>$(RimWorldDir)\UnityStubs.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Waylith">
+            <HintPath>$(RimWorldDir)\Waylith.dll</HintPath>
             <Private>false</Private>
         </Reference>
     </ItemGroup>
@@ -129,7 +146,6 @@
         <MakeDir Directories="$(ModRoot)\$(GameVersion)\Assemblies" />
         <ItemGroup>
             <_StagedAssemblies Include="$(TargetPath)" />
-            <_StagedAssemblies Include="$(OutputPath)IndexRange.dll" Condition="Exists('$(OutputPath)IndexRange.dll')" />
             <_StagedAssemblies Include="$(ModRoot)\Libs\Scriban.dll" Condition="Exists('$(ModRoot)\Libs\Scriban.dll')" />
         </ItemGroup>
         <Copy SourceFiles="@(_StagedAssemblies)" DestinationFolder="$(ModRoot)\$(GameVersion)\Assemblies\" SkipUnchangedFiles="true" />

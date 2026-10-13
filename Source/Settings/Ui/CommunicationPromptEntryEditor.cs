@@ -284,7 +284,7 @@ internal sealed class CommunicationPromptEntryEditor : CommunicationSettingsColl
             if (te != null && te.cursorIndex != Owner._lastPromptEditorCursorPos)
             {
                 Owner._lastPromptEditorCursorPos = te.cursorIndex;
-                float cursorY = te.graphicalCursorPos.y;
+                float cursorY = TextAreaCursor.LineTop(newContent, te.cursorIndex, editorInnerWidth);
                 if (cursorY < Owner._promptContentScrollPos.y)
                     Owner._promptContentScrollPos.y = cursorY;
                 else if (cursorY + 25f > Owner._promptContentScrollPos.y + editorRect.height)

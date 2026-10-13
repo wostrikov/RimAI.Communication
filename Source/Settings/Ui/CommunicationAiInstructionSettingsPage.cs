@@ -143,7 +143,7 @@ internal sealed class CommunicationAiInstructionSettingsPage : CommunicationSett
             if (te != null && te.cursorIndex != Owner._lastTextAreaCursorPos)
             {
                 Owner._lastTextAreaCursorPos = te.cursorIndex;
-                float cursorY = te.graphicalCursorPos.y;
+                float cursorY = TextAreaCursor.LineTop(newInstruction, te.cursorIndex, innerWidth);
                 if (cursorY < Owner._aiInstructionScrollPos.y)
                     Owner._aiInstructionScrollPos.y = cursorY;
                 else if (cursorY + 25f > Owner._aiInstructionScrollPos.y + textAreaHeight)
