@@ -331,6 +331,14 @@ public class CommunicationSettings : ModSettings
                     baseEntry.Content = Constant.DefaultInstruction;
                     changed = true;
                 }
+                // The slave line that told every slave to lament forced labour, wherever
+                // a stored copy of the instruction still carries it.
+                string settled = CaptiveDemeanorPolicy.ReplaceSupersededRoleLines(baseEntry?.Content);
+                if (baseEntry != null && settled != baseEntry.Content)
+                {
+                    baseEntry.Content = settled;
+                    changed = true;
+                }
             }
 
             if (changed)
@@ -346,6 +354,7 @@ public class CommunicationSettings : ModSettings
                 SimpleModeInstruction = Constant.DefaultInstruction;
                 migratedDefault = true;
             }
+            SimpleModeInstruction = CaptiveDemeanorPolicy.ReplaceSupersededRoleLines(SimpleModeInstruction);
 
             // 1. Recover from Preset (Reverse Migration)
             // If SimpleModeInstruction is default, but we have a custom instruction in the preset, pull it back.

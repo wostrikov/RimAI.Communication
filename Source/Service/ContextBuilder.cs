@@ -292,6 +292,24 @@ public static class ContextBuilder
         return pawn.GetPrisonerSlaveStatus(infoLevel);
     }
 
+    /// <summary>
+    /// How a slave speaks right now, from suppression and tiredness. Always given for a
+    /// slave, whatever the status option above says: that option adds a number, and
+    /// without this line the role instruction had every slave lamenting forced labour.
+    /// </summary>
+    public static string GetCaptiveDemeanorContext(Pawn pawn)
+    {
+        if (pawn == null || !pawn.IsSlave)
+            return null;
+
+        var suppression = pawn.needs?.TryGetNeed<Need_Suppression>();
+        // A slave with no suppression need - a mod took it away - is treated as settled.
+        float percent = suppression != null ? suppression.CurLevelPercentage * 100f : 100f;
+        var rest = pawn.needs?.rest;
+        bool exhausted = rest != null && rest.CurLevelPercentage < 0.25f;
+        return CaptiveDemeanorPolicy.SlaveDemeanor(percent, exhausted);
+    }
+
     public static string GetRelationsContext(Pawn pawn, PromptService.InfoLevel infoLevel)
     {
         var contextSettings = Settings.Get().Context;

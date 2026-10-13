@@ -362,6 +362,10 @@ public class PromptManager : IExposable
         {
             baseEntry.Content = Constant.DefaultInstruction;
         }
+        if (baseEntry != null)
+        {
+            baseEntry.Content = CaptiveDemeanorPolicy.ReplaceSupersededRoleLines(baseEntry.Content);
+        }
 
         var jsonEntry = BuiltInPromptEntries.FindJsonFormat(preset);
         string oldJson = Constant.LegacyEnglishJsonInstruction + "\n{{ if settings.ApplyMoodAndSocialEffects }}\n" +
