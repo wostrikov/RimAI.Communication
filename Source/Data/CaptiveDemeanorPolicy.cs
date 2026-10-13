@@ -7,9 +7,9 @@ namespace Ustas.RimAI.Communication.Data;
 /// obedient; reference forced labor and exhaustion" - and the model obeyed it
 /// to the letter: every slave, in every line, complained about forced labour,
 /// including the ones with nothing to do who had just slept twelve hours and
-/// whose suppression stood at a hundred percent. The owner's report on
-/// 2026-10-13 was a slave saying "I have only just woken up and forced labour
-/// has already worn me out".
+/// whose suppression stood at a hundred percent. The report that prompted
+/// this was a slave saying "I have only just woken up and forced labour has
+/// already worn me out".
 ///
 /// So the instruction now says only what is true of every slave, and the
 /// pawn's own context carries a demeanor line worked out from suppression and
@@ -18,7 +18,7 @@ namespace Ustas.RimAI.Communication.Data;
 /// </summary>
 public static class CaptiveDemeanorPolicy
 {
-    /// <summary>The role line of the base instruction as shipped until 2026-10-13, in Ukrainian.</summary>
+    /// <summary>The role line of the base instruction as it first shipped, in Ukrainian.</summary>
     public const string SupersededSlaveLineUkrainian =
         "Раб: наляканий і слухняний; згадуй примусову працю та виснаження; називай колоністів «господарями»";
 
