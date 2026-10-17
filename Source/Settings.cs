@@ -88,6 +88,7 @@ public class Settings : Mod
             RimAiHandshakeDescriptor.Current(RimAiModuleIds.Communication, Version, isOptional: true),
             CommunicationComposition.Current.Start);
         LongEventHandler.ExecuteWhenFinished(RimAICommunicationPersistenceLiveProbe.TryRun);
+        LongEventHandler.ExecuteWhenFinished(ArchivableFilterMigration.RunOnce);
     }
 
     internal void RegisterRimAIContributions()

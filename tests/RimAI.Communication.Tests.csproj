@@ -23,6 +23,12 @@
     <Compile Include="..\Source\Policy\EventPromptPolicy.cs" Link="EventPromptPolicy.cs" />
     <Compile Include="..\Source\Policy\PlayerOrderPolicy.cs" Link="PlayerOrderPolicy.cs" />
     <Compile Include="..\Source\Error\FailureNoticeGate.cs" Link="FailureNoticeGate.cs" />
+    <Compile Include="..\Source\Policy\ArchivableFilterKeys.cs" Link="ArchivableFilterKeys.cs" />
+    <Compile Include="..\Source\Policy\MetPairRegistry.cs" Link="MetPairRegistry.cs" />
+    <Compile Include="..\Source\Data\BoundedHistory.cs" Link="BoundedHistory.cs" />
+    <Compile Include="..\Source\Data\BaseInstructionLineage.cs" Link="BaseInstructionLineage.cs" />
+    <Compile Include="..\Source\Policy\MonologuePolicy.cs" Link="MonologuePolicy.cs" />
+    <Compile Include="..\Source\Policy\ThoughtTopicPolicy.cs" Link="ThoughtTopicPolicy.cs" />
     <None Include="..\Source\Client\OpenAI\OpenAIClient.cs" Link="OpenAIClient.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Data\PawnState.cs" Link="PawnState.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Service\TalkService.cs" Link="TalkService.cs.src" CopyToOutputDirectory="PreserveNewest" />
@@ -51,6 +57,19 @@
     <None Include="..\Source\Patches\ArchivePatch.cs" Link="ArchivePatch.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Patches\TickManagerPatch.cs" Link="TickManagerPatch.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Client\OpenAI\OpenAIStreamHandler.cs" Link="OpenAIStreamHandler.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Prompt\Parser\ScribanParser.cs" Link="ScribanParser.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Client\Player2\Player2Client.cs" Link="Player2Client.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Patches\FloatMenuPatch.cs" Link="FloatMenuPatch.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Util\PawnCombat.cs" Link="PawnCombat.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Data\RimTalkWorldComponent.cs" Link="RimTalkWorldComponent.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Settings\Ui\CommunicationEventFilterSettingsPage.cs" Link="CommunicationEventFilterSettingsPage.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Data\ApiHistory.cs" Link="ApiHistory.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\ConversationPartner.cs" Link="ConversationPartner.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\PawnSelector.cs" Link="PawnSelector.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Patches\ThoughtPatch.cs" Link="ThoughtPatch.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Service\TopicService.cs" Link="TopicService.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Languages\English\Keyed\Translation_English.xml" Link="lang-en.xml.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Languages\Ukrainian (Українська)\Keyed\Translation_English.xml" Link="lang-uk.xml.src" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj" />
   </ItemGroup>
 </Project>

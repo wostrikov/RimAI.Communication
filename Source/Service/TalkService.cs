@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Error;
 using Ustas.RimAI.Communication.Prompt;
 using Ustas.RimAI.Communication.UI;
 using Ustas.RimAI.Communication.Util;
@@ -105,6 +106,15 @@ public static class TalkService
 
         // Delegate prompt assembly to PromptManager (Handles Simple/Advanced modes and fallbacks)
         talkRequest.PromptMessages = PromptManager.Instance.BuildMessages(talkRequest, pawns, status);
+
+        // A template that did not render would reach the model as raw "{{ ... }}". The request
+        // is spent rather than retried: the same template would fail again on the next tick.
+        if (talkRequest.PromptRenderFailure != null)
+        {
+            AIErrorHandler.ReportPromptRenderFailure(talkRequest.PromptRenderFailure);
+            pawn1?.MarkRequestSpoken(talkRequest);
+            return true;
+        }
         
         // Update prompt with the actual rendered content (important for Advanced Mode history)
         var extracted = PromptManager.ExtractUserPrompt(talkRequest.PromptMessages);
@@ -176,6 +186,7 @@ public static class TalkService
             // Once the stream is complete, save the full conversation to history.
             AddResponsesToHistory(receivedResponses, talkRequest.Prompt, talkRequest);
             StoryThreadService.Capture(talkRequest, receivedResponses);
+            EncounterMemory.RecordTalk(talkRequest, receivedResponses);
         }
         catch (OperationCanceledException)
         {

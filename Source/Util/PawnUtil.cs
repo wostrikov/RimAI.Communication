@@ -73,21 +73,12 @@ public static class PawnUtil
         // enemyTarget is sticky: RimWorld does not reliably clear it when a fight ends and it
         // survives save/reload, so a bare null check marks anyone who ever fought as in combat
         // for good. It only counts while the target is still a live threat.
-        if (IsLiveThreat(pawn, pawn.mindState?.enemyTarget)) return true;
+        if (PawnCombat.IsLiveThreat(pawn, pawn.mindState?.enemyTarget)) return true;
 
-        if (pawn.stances?.curStance is Stance_Busy busy && busy.verb != null)
-            return true;
+        if (PawnCombat.IsFiringAtHostile(pawn)) return true;
 
         Pawn hostilePawn = pawn.GetHostilePawnNearBy();
         return hostilePawn != null && pawn.Position.DistanceTo(hostilePawn.Position) <= 20f;
-    }
-
-    private static bool IsLiveThreat(Pawn pawn, Thing target)
-    {
-        if (target == null || target.Destroyed || !target.Spawned) return false;
-        if (target.Map != pawn.Map) return false;
-        if (target is Pawn targetPawn && (targetPawn.Dead || targetPawn.Downed)) return false;
-        return pawn.Position.DistanceTo(target.Position) <= 30f;
     }
 
     public static string GetRole(this Pawn pawn, bool includeFaction = false)

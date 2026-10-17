@@ -9,6 +9,7 @@ using Ustas.RimAI.Communication.Util;
 using Ustas.RimAI.Core.AI;
 using Ustas.RimAI.Core.Net;
 using Ustas.RimAI.Core.Player2;
+using Ustas.RimAI.Core.Threading;
 using RimWorld;
 using Verse;
 using RimAI.Core.Runtime;
@@ -250,9 +251,12 @@ public class Player2Client : IAIClient
         return responseText;
     }
 
+    // Both notices are raised on the request thread. LongEventHandler.ExecuteWhenFinished runs
+    // its action at once on the calling thread when no long event is under way, so it handed
+    // Messages.Message to that thread; the main-thread scheduler does not.
     static void ShowNotification(string messageKey, MessageTypeDef type)
     {
-        LongEventHandler.ExecuteWhenFinished(() =>
+        MainThreadSchedulerAccess.RunInlineOrEnqueue(() =>
         {
             try
             {
@@ -283,7 +287,7 @@ public class Player2Client : IAIClient
         RimAiBackground.Run(() =>
         {
             bool isAvailable = Player2Session.Current.ProbeHealth(Player2EndpointKind.LocalApp, force: true).Healthy;
-            LongEventHandler.ExecuteWhenFinished(() =>
+            MainThreadSchedulerAccess.RunInlineOrEnqueue(() =>
             {
                 if (isAvailable)
                     Messages.Message("RimTalk: Player2 desktop app detected!", MessageTypeDefOf.PositiveEvent);

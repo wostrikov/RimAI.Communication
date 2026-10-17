@@ -68,7 +68,7 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
 
         // Get a rect for the entire checkbox section. We'll manually manage the layout within this.
         // The height is an estimate; we will adjust the main listing's Y position later.
-        float estimatedHeight = settings.AllowCustomConversation ? 340f : 240f;
+        float estimatedHeight = settings.AllowCustomConversation ? 340f : 300f;
         Rect checkboxSectionRect = listingStandard.GetRect(estimatedHeight);
 
         // --- Left Column ---
@@ -132,6 +132,15 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
         
         rightListing.CheckboxLabeled("RimTalk.Settings.AllowMonologue".Translate().ToString(),
             ref settings.AllowMonologue, "RimTalk.Settings.AllowMonologueTooltip".Translate().ToString());
+        if (settings.AllowMonologue)
+        {
+            // How often a pawn alone says something to itself; the rest of those turns are silent.
+            string chanceLabel = "RimTalk.Settings.MonologueChance".Translate(Mathf.RoundToInt(settings.MonologueChance * 100f)).ToString();
+            Rect chanceLabelRect = rightListing.GetRect(Text.CalcHeight(chanceLabel, rightListing.ColumnWidth));
+            Widgets.Label(chanceLabelRect, chanceLabel);
+            TooltipHandler.TipRegion(chanceLabelRect, "RimTalk.Settings.MonologueChanceTooltip".Translate().ToString());
+            settings.MonologueChance = Mathf.Round(rightListing.Slider(settings.MonologueChance, 0f, 1f) * 20f) / 20f;
+        }
         rightListing.Gap(6f);
         rightListing.CheckboxLabeled("RimTalk.Settings.AllowSlavesToTalk".Translate().ToString(),
             ref settings.AllowSlavesToTalk, "RimTalk.Settings.AllowSlavesToTalkTooltip".Translate().ToString());
@@ -247,6 +256,7 @@ internal sealed class CommunicationBasicSettingsPage : CommunicationSettingsColl
             settings.AllowSimultaneousConversations = false;
             settings.DisplayTalkWhenDrafted = true;
             settings.AllowMonologue = true;
+            settings.MonologueChance = Policy.MonologuePolicy.DefaultChance;
             settings.AllowSlavesToTalk = true;
             settings.AllowPrisonersToTalk = true;
             settings.AllowOtherFactionsToTalk = false;

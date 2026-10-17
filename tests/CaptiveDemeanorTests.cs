@@ -49,10 +49,11 @@ internal static class CaptiveDemeanorTests
         string constant = Read("Constant.cs.src");
         string prompt = Read("PromptService.cs.src");
         string builder = Read("ContextBuilder.cs.src");
-        int current = constant.IndexOf("public static string DefaultInstruction", StringComparison.Ordinal);
-        T(current >= 0 && constant.IndexOf("{CaptiveDemeanorPolicy.SlaveLineUkrainian}", current, StringComparison.Ordinal) > current,
-            "default-instruction-takes-the-new-line");
-        T(constant.IndexOf("згадуй примусову працю", current, StringComparison.Ordinal) < 0, "default-instruction-lost-the-old-line");
+        T(constant.Contains("public static string DefaultInstruction => BaseInstructionLineage.Ukrainian(Lang);"),
+            "default-instruction-is-the-lineage-current");
+        string current = BaseInstructionLineage.Ukrainian("українська");
+        T(current.Contains(CaptiveDemeanorPolicy.SlaveLineUkrainian), "default-instruction-takes-the-new-line");
+        T(!current.Contains("згадуй примусову працю"), "default-instruction-lost-the-old-line");
         T(prompt.Contains("ContextBuilder.GetCaptiveDemeanorContext(pawn)"), "demeanor-reaches-the-pawn-context");
         int demeanor = builder.IndexOf("public static string GetCaptiveDemeanorContext", StringComparison.Ordinal);
         int next = builder.IndexOf("public static string GetRelationsContext", StringComparison.Ordinal);

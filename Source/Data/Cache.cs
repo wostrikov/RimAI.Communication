@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -116,8 +117,9 @@ public static class Cache
     /// Selects a random pawn from the provided list, with selection chance proportional to their TalkInitiationWeight.
     /// </summary>
     /// <param name="pawns">The collection of pawns to select from.</param>
+    /// <param name="weightFactor">Optional multiplier on each pawn's share of the choice.</param>
     /// <returns>A single pawn, or null if the list is empty or no pawn has a weight > 0.</returns>
-    public static Pawn GetRandomWeightedPawn(IEnumerable<Pawn> pawns)
+    public static Pawn GetRandomWeightedPawn(IEnumerable<Pawn> pawns, Func<Pawn, double> weightFactor = null)
     {
         var pawnList = pawns.ToList();
         if (pawnList.NullOrEmpty())
@@ -186,12 +188,13 @@ public static class Cache
             return null;
         }
 
-        // 5. Select Pawn
-        var randomWeight = Random.NextDouble() * effectiveTotalWeight;
-        var cumulativeWeight = 0.0;
-
-        foreach (var pawn in pawnList)
+        // 5. Select Pawn. The factor shifts the choice between pawns, not how often anyone talks:
+        // the silence check above stays on the pawns' own weights.
+        var effectiveWeights = new double[pawnList.Count];
+        double selectionTotal = 0.0;
+        for (int i = 0; i < pawnList.Count; i++)
         {
+            var pawn = pawnList[i];
             var currentPawnWeight = Get(pawn)?.TalkInitiationWeight ?? 0.0;
             double currentEffectiveWeight = 0.0;
 
@@ -200,13 +203,21 @@ public static class Cache
             else if (pawn.IsPrisoner) currentEffectiveWeight = currentPawnWeight * prisonerScaleFactor;
             else if (pawn.IsVisitor()) currentEffectiveWeight = currentPawnWeight * visitorScaleFactor;
             else if (pawn.IsEnemy()) currentEffectiveWeight = currentPawnWeight * enemyScaleFactor;
-            
-            cumulativeWeight += currentEffectiveWeight;
 
+            if (currentEffectiveWeight > 0 && weightFactor != null)
+                currentEffectiveWeight *= Math.Max(0.0, weightFactor(pawn));
+
+            effectiveWeights[i] = currentEffectiveWeight;
+            selectionTotal += currentEffectiveWeight;
+        }
+
+        var randomWeight = Random.NextDouble() * selectionTotal;
+        var cumulativeWeight = 0.0;
+        for (int i = 0; i < pawnList.Count; i++)
+        {
+            cumulativeWeight += effectiveWeights[i];
             if (randomWeight < cumulativeWeight)
-            {
-                return pawn;
-            }
+                return pawnList[i];
         }
 
         return pawnList.LastOrDefault(p => (Get(p)?.TalkInitiationWeight ?? 0.0) > 0);

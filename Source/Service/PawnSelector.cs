@@ -102,7 +102,23 @@ public class PawnSelector
         }
 
         // Return the highest priority pawn found, or null if none are available.
-        return pawnWithOldestUserRequest ?? 
-               (talkReadyPawns.Any() ? Cache.GetRandomWeightedPawn(talkReadyPawns) : null);
+        return pawnWithOldestUserRequest ??
+               (talkReadyPawns.Any() ? Cache.GetRandomWeightedPawn(talkReadyPawns, ConversationWeight) : null);
+    }
+
+    // A pawn with someone in earshot is more likely to be the one who speaks, and one holding a
+    // vanilla chitchat or a fresh feeling more likely still, so those are voiced before they expire.
+    private const double PartnerNearbyWeight = 3.0;
+    private const double PendingPairingWeight = 2.0;
+
+    private static double ConversationWeight(Pawn pawn)
+    {
+        double factor = 1.0;
+        var state = Cache.Get(pawn);
+        if (state != null && state.TalkRequests.Any(r => r.TalkType is TalkType.Chitchat or TalkType.Thought))
+            factor *= PendingPairingWeight;
+        if (ConversationPartner.NearestFor(pawn) != null)
+            factor *= PartnerNearbyWeight;
+        return factor;
     }
 }

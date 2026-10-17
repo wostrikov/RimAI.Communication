@@ -139,22 +139,35 @@ internal static class TickManagerPatch
 
             if (selectedPawn != null)
             {
-                // 1. ALWAYS try to get from the general pool first.
-                var talkGenerated = TryGenerateTalkFromPool(selectedPawn);
+                var pawnState = Cache.Get(selectedPawn);
+                var queued = pawnState?.GetNextTalkRequest();
 
-                // 2. If the pawn has a specific talk request, try generating it
-                if (!talkGenerated)
-                {
-                    var pawnState = Cache.Get(selectedPawn);
-                    if (pawnState.GetNextTalkRequest() != null)
-                        talkGenerated = TalkService.GenerateTalk(pawnState.GetNextTalkRequest());
-                }
+                // Every talk the pawn starts itself is aimed at someone near. With nobody there,
+                // the turn is a monologue only now and then, and otherwise passes in silence;
+                // what the player asked for, and a bedtime or waking line, go ahead either way.
+                bool setsOwnRecipient = queued != null && (queued.TalkType.IsFromUser() || queued.TalkType == TalkType.Sleep);
+                Pawn partner = ConversationPartner.NearestFor(selectedPawn);
+                bool mayTalk = partner != null || setsOwnRecipient || ConversationPartner.MayTalkAlone(selectedPawn);
 
-                // 3. Fallback: generate based on current context if nothing else worked
-                if (!talkGenerated)
+                if (mayTalk)
                 {
-                    TalkRequest talkRequest = new TalkRequest(null, selectedPawn);
-                    TalkService.GenerateTalk(talkRequest);
+                    // 1. ALWAYS try to get from the general pool first.
+                    var talkGenerated = TryGenerateTalkFromPool(selectedPawn, partner);
+
+                    // 2. If the pawn has a specific talk request, try generating it
+                    if (!talkGenerated && queued != null)
+                    {
+                        if (!setsOwnRecipient)
+                            ConversationPartner.Aim(queued, partner);
+                        talkGenerated = TalkService.GenerateTalk(queued);
+                    }
+
+                    // 3. Fallback: generate based on current context if nothing else worked
+                    if (!talkGenerated)
+                    {
+                        TalkRequest talkRequest = new TalkRequest(null, selectedPawn, partner);
+                        TalkService.GenerateTalk(talkRequest);
+                    }
                 }
             }
             
@@ -162,12 +175,16 @@ internal static class TickManagerPatch
         }
     }
 
-    private static bool TryGenerateTalkFromPool(Pawn pawn)
+    private static bool TryGenerateTalkFromPool(Pawn pawn, Pawn partner)
     {
         // If the pawn is a free colonist not in danger and the pool has requests
         if (!pawn.IsFreeNonSlaveColonist || pawn.IsQuestLodger() || TalkRequestPool.IsEmpty || pawn.IsInDanger(true)) return false;
         var request = TalkRequestPool.GetRequestFromPool(pawn);
-        return request != null && TalkService.GenerateTalk(request);
+        if (request == null) return false;
+        // A pool request is shared by the colony and lands on whoever speaks next, so the
+        // recipient is this speaker's, not one left over from an earlier try.
+        request.Recipient = partner;
+        return TalkService.GenerateTalk(request);
     }
 
     private static bool IsNow(double interval)

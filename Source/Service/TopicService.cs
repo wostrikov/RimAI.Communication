@@ -15,6 +15,7 @@ public static class TopicService
 {
     private static readonly object Lock = new();
     private static readonly Random Rng = new();
+    private const double KeywordTopicChance = 0.20;
 
     private static Queue<string> _approachDeck = new();
     private static Queue<string> _subjectDeck = new();
@@ -57,8 +58,9 @@ public static class TopicService
     }
 
     /// <summary>
-    /// A topic half the time, and always for a pawn's first talk. Animals, mechanoids, entities
-    /// and mutants never get a human narrative topic.
+    /// A topic one time in five, and always for a pawn's first talk: the abstract subjects of the
+    /// keyword pool give way to what the pawns actually feel. Animals, mechanoids, entities and
+    /// mutants never get a human narrative topic.
     /// </summary>
     public static bool TryGetTopic(Pawn pawn, out string approach, out string subject, bool always = false)
     {
@@ -70,7 +72,7 @@ public static class TopicService
         lock (Lock)
         {
             bool isFirstTalk = pawn != null && Cache.Get(pawn)?.LastTalkTick == 0;
-            if (!always && !isFirstTalk && Rng.NextDouble() >= 0.50) return false;
+            if (!always && !isFirstTalk && Rng.NextDouble() >= KeywordTopicChance) return false;
             EnsureDecks();
             approach = Draw(_approachDeck) ?? "casual remark";
             subject = Draw(_subjectDeck) ?? "daily life";

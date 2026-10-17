@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using RimWorld;
 using UnityEngine;
+using Ustas.RimAI.Communication.Policy;
 using Verse;
 using Logger = Ustas.RimAI.Communication.Util.Logger;
 
@@ -20,11 +21,15 @@ internal sealed class CommunicationEventFilterSettingsPage : CommunicationSettin
     internal bool _archivableTypesScanned;
     internal bool ArchivableTypesScanned => _archivableTypesScanned;
     private const string Core = "Core";
-    private const string VerseMessage = "Verse.Message";
+    private const string VerseMessage = ArchivableFilterKeys.MessageParent;
 
     internal void ScanForArchivableTypes()
     {
         if (_archivableTypesScanned) return;
+
+        // Bare message-def keys left by an older filter have to move before the defaults below
+        // are written, or their names would read as letter keys.
+        ArchivableFilterMigration.RunOnce();
 
         var archivableTypes = new HashSet<string>();
         _typeHierarchy = new Dictionary<string, List<string>>();
@@ -137,24 +142,24 @@ internal sealed class CommunicationEventFilterSettingsPage : CommunicationSettin
                 _sourceMap[parentType] = defSource;
         }
 
+        // Message defs get keys of their own: several share a name with a LetterDef.
         foreach (var def in DefDatabase<MessageTypeDef>.AllDefs)
         {
             string parentType = VerseMessage;
-
-            if (string.IsNullOrEmpty(parentType)) continue;
+            string key = ArchivableFilterKeys.ForMessageDef(def.defName);
 
             archivableTypes.Add(parentType);
-            archivableTypes.Add(def.defName);
+            archivableTypes.Add(key);
 
             if (!_typeHierarchy.ContainsKey(parentType))
                 _typeHierarchy[parentType] = new List<string>();
 
-            if (!_typeHierarchy[parentType].Contains(def.defName))
-                _typeHierarchy[parentType].Add(def.defName);
+            if (!_typeHierarchy[parentType].Contains(key))
+                _typeHierarchy[parentType].Add(key);
 
             // Store Source
             string defSource = def.modContentPack?.Name ?? Core;
-            _sourceMap[def.defName] = defSource;
+            _sourceMap[key] = defSource;
 
             // Ensure parent has a source
             if (!_sourceMap.ContainsKey(parentType))
@@ -169,19 +174,6 @@ internal sealed class CommunicationEventFilterSettingsPage : CommunicationSettin
             _sourceMap[type] = Core;
         }
 
-        // Deduplicate: If a type appears in Verse.Message, remove it from other parents (e.g. StandardLetter)
-        // This prevents double entries for things like "NegativeEvent" which exist as both LetterDef and MessageTypeDef
-        if (_typeHierarchy.TryGetValue(VerseMessage, out var msgChildren))
-        {
-            var messageKeys = new HashSet<string>(msgChildren);
-            foreach (List<string> children in from parent in _typeHierarchy.Keys.ToList()
-                     where parent != VerseMessage
-                     select _typeHierarchy[parent])
-            {
-                children.RemoveAll(child => messageKeys.Contains(child));
-            }
-        }
-
         _discoveredArchivableTypes = archivableTypes.OrderBy(x => x).ToList();
 
         // Sort children for UI consistency
@@ -194,21 +186,12 @@ internal sealed class CommunicationEventFilterSettingsPage : CommunicationSettin
 
         CommunicationSettings settings = Settings.Get();
 
-        // Identify all Message-related types (Parent + Children) to disable them by default
-        var messageTypes = new HashSet<string> { VerseMessage };
-        if (_typeHierarchy.TryGetValue(VerseMessage, out var messageChildren))
-        {
-            foreach (var child in messageChildren) messageTypes.Add(child);
-        }
-
+        // Only keys without a value get one: messages off, everything else on. A stored value,
+        // whatever it is, stays as the player left it.
         foreach (var typeName in _discoveredArchivableTypes)
         {
             if (!settings.EnabledArchivableTypes.ContainsKey(typeName))
-            {
-                // Disable messages by default, enable everything else
-                bool defaultEnabled = !messageTypes.Contains(typeName);
-                settings.EnabledArchivableTypes[typeName] = defaultEnabled;
-            }
+                settings.EnabledArchivableTypes[typeName] = !ArchivableFilterKeys.IsMessageKey(typeName);
         }
 
         Logger.Message(
@@ -305,14 +288,15 @@ internal sealed class CommunicationEventFilterSettingsPage : CommunicationSettin
                     bool isChildEnabled = settings.EnabledArchivableTypes.TryGetValue(childKey, out var cVal) && cVal;
                     bool newChildEnabled = isChildEnabled;
 
-                    Widgets.CheckboxLabeled(childRect, childKey, ref newChildEnabled);
+                    string childLabel = ArchivableFilterKeys.DisplayName(childKey);
+                    Widgets.CheckboxLabeled(childRect, childLabel, ref newChildEnabled);
 
                     // Draw Source (Mod Name)
                     if (_sourceMap.TryGetValue(childKey, out var cSource) &&
                         !string.IsNullOrEmpty(cSource) &&
                         cSource != Core)
                     {
-                        float nameWidth = Text.CalcSize(childKey).x;
+                        float nameWidth = Text.CalcSize(childLabel).x;
                         Text.Font = GameFont.Tiny;
                         GUI.color = Color.gray;
                         Rect sourceRect = new Rect(childRect.x + nameWidth + 10f, childRect.y + 2f, 300f, 24f);
@@ -351,18 +335,8 @@ internal sealed class CommunicationEventFilterSettingsPage : CommunicationSettin
         Rect resetButtonRect = listingStandard.GetRect(30f);
         if (Widgets.ButtonText(resetButtonRect, "RimTalk.Settings.ResetToDefault".Translate()))
         {
-            // Identify all Message-related types (Parent + Children) to disable them by default
-            var messageTypes = new HashSet<string> { VerseMessage };
-            if (_typeHierarchy.TryGetValue(VerseMessage, out var messageChildren))
-            {
-                foreach (var child in messageChildren) messageTypes.Add(child);
-            }
-
             foreach (var typeName in _discoveredArchivableTypes)
-            {
-                bool defaultEnabled = !messageTypes.Contains(typeName);
-                settings.EnabledArchivableTypes[typeName] = defaultEnabled;
-            }
+                settings.EnabledArchivableTypes[typeName] = !ArchivableFilterKeys.IsMessageKey(typeName);
         }
     }
 

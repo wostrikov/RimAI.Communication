@@ -31,6 +31,7 @@ public static class Constant
     public static bool IsLegacyDefaultInstruction(string value)
     {
         if (string.IsNullOrWhiteSpace(value)) return false;
+        if (BaseInstructionLineage.IsFormerDefault(value)) return true;
         static string Normalize(string text) => (text ?? string.Empty).Replace("\r\n", "\n").Trim();
         string normalized = Normalize(value);
         if (normalized == Normalize(LegacyEnglishDefaultInstruction)) return true;
@@ -61,22 +62,10 @@ public static class Constant
             : LanguageDatabase.activeLanguage?.info?.friendlyNameNative ?? "English";
     public static HediffDef VocalLinkDef => DefDatabase<HediffDef>.GetNamedSilentFail("VocalLinkImplant");
 
-    public static string DefaultInstruction =>
-        $"""
-         Відігравай персонажа RimWorld відповідно до його профілю
+    public static string DefaultInstruction => BaseInstructionLineage.Ukrainian(Lang);
 
-         Правила:
-         Зберігай оригінальні імена (не перекладай їх)
-         Веди короткий діалог (лише мовою {Lang}, 1–2 речення)
-
-         Ролі:
-         Полонений: насторожений і нерішучий; згадуй ув'язнення; благай або торгуйся
-         {CaptiveDemeanorPolicy.SlaveLineUkrainian}
-         Відвідувач: ввічливий, допитливий і шанобливий; стався до інших відвідувачів із тієї самої групи як до супутників
-         Ворог: ворожий та агресивний; використовуй стислі накази й погрози
-
-         Монолог = 1 репліка. Розмова = 4–8 коротких реплік
-         """;
+    /// <summary>The current default to put in place of <paramref name="stored"/>, a legacy default.</summary>
+    public static string UpgradeLegacyDefaultInstruction(string stored) => BaseInstructionLineage.Upgrade(stored, Lang);
 
     public const string JsonInstruction = """
                                            Виводь JSONL.

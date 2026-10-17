@@ -22,7 +22,8 @@ public static class ThoughtTracker
         // Use centralized method from Hediff_Persona
         if (hediff.TryMarkAsSpoken(thought))
         {
-            Cache.Get(pawn)?.AddTalkRequest(GetThoughtLabel(thought), pawn, TalkType.Thought);
+            // No recipient yet: whoever is near when the feeling is voiced is told about it.
+            Cache.Get(pawn)?.AddTalkRequest(GetThoughtLabel(thought), null, TalkType.Thought);
         }
     }
 
@@ -161,7 +162,9 @@ public static class PatchThoughtHandlerGetDistinctMoodThoughtGroups
             {
                 try
                 {
-                    if (!(thought.MoodOffset() > 0 && __instance.pawn.InMentalState))
+                    // The same bar as a memory: a situational feeling under 3 mood is not worth a word.
+                    float offset = thought.MoodOffset();
+                    if (Math.Abs(offset) >= 3f && !(offset > 0 && __instance.pawn.InMentalState))
                     {
                         ThoughtTracker.TryMarkAsProcessed(__instance.pawn, thought);
                     }

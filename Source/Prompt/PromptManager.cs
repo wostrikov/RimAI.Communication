@@ -360,7 +360,7 @@ public class PromptManager : IExposable
         var baseEntry = BuiltInPromptEntries.FindBaseInstruction(preset);
         if (baseEntry != null && Constant.IsLegacyDefaultInstruction(baseEntry.Content))
         {
-            baseEntry.Content = Constant.DefaultInstruction;
+            baseEntry.Content = Constant.UpgradeLegacyDefaultInstruction(baseEntry.Content);
         }
         if (baseEntry != null)
         {
@@ -454,6 +454,7 @@ public class PromptManager : IExposable
         }
 
         talkRequest.PromptMessageSegments = segments.Count > 0 ? segments : null;
+        talkRequest.PromptRenderFailure = context.RenderFailure;
         
         return messages.Select(m => ((Role)m.role, m.content)).ToList();
     }
@@ -627,7 +628,7 @@ public class PromptManager : IExposable
                 continue;
             }
 
-            var content = ScribanParser.Render(entry.Content, context);
+            var content = ScribanParser.RenderEntry(entry.Name ?? entry.Id, entry.Content, context);
             if (!string.IsNullOrWhiteSpace(content))
             {
                 var role = GetEffectiveRole(entry);
@@ -650,7 +651,7 @@ public class PromptManager : IExposable
         // 2. Process InChat entries (Anchored to History)
         foreach (var entry in preset.GetInChatEntries())
         {
-            var content = ScribanParser.Render(entry.Content, context);
+            var content = ScribanParser.RenderEntry(entry.Name ?? entry.Id, entry.Content, context);
             if (!string.IsNullOrWhiteSpace(content))
             {
                 var role = GetEffectiveRole(entry);

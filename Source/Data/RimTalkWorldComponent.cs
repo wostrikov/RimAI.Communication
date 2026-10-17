@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Ustas.RimAI.Communication.Policy;
 using Ustas.RimAI.Communication.Util;
 using RimWorld.Planet;
 using Verse;
@@ -20,12 +21,22 @@ public class RimTalkWorldComponent(World world) : WorldComponent(world)
     /// <summary>Orders the player gave pawns in conversation; see PlayerOrderService.</summary>
     public List<PawnOrders> PlayerOrders = new();
 
+    /// <summary>Pawns that have already talked to each other; see EncounterMemory.</summary>
+    public readonly MetPairRegistry MetPairs = new();
+
     public override void ExposeData()
     {
         base.ExposeData();
 
         Scribe_Collections.Look(ref StoryThreads, "storyThreads", LookMode.Deep);
         Scribe_Collections.Look(ref PlayerOrders, "playerOrders", LookMode.Deep);
+
+        // A save from before the registry has no node, and loads with nobody met.
+        List<long> metPairs = Scribe.mode == LoadSaveMode.Saving ? MetPairs.Snapshot() : null;
+        Scribe_Collections.Look(ref metPairs, "metPawnPairs", LookMode.Value);
+        if (Scribe.mode == LoadSaveMode.LoadingVars)
+            MetPairs.Load(metPairs);
+
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             StoryThreads ??= new List<StoryThread>();

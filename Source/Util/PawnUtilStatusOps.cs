@@ -57,13 +57,13 @@ namespace Ustas.RimAI.Communication.Util
     {
         if (pawn.IsVisitor())
         {
-            lines.Add("Visiting user colony");
+            lines.Add("Visiting the colony");
             return;
         }
 
         if (pawn.IsFreeColonist && pawn.GetMapRole() == MapRole.Invading)
         {
-            lines.Add("You are away from colony, attacking to capture enemy settlement");
+            lines.Add("Away from own colony, attacking to capture an enemy settlement");
             return;
         }
 
@@ -73,13 +73,13 @@ namespace Ustas.RimAI.Communication.Util
             {
                 var lord = pawn.GetLord()?.LordJob;
                 if (lord is LordJob_StageThenAttack || lord is LordJob_Siege)
-                    lines.Add("waiting to invade user colony");
+                    lines.Add("waiting to invade the colony");
                 else
-                    lines.Add("invading user colony");
+                    lines.Add("invading the colony");
             }
             else
             {
-                lines.Add("Fighting to protect your home from being captured");
+                lines.Add("Fighting to protect own home from being captured");
             }
 
             return;

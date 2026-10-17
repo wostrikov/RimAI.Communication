@@ -126,13 +126,27 @@ public static class AIErrorHandler
         }
     }
 
+    /// <summary>
+    /// A prompt entry that failed to render: the talk is dropped instead of sending the raw
+    /// template, and the player hears of it through the same collapsed notice as a failed request.
+    /// </summary>
+    public static void ReportPromptRenderFailure(string failure)
+    {
+        Logger.Warning($"Prompt template failed to render; the talk was not sent. Entry {failure}");
+        ShowGenerationNotice(failure);
+    }
+
     static void ShowGenerationWarning(Exception ex)
     {
         Logger.Warning(ex.Message);
+        ShowGenerationNotice(ex.Message);
+    }
+
+    static void ShowGenerationNotice(string reason)
+    {
         if (!GenerationFailures.Record(DateTime.UtcNow))
             return;
 
-        string reason = ex.Message;
         // Messages belong to the main thread; a failure is reported from the request's own.
         MainThreadSchedulerAccess.RunInlineOrEnqueue(() =>
         {

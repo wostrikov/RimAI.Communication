@@ -28,7 +28,10 @@ public static class PresetPreviewGenerator
         {
             // Mark as preview to handle UI-specific logic (like chat history placeholders)
             ctx.IsPreview = true;
-            return ScribanParser.Render(template, ctx, logErrors: false);
+            // The preview shows why a template fails, which is what the talk itself now drops.
+            return ScribanParser.TryRender(template, ctx, out string rendered, out string error)
+                ? rendered
+                : "RimTalk.Settings.PromptPreset.PreviewError".Translate(error).ToString();
         }
         catch (Exception ex)
         {

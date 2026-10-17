@@ -40,15 +40,16 @@ public static class ArchivePatch
         // nobody had opened it every message reached the talk pool.
         if (archivable is Message message)
         {
-            if (!enabledTypes.TryGetValue("Verse.Message", out var messagesEnabled) || !messagesEnabled)
+            if (!enabledTypes.TryGetValue(ArchivableFilterKeys.MessageParent, out var messagesEnabled) || !messagesEnabled)
                 return false;
 
             return message.def == null
-                || !enabledTypes.TryGetValue(message.def.defName, out var isMessageDefEnabled)
+                || !enabledTypes.TryGetValue(ArchivableFilterKeys.ForMessageDef(message.def.defName), out var isMessageDefEnabled)
                 || isMessageDefEnabled;
         }
 
-        // Letters and everything else are on unless switched off, by C# type and then by def.
+        // Letters and everything else are on unless switched off, by C# type and then by def. A
+        // letter def is looked up by its bare name, which no message def uses any more.
         string typeName = archivable.GetType().FullName;
         if (enabledTypes.TryGetValue(typeName, out var isTypeEnabled) && !isTypeEnabled)
             return false;

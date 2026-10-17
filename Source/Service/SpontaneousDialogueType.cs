@@ -32,11 +32,15 @@ public static class SpontaneousDialogueType
         else if (pawns.Count == 1)
         {
             // Named as one speaker: "monologue" alone let the model write lines for pawns nearby.
-            intentSb.Append($"{shortName} short monologue (only {shortName} speaks)");
+            // And to nobody: a monologue with no listener was read as a speech to the player.
+            intentSb.Append($"{shortName} short monologue (only {shortName} speaks), muttering to themself, never to the reader or player");
         }
         else
         {
-            intentSb.Append($"{shortName} starts conversation, taking turns");
+            // The partner by name: "starts conversation" alone had the speaker address whoever
+            // the model imagined was listening, most often the player.
+            string partnerName = PromptService.GetUniqueName(partner, pawns);
+            intentSb.Append($"{shortName} speaks directly to {partnerName} by name; {partnerName} answers from their own feelings; they take turns");
         }
 
         if (!inCombat)
@@ -65,11 +69,14 @@ public static class SpontaneousDialogueType
         {
             // Without a prompt of its own, a talk gets a fresh angle, or a story to carry on,
             // which is what keeps the same pair from circling the same few remarks. A first
-            // meeting gets none: two strangers introduce themselves before they reminisce.
+            // meeting gets none: two strangers introduce themselves before they reminisce. Most
+            // talks open on one of the speaker's strongest feelings instead, which the partner
+            // answers with their own.
             if (!talkRequest.TopicHintDrawn)
             {
                 talkRequest.TopicHintDrawn = true;
-                talkRequest.TopicHint = TopicService.DrawHint(talkRequest, mainPawn);
+                talkRequest.TopicHint = ThoughtTopicService.TryDrawTopic(mainPawn, partner, pawns)
+                                        ?? TopicService.DrawHint(talkRequest, mainPawn);
             }
             if (talkRequest.TopicHint != null)
                 topicSb.Append(talkRequest.TopicHint);

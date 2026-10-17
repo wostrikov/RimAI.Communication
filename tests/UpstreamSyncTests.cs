@@ -55,7 +55,8 @@ internal static class UpstreamSyncTests
         // Letters and messages.
         T(archive.Contains("TalkRequestPool.Add(prompt, mapId: eventMap?.uniqueID ?? -1, talkType: talkType);"), "letter-is-one-pool-request");
         T(!archive.Contains("AddTalkRequest"), "letter-no-longer-per-colonist");
-        T(archive.Contains("\"Verse.Message\", out var messagesEnabled"), "messages-off-unless-enabled");
+        T(archive.Contains("ArchivableFilterKeys.MessageParent, out var messagesEnabled"), "messages-off-unless-enabled");
+        T(archive.Contains("ArchivableFilterKeys.ForMessageDef(message.def.defName)"), "message-defs-keyed-apart-from-letters");
         T(archive.Contains("(Target: {pawn.LabelShort})"), "letter-names-its-target");
 
         // The stream's last line.

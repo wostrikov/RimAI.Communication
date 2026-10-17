@@ -44,9 +44,38 @@ public static class ScribanParser
 		object value;
 		return _sessionVariables.TryGetValue(key.ToLowerInvariant(), out value) ? value : "";
 	}
+    /// <summary>
+    /// Renders a template, and on a parse or render error returns the raw template text. Kept
+    /// for the other modules that call it; a prompt for the model goes through
+    /// <see cref="RenderEntry"/>, so that a literal "{{ ... }}" never reaches it.
+    /// </summary>
     public static string Render(string templateText, PromptContext context, bool logErrors = true)
     {
-        if (string.IsNullOrWhiteSpace(templateText)) return "";
+        if (TryRender(templateText, context, out string rendered, out string error))
+            return rendered;
+        if (logErrors) Logger.Error(error);
+        return templateText;
+    }
+
+    /// <summary>
+    /// Renders one prompt entry. On failure it notes the first failing entry, by name, on the
+    /// context and returns null, so the caller can drop the talk rather than send the template.
+    /// </summary>
+    public static string RenderEntry(string entryName, string templateText, PromptContext context)
+    {
+        if (TryRender(templateText, context, out string rendered, out string error))
+            return rendered;
+        if (context != null)
+            context.RenderFailure ??= $"{entryName ?? "Entry"}: {error}";
+        return null;
+    }
+
+    /// <returns>False on a parse or render error, with <paramref name="rendered"/> empty.</returns>
+    public static bool TryRender(string templateText, PromptContext context, out string rendered, out string error)
+    {
+        rendered = string.Empty;
+        error = null;
+        if (string.IsNullOrWhiteSpace(templateText)) return true;
         TalkLifecycle.PublishScribanRenderStarted(context);
         
         try
@@ -54,8 +83,8 @@ public static class ScribanParser
             var template = Template.Parse(templateText);
             if (template.HasErrors)
             {
-                if (logErrors) Logger.Error($"Scriban Parse Errors: {string.Join("\n", template.Messages)}");
-                return templateText;
+                error = $"Scriban Parse Errors: {string.Join("\n", template.Messages)}";
+                return false;
             }
 
             var scriptObject = new ScriptObject();
@@ -270,12 +299,15 @@ public static class ScribanParser
             };
 
             templateContext.PushGlobal(scriptObject);
-            return TalkLifecycle.PublishScribanRendered(context, template.Render(templateContext));
+            rendered = TalkLifecycle.PublishScribanRendered(context, template.Render(templateContext)) ?? string.Empty;
+            return true;
         }
         catch (Exception ex)
         {
-            if (logErrors) Logger.Error($"Scriban Render Error: {ex.Message}");
-            return templateText;
+            // A template runs arbitrary member access over game objects; whatever it throws is
+            // the template's own error, and goes back to the caller as one.
+            error = $"Scriban Render Error: {ex.Message}";
+            return false;
         }
     }
 

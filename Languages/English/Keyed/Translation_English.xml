@@ -200,6 +200,8 @@ Crucial Tips:
 
     <RimTalk.Settings.AllowMonologue>Allow Monologues</RimTalk.Settings.AllowMonologue>
     <RimTalk.Settings.AllowMonologueTooltip>When enabled, pawns may generate AI-driven monologues even when no other pawn is nearby.</RimTalk.Settings.AllowMonologueTooltip>
+    <RimTalk.Settings.MonologueChance>Monologue chance when alone: {0}%</RimTalk.Settings.MonologueChance>
+    <RimTalk.Settings.MonologueChanceTooltip>How often a pawn with nobody nearby to talk to says something to itself anyway. The rest of those turns pass in silence, so pawns mostly talk to each other.</RimTalk.Settings.MonologueChanceTooltip>
     <RimTalk.Settings.AllowSlavesToTalk>Allow Slaves to Talk</RimTalk.Settings.AllowSlavesToTalk>
     <RimTalk.Settings.AllowSlavesToTalkTooltip>Enable this to allow slaves to have AI-generated conversations.</RimTalk.Settings.AllowSlavesToTalkTooltip>
     <RimTalk.Settings.AllowPrisonersToTalk>Allow Prisoners to Talk</RimTalk.Settings.AllowPrisonersToTalk>

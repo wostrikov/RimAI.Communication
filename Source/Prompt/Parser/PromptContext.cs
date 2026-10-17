@@ -67,6 +67,12 @@ public class PromptContext
     /// <summary>Whether this context is being used for preview (e.g. settings menu)</summary>
     public bool IsPreview { get; set; }
 
+    /// <summary>
+    /// The first prompt entry that failed to render, "name: error"; null while every entry has
+    /// rendered. Set by <see cref="ScribanParser.RenderEntry"/>.
+    /// </summary>
+    public string RenderFailure { get; set; }
+
     /// <summary>True when the primary typed Memory context provider supplied this turn.</summary>
     public bool UsedTypedMemoryContext { get; set; }
 

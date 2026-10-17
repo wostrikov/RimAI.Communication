@@ -17,6 +17,8 @@ public class PawnState(Pawn pawn)
     public int LastTalkTick { get; set; } = 0;
     public string LastStatus { get; set; } = "";
     public int RejectCount { get; set; }
+    /// <summary>The thought this pawn last opened a talk on, so the next one opens on another.</summary>
+    public string LastThoughtTopicDefName { get; set; }
     public readonly List<TalkResponse> TalkResponses = [];
     private readonly ConcurrentQueue<TalkResponse> _incomingTalkResponses = new();
     // Same hazard as AIService._busy: set on the main thread, cleared in a finally on a

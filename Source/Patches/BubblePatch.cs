@@ -64,11 +64,12 @@ public static class Bubbler_Add
                           interactionDef == InteractionDefOf.DeepTalk;
 
         // The cache lookup first: most interactions stop here, and the danger and nearby-pawn
-        // checks below walk the map. Chitchat is ignored while a talk request is waiting. A pawn
+        // checks below walk the map. Chitchat is ignored only while another chitchat is waiting:
+        // a queued feeling or event is no reason to drop a pairing the game itself made. A pawn
         // who does not talk keeps its single-pawn bubble, since nothing is said in its place.
         PawnState pawnState = Cache.Get(initiator);
         if (pawnState == null) return isSinglePawn;
-        if (!isFastTrack && isChitchat && pawnState.TalkRequests.Count > 0)
+        if (!isFastTrack && isChitchat && pawnState.TalkRequests.Any(r => r.TalkType == TalkType.Chitchat))
             return false;
 
         if (!isFastTrack && isChitchat

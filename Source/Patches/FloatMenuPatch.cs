@@ -18,8 +18,10 @@ namespace Ustas.RimAI.Communication.Patches;
 public static class FloatMenuPatch
 {
     private const int ClickRadiusCells = 1;
-    // The 3x3 cell scan finds candidates; only a pawn drawn within this distance of the click
-    // gets the option, so clicking beside someone no longer offers talk to a neighbour.
+    // The 3x3 cell scan finds candidates; a pawn on a neighboring cell gets the option only
+    // when drawn within this distance of the click, so clicking beside someone no longer offers
+    // talk to a neighbor. A pawn on the clicked cell always counts: one walking is drawn
+    // between cells, and the test turned it down while the cursor was right on it.
     private const float MaxClickDistance = 0.65f;
     private const float MaxClickDistanceSquared = MaxClickDistance * MaxClickDistance;
 
@@ -50,7 +52,8 @@ public static class FloatMenuPatch
         if (result == null) return;
         if (!Settings.Get().AllowCustomConversation) return;
 
-        if (selectedPawn == null || selectedPawn.Drafted) return;
+        // A drafted pawn can talk too; only its reach test below is looser.
+        if (selectedPawn == null) return;
         if (!selectedPawn.Spawned || selectedPawn.Dead) return;
 
         Map map = selectedPawn.Map;
@@ -74,8 +77,11 @@ public static class FloatMenuPatch
                     {
                         if (!processedPawns.Add(hitPawn)) continue;
 
-                        Vector3 offset = clickPos - hitPawn.DrawPos;
-                        if (offset.x * offset.x + offset.z * offset.z > MaxClickDistanceSquared) continue;
+                        if (dx != 0 || dz != 0)
+                        {
+                            Vector3 offset = clickPos - hitPawn.DrawPos;
+                            if (offset.x * offset.x + offset.z * offset.z > MaxClickDistanceSquared) continue;
+                        }
 
                         if (TryResolveForHitPawn(selectedPawn, hitPawn, out var initiator, out var target))
                         {
@@ -146,8 +152,10 @@ public static class FloatMenuPatch
         if (initiator == Cache.GetPlayer())
             return true;
 
-        // Could add path to reach
-        if (!initiator.CanReach(target, PathEndMode.Touch, Danger.None))
+        // Danger.None refused any path that crosses so much as a hot or cold room. A drafted
+        // pawn is under the player's orders and goes wherever it is sent.
+        Danger maxDanger = initiator.Drafted ? Danger.Deadly : Danger.Some;
+        if (!initiator.CanReach(target, PathEndMode.Touch, maxDanger))
             return false;
 
         return true;

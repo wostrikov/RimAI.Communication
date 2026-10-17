@@ -180,6 +180,8 @@
   <RimTalk.Settings.EnableSleepDialogueTooltip>Раз за ніч персонаж, лягаючи спати, кидає коротке сонне слово, а прокинувшись — ранкове: тому, хто поруч, або самому собі.</RimTalk.Settings.EnableSleepDialogueTooltip>
   <RimTalk.Settings.AllowMonologue>Дозволити монологи</RimTalk.Settings.AllowMonologue>
   <RimTalk.Settings.AllowMonologueTooltip>Коли ввімкнено, персонажі можуть генерувати монологи за допомогою ШІ, навіть якщо поблизу немає інших персонажів.</RimTalk.Settings.AllowMonologueTooltip>
+  <RimTalk.Settings.MonologueChance>Імовірність монологу на самоті: {0}%</RimTalk.Settings.MonologueChance>
+  <RimTalk.Settings.MonologueChanceTooltip>Як часто персонаж, поруч із яким немає з ким поговорити, усе ж щось каже сам до себе. Решту часу він мовчить, тож персонажі здебільшого розмовляють між собою.</RimTalk.Settings.MonologueChanceTooltip>
   <RimTalk.Settings.AllowSlavesToTalk>Дозволити рабам розмовляти</RimTalk.Settings.AllowSlavesToTalk>
   <RimTalk.Settings.AllowSlavesToTalkTooltip>Увімкніть це, щоб дозволити рабам вести згенеровані ШІ розмови.</RimTalk.Settings.AllowSlavesToTalkTooltip>
   <RimTalk.Settings.AllowPrisonersToTalk>Дозволити полоненим розмовляти</RimTalk.Settings.AllowPrisonersToTalk>

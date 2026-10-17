@@ -4,6 +4,7 @@ using System.Linq;
 using Ustas.RimAI.Communication.Client.OpenAI;
 using Ustas.RimAI.Communication.Client.ProviderPolicy;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Policy;
 using Ustas.RimAI.Communication.Prompt;
 using UnityEngine;
 using Verse;
@@ -34,9 +35,19 @@ public class CommunicationSettings : ModSettings
     public PromptManager PromptSystem = new();
     public bool UseAdvancedPromptMode = false;  // Default to Simple Mode
     public Dictionary<string, bool> EnabledArchivableTypes = new();
+    /// <summary>
+    /// Set once the event filter's bare message-def keys have moved to their prefixed keys,
+    /// so the move never runs again over values the player has set since.
+    /// </summary>
+    public bool ArchivableFilterKeysMigrated = false;
     public Dictionary<string, bool> FastTrackInteractions = new();
     public bool DisplayTalkWhenDrafted = true;
     public bool AllowMonologue = true;
+    /// <summary>
+    /// How often a pawn with nobody to talk to says something to itself anyway; the rest of
+    /// those turns pass in silence. Only while monologues are allowed at all.
+    /// </summary>
+    public float MonologueChance = MonologuePolicy.DefaultChance;
     public bool AllowSlavesToTalk = true;
     public bool AllowPrisonersToTalk = true;
     public bool AllowOtherFactionsToTalk = false;
@@ -224,6 +235,7 @@ public class CommunicationSettings : ModSettings
         Scribe_Values.Look(ref AllowSimultaneousConversations, "allowSimultaneousConversations", false);
         Scribe_Values.Look(ref DisplayTalkWhenDrafted, "displayTalkWhenDrafted", true);
         Scribe_Values.Look(ref AllowMonologue, "allowMonologue", true);
+        Scribe_Values.Look(ref MonologueChance, "monologueChance", MonologuePolicy.DefaultChance);
         Scribe_Values.Look(ref AllowSlavesToTalk, "allowSlavesToTalk", true);
         Scribe_Values.Look(ref AllowPrisonersToTalk, "allowPrisonersToTalk", true);
         Scribe_Values.Look(ref AllowOtherFactionsToTalk, "allowOtherFactionsToTalk", false);
@@ -238,6 +250,7 @@ public class CommunicationSettings : ModSettings
         Scribe_Values.Look(ref EnableSleepDialogue, "enableSleepDialogue", true);
         Scribe_Values.Look(ref DisableAiAtSpeed, "DisableAiAtSpeed", 0);
         Scribe_Collections.Look(ref EnabledArchivableTypes, "enabledArchivableTypes", LookMode.Value, LookMode.Value);
+        Scribe_Values.Look(ref ArchivableFilterKeysMigrated, "archivableFilterKeysMigrated", false);
         Scribe_Collections.Look(ref FastTrackInteractions, "fastTrackInteractions", LookMode.Value, LookMode.Value);
         FastTrackInteractions ??= new Dictionary<string, bool>();
         Scribe_Values.Look(ref AllowBabiesToTalk, "allowBabiesToTalk", true);
@@ -351,7 +364,7 @@ public class CommunicationSettings : ModSettings
             bool migratedDefault = false;
             if (Constant.IsLegacyDefaultInstruction(SimpleModeInstruction))
             {
-                SimpleModeInstruction = Constant.DefaultInstruction;
+                SimpleModeInstruction = Constant.UpgradeLegacyDefaultInstruction(SimpleModeInstruction);
                 migratedDefault = true;
             }
             SimpleModeInstruction = CaptiveDemeanorPolicy.ReplaceSupersededRoleLines(SimpleModeInstruction);

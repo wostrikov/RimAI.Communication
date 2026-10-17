@@ -47,8 +47,12 @@ sealed class CommunicationPromptTemplateRenderer : IPromptTemplateRenderer
                 }
             }
 
-            rendered = ScribanParser.Render(template, context, logErrors: false) ?? string.Empty;
-            return true;
+            // A failed render reports its error instead of passing the raw template on as success.
+            bool ok = ScribanParser.TryRender(template, context, out rendered, out error);
+            error ??= string.Empty;
+            if (!ok)
+                rendered = template;
+            return ok;
         }
         catch (Exception ex)
         {

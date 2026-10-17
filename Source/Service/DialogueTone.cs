@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Ustas.RimAI.Communication.Util;
 using RimWorld;
+using RimWorld.Planet;
 using Verse;
+using Verse.AI.Group;
 
 namespace Ustas.RimAI.Communication.Service;
 
@@ -40,15 +42,27 @@ public static class DialogueTone
 
     /// <summary>
     /// Whether the two meet for the first time: someone from outside the colony, with no family
-    /// tie, no liking and no shared memory of an earlier talk.
+    /// tie, no liking and no shared memory of an earlier talk. A prisoner, a slave or someone on
+    /// the other side of a fight is no new acquaintance to greet, and people who arrived in one
+    /// group - one lord, one caravan - already know each other.
     /// </summary>
     public static bool IsFirstMeeting(Pawn mainPawn, Pawn partner)
     {
         if (mainPawn == null || partner == null || partner.IsPlayer() || mainPawn.IsPlayer()) return false;
+        if (mainPawn.IsPrisoner || partner.IsPrisoner || mainPawn.IsSlave || partner.IsSlave) return false;
         if (!RelationsService.IsOutsiderOrStranger(mainPawn, partner)) return false;
+        if (PawnCombat.IsHostilePair(partner, mainPawn) || PawnCombat.IsHostilePair(mainPawn, partner)) return false;
+        if (IsSameGroup(mainPawn, partner)) return false;
         if (mainPawn.GetMostImportantRelation(partner) != null) return false;
         if (mainPawn.relations != null && mainPawn.relations.OpinionOf(partner) >= 20) return false;
+        if (EncounterMemory.HaveMet(mainPawn, partner)) return false;
         return !RemembersMeeting(mainPawn, partner) && !RemembersMeeting(partner, mainPawn);
+    }
+
+    private static bool IsSameGroup(Pawn a, Pawn b)
+    {
+        if (a.GetLord() is { } lord && lord == b.GetLord()) return true;
+        return a.GetCaravan() is { } caravan && caravan == b.GetCaravan();
     }
 
     private static bool RemembersMeeting(Pawn pawn, Pawn other)

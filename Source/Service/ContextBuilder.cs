@@ -254,16 +254,11 @@ public static class ContextBuilder
         if (!contextSettings.IncludeThoughts)
             return null;
 
-        var allThoughts = ContextHelper.GetThoughts(pawn);
-
-        // For Short level, only include latest 3 thoughts
-        var thoughts = infoLevel == PromptService.InfoLevel.Short
-            ? allThoughts.Keys.Take(3).Select(t => CommonUtil.Sanitize(t.LabelCap ?? t.def?.defName ?? "UnknownThought"))
-            : allThoughts.Keys.Select(t => CommonUtil.Sanitize(t.LabelCap ?? t.def?.defName ?? "UnknownThought"));
-
-        if (thoughts.Any())
-            return $"Memory: {string.Join(", ", thoughts)}";
-        return null;
+        // The strongest feelings, each with its sign and weight, so the model knows what is on
+        // the pawn's mind and how much: five for the speaker, three for everyone else.
+        var thoughts = ThoughtTopicService.DescribeStrongestThoughts(pawn,
+            infoLevel == PromptService.InfoLevel.Short ? 3 : 5);
+        return thoughts != null ? $"Memory: {thoughts}" : null;
     }
 
     public static string GetAllThoughtsContext(Pawn pawn)

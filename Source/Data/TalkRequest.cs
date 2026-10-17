@@ -125,6 +125,12 @@ public class TalkRequest(string prompt, Pawn initiator, Pawn recipient = null, T
     /// </summary>
     public List<PromptMessageSegment> PromptMessageSegments { get; set; }
 
+    /// <summary>
+    /// The prompt entry that failed to render while the messages were built, "name: error";
+    /// null when all rendered. A talk with one is not sent.
+    /// </summary>
+    public string PromptRenderFailure { get; set; }
+
     public bool IsExpired()
     {
         if (TalkType.IsFromUser()) return false;
