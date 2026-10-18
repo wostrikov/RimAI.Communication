@@ -23,20 +23,8 @@ public class OpenAIClient(
     bool officialOpenAI = false)
     : IAIClient
 {
-    private const string DefaultPath = "/v1/chat/completions";
-    private readonly string _endpointUrl = FormatEndpointUrl(baseUrl);
+    private readonly string _endpointUrl = ChatCompletionsEndpoint.Format(baseUrl);
     private readonly Random _random = new();
-
-    private static string FormatEndpointUrl(string baseUrl)
-    {
-        if (string.IsNullOrEmpty(baseUrl)) return string.Empty;
-        var trimmed = baseUrl.Trim().TrimEnd('/');
-        var uri = new Uri(trimmed);
-        // Append default path if only base domain is provided
-        return (uri.AbsolutePath == "/" || string.IsNullOrEmpty(uri.AbsolutePath.Trim('/')))
-            ? trimmed + DefaultPath
-            : trimmed;
-    }
 
     public Task<Payload> GetChatCompletionAsync(List<(Role role, string message)> prefixMessages,
         List<(Role role, string message)> messages,

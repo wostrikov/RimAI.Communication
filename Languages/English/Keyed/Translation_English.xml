@@ -284,7 +284,7 @@ Crucial Tips:
     <RimTalk.Settings.BaseUrlLabel>Base Url:</RimTalk.Settings.BaseUrlLabel>
     <RimTalk.Settings.ModelLabel>Model:</RimTalk.Settings.ModelLabel>
     <RimTalk.Settings.EnterApiKey>(enter valid api key to fetch models)</RimTalk.Settings.EnterApiKey>
-    <RimTalk_Settings_Api_BaseUrlInfo>If you provide only the base (e.g., http://localhost:1234), /v1/chat/completions will be added automatically. If you enter the full path, it will be used exactly as entered.</RimTalk_Settings_Api_BaseUrlInfo>
+    <RimTalk_Settings_Api_BaseUrlInfo>If you provide only the base (e.g., http://localhost:1234), /v1/chat/completions will be added automatically, and an address ending in /v1 gets /chat/completions. Any other full path is used exactly as entered.</RimTalk_Settings_Api_BaseUrlInfo>
 
     <!-- Settings_Context.cs -->
     <RimTalk.Settings.ContextFilter>Context Filter</RimTalk.Settings.ContextFilter>

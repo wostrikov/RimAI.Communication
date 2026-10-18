@@ -257,7 +257,7 @@
   <RimTalk.Settings.BaseUrlLabel>Базова URL-адреса:</RimTalk.Settings.BaseUrlLabel>
   <RimTalk.Settings.ModelLabel>Модель:</RimTalk.Settings.ModelLabel>
   <RimTalk.Settings.EnterApiKey>(введіть дійсний API-ключ, щоб отримати моделі)</RimTalk.Settings.EnterApiKey>
-  <RimTalk_Settings_Api_BaseUrlInfo>Якщо ви вкажете лише базову адресу (наприклад, http://localhost:1234), /v1/chat/completions буде додано автоматично. Якщо ви введете повний шлях, його буде використано саме в такому вигляді.</RimTalk_Settings_Api_BaseUrlInfo>
+  <RimTalk_Settings_Api_BaseUrlInfo>Якщо ви вкажете лише базову адресу (наприклад, http://localhost:1234), /v1/chat/completions буде додано автоматично, а до адреси, що закінчується на /v1, — /chat/completions. Будь-який інший повний шлях буде використано саме в такому вигляді.</RimTalk_Settings_Api_BaseUrlInfo>
   <RimTalk.Settings.ContextFilter>Фільтр контексту</RimTalk.Settings.ContextFilter>
   <RimTalk.Settings.ContextFilterDescription>Виберіть, які відомості про персонажів і їхнє оточення слід надсилати як контекст для створення діалогів.</RimTalk.Settings.ContextFilterDescription>
   <RimTalk.Settings.ContextFilterTip>Порада: більше — не завжди краще. Надмірна кількість інформації може відволікти ШІ або змусити його зациклитися на несуттєвих деталях.</RimTalk.Settings.ContextFilterTip>
