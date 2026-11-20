@@ -73,6 +73,17 @@ internal static class ProviderOrchestrationTests
         T(CommunicationFailureClassifier.FromErrorKind("arbiter_reset") == CommunicationFailureClass.Cancelled, "classify-arbiter-reset");
         T(CommunicationFailureClassifier.FromErrorKind("arbiter_cancelled") == CommunicationFailureClass.Cancelled, "classify-arbiter-cancelled");
         T(CommunicationFailureClassifier.FromErrorKind("arbiter_queue_full") != CommunicationFailureClass.Cancelled, "arbiter-queue-full-is-not-cancel");
+        // A failed request reads by its provider code, then its status - never Unknown
+        // when either is there (it was Unknown for every AIRequestException).
+        T(CommunicationFailureClassifier.FromRequestFailure(404, "http_error", "model_not_found") == CommunicationFailureClass.Configuration, "request-model-not-found");
+        T(CommunicationFailureClassifier.FromRequestFailure(401, "http_error", "invalid_api_key") == CommunicationFailureClass.Authentication, "request-invalid-key");
+        T(CommunicationFailureClassifier.FromRequestFailure(429, "http_error", "insufficient_quota") == CommunicationFailureClass.RateLimited, "request-quota");
+        T(CommunicationFailureClassifier.FromRequestFailure(403, "http_error", null) == CommunicationFailureClass.Authentication, "request-403");
+        T(CommunicationFailureClassifier.FromRequestFailure(400, "http_error", null) == CommunicationFailureClass.Configuration, "request-400");
+        T(CommunicationFailureClassifier.FromRequestFailure(503, "http_5xx", null) == CommunicationFailureClass.ProviderUnavailable, "request-503");
+        T(CommunicationFailureClassifier.FromRequestFailure(0, "transport_error", null) == CommunicationFailureClass.Transport, "request-transport");
+        T(CommunicationFailureClassifier.FromPayload("HTTP 404: [model_not_found] The model does not exist", null, 0) == CommunicationFailureClass.Configuration, "payload-http-prefix");
+        T(CommunicationFailureClassifier.FromPayload("HTTP 401: Incorrect API key provided", null, 0) == CommunicationFailureClass.Authentication, "payload-http-401");
 
         var invoked = new List<string>();
         var primary = Run(Chain(google, deepseek), slot =>
