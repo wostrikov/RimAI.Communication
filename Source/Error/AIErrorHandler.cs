@@ -74,12 +74,19 @@ public static class AIErrorHandler
     {
         if (outcome == null)
             return;
+        // What the provider said, on the line that says it failed: without it every
+        // failure read "class=Unknown ... success=" and nothing else, in the log and on
+        // screen, and the laptop could not tell a missing model from a spent quota.
+        string detail = ErrorUtil.RedactKeys((outcome.Value as Payload)?.ErrorMessage);
+        if (detail != null && detail.Length > 400)
+            detail = detail.Substring(0, 400) + "…";
         foreach (var attempt in outcome.Attempts)
         {
             if (attempt.Kind == CommunicationAttemptKind.Success && outcome.Attempts.Count == 1)
                 continue;
             Logger.Warning(
-                $"[RIMAI_TEXT_AI] request={outcome.RequestId} attempt={attempt.AttemptNumber} provider={attempt.Provider} class={attempt.FailureClass} kind={attempt.Kind} terminal={outcome.TerminalClass} success={outcome.SuccessfulProvider}");
+                $"[RIMAI_TEXT_AI] request={outcome.RequestId} attempt={attempt.AttemptNumber} provider={attempt.Provider} class={attempt.FailureClass} kind={attempt.Kind} terminal={outcome.TerminalClass} success={outcome.SuccessfulProvider}"
+                + (outcome.Succeeded || string.IsNullOrEmpty(detail) ? "" : $" detail={detail}"));
         }
     }
 
@@ -90,7 +97,14 @@ public static class AIErrorHandler
         if (outcome?.TerminalClass == CommunicationFailureClass.Cancelled)
             return new OperationCanceledException(outcome.TerminalClass.ToString());
         if (outcome?.Value is Payload payload)
-            return new AIRequestException(outcome.TerminalClass.ToString(), payload);
+        {
+            // The provider's reason where there is one; the class name alone is what the
+            // player used to read - "Unknown".
+            string reason = string.IsNullOrWhiteSpace(payload.ErrorMessage)
+                ? outcome.TerminalClass.ToString()
+                : $"{outcome.TerminalClass}: {ErrorUtil.RedactKeys(payload.ErrorMessage)}";
+            return new AIRequestException(reason, payload);
+        }
         return new AIRequestException(outcome?.TerminalClass.ToString() ?? "Unknown", null);
     }
 

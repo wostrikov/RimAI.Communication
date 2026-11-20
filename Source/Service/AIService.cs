@@ -161,7 +161,7 @@ public static class AIService
                     {
                         return DeliveredOrFail(
                             deliveredTalkObjects,
-                            CommunicationFailureClassifier.FromException(ex),
+                            CommunicationFailureClassifier.FromRequestFailure(ex.StatusCode, ex.ErrorKind, ex.ErrorCode),
                             ex.Message,
                             ex.Payload);
                     }

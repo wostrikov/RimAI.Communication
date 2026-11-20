@@ -83,8 +83,14 @@ public class OpenAIClient(
         }
         if (!shared.Succeeded)
         {
-            throw new AIRequestException(shared.Error ?? "Request failed",
-                new Payload(_endpointUrl, model, jsonContent, shared.RawPayload, 0, shared.Error));
+            // The status and the provider's own words, not the transport's sentence: "The
+            // remote server returned an error: (404)" says nothing about which of model,
+            // key or quota it was, and the class this used to reach the log as was Unknown.
+            string errorMsg = DescribeFailure(shared.StatusCode,
+                ErrorUtil.ExtractErrorMessage(shared.RawPayload) ?? shared.Error ?? "Request failed");
+            throw new AIRequestException(errorMsg,
+                new Payload(_endpointUrl, model, jsonContent, shared.RawPayload, 0, errorMsg),
+                shared.StatusCode, shared.ErrorKind, ErrorUtil.ExtractErrorCode(shared.RawPayload));
         }
 
         string responseText = shared.RawPayload;
@@ -347,14 +353,23 @@ public class OpenAIClient(
 
         if (!http.Succeeded)
         {
-            string errorMsg = ErrorUtil.ExtractErrorMessage(responseText) ?? http.ErrorMessage;
-            Logger.Error($"Request failed: {http.StatusCode} - {errorMsg}");
+            string errorMsg = DescribeFailure(http.StatusCode,
+                ErrorUtil.ExtractErrorMessage(responseText) ?? http.ErrorMessage ?? "Request failed");
+            Logger.Error($"Request failed: {errorMsg}");
             throw new AIRequestException(errorMsg,
-                new Payload(_endpointUrl, model, jsonContent, responseText, 0, errorMsg));
+                new Payload(_endpointUrl, model, jsonContent, responseText, 0, errorMsg),
+                http.StatusCode, null, ErrorUtil.ExtractErrorCode(responseText));
         }
 
         Logger.Debug($"API response received: HTTP {http.StatusCode}");
         return responseText;
+    }
+
+    /// <summary>"HTTP 404: [model_not_found] The model ... does not exist", with keys cut.</summary>
+    static string DescribeFailure(int statusCode, string detail)
+    {
+        string text = statusCode > 0 ? $"HTTP {statusCode}: {detail}" : detail;
+        return ErrorUtil.RedactKeys(text);
     }
 
     public static async Task<List<string>> FetchModelsAsync(string apiKey, string url)

@@ -24,6 +24,10 @@ public static class CommunicationFailureClassifier
             return CommunicationFailureClass.Authentication;
         if (statusCode == 429)
             return CommunicationFailureClass.RateLimited;
+        // A model the key cannot use, a parameter the endpoint refuses: retrying the same
+        // request cannot help, and the settings can.
+        if (statusCode == 400 || statusCode == 404 || statusCode == 422)
+            return CommunicationFailureClass.Configuration;
         if (statusCode >= 500)
             return CommunicationFailureClass.ProviderUnavailable;
         if (statusCode == 408)
@@ -63,6 +67,30 @@ public static class CommunicationFailureClassifier
             default:
                 return CommunicationFailureClass.Unknown;
         }
+    }
+
+    /// <summary>
+    /// A failed request as the client saw it: the provider's own error code first, where
+    /// it names the cause outright, then the transport kind and the HTTP status. Every
+    /// AIRequestException used to reach FromException, which reads none of them and
+    /// answered Unknown for all.
+    /// </summary>
+    public static CommunicationFailureClass FromRequestFailure(int statusCode, string errorKind, string errorCode)
+    {
+        switch ((errorCode ?? string.Empty).Trim().ToLowerInvariant())
+        {
+            case "invalid_api_key":
+            case "invalid_authentication":
+                return CommunicationFailureClass.Authentication;
+            case "insufficient_quota":
+            case "rate_limit_exceeded":
+                return CommunicationFailureClass.RateLimited;
+            case "model_not_found":
+            case "unsupported_parameter":
+            case "unsupported_value":
+                return CommunicationFailureClass.Configuration;
+        }
+        return FromHttp(statusCode, errorKind, false, false);
     }
 
     public static CommunicationFailureClass FromOpenAICategory(OpenAIErrorCategory category)
@@ -121,6 +149,11 @@ public static class CommunicationFailureClassifier
         {
             if (errorMessage.IndexOf("quota", StringComparison.OrdinalIgnoreCase) >= 0)
                 return CommunicationFailureClass.RateLimited;
+            // The clients write a failed request as "HTTP 404: [model_not_found] ...".
+            var described = System.Text.RegularExpressions.Regex.Match(errorMessage, @"^HTTP (\d{3}): (?:\[([^\]]+)\])?");
+            if (described.Success)
+                return FromRequestFailure(int.Parse(described.Groups[1].Value), null,
+                    described.Groups[2].Success ? described.Groups[2].Value : null);
             return CommunicationFailureClass.Unknown;
         }
 
